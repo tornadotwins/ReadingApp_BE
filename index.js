@@ -1,11 +1,14 @@
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const path = require("path");
-const dbConfig = require("./config/db.config.js");
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
+import morgan from 'morgan';
+
+import authRoute from './routes/auth.route';
+import dbConfig from './config/db.config';
 
 // Connect DB.
-const mongoose = require("mongoose");
 mongoose
   .connect(dbConfig.url)
   .then(() => {
@@ -30,7 +33,11 @@ app.use(function (req, res, next) {
 });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(morgan('combined'));
 
-const server = app.listen(process.env.PORT || 5000, () => {
-  console.log("Server is up and running on port number");
+app.use("/auth", authRoute);
+
+const port = process.env.PORT || 5000;
+const server = app.listen(port, () => {
+  console.log(`Server is up and running on ${port} port number`);
 });
