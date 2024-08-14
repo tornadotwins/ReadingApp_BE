@@ -12,25 +12,25 @@ exports.signup = async (req, res) => {
 
   // Check if fields are existing.
   if (Object.keys(req.body).length === 0) {
-    return res.status(400).json({message: ERROR_MESSAGES.EMPTY_BODY});
+    return res.status(400).json({ message: ERROR_MESSAGES.EMPTY_BODY });
   }
 
   const { username, email, password } = req.body;
-  
+
   // Validate username is unique.
   const userByUsername = await User.findOne({ username });
   if (userByUsername) {
-    return res.status(400).send({message: ERROR_MESSAGES.USERNAME_IN_USE});
+    return res.status(400).send({ message: ERROR_MESSAGES.USERNAME_IN_USE });
   }
 
   // Validate email is unique.
   const userByEmail = await User.findOne({ email });
   if (userByEmail) {
-    return res.status(400).send({message: ERROR_MESSAGES.EMAIL_IN_USE});
+    return res.status(400).send({ message: ERROR_MESSAGES.EMAIL_IN_USE });
   }
 
   const salt = crypto.randomBytes(16).toString('base64');
-  const hash = crypto.createHmac('sha512',salt).update(password).digest("base64");
+  const hash = crypto.createHmac('sha512', salt).update(password).digest("base64");
 
   const user = new User();
   user.username = username;
@@ -43,7 +43,7 @@ exports.signup = async (req, res) => {
   await user.save();
 
   // Generate Token.
-  const token = generateToken({id: user._id}, Config.VERIFY_EMAIL_TIME);
+  const token = generateToken({ id: user._id }, Config.VERIFY_EMAIL_TIME);
   const redirectUrl = Config.BASE_URL + '/verify_email?token=' + token;
 
   // Send verification email.
@@ -63,7 +63,7 @@ exports.signup = async (req, res) => {
 /////////////////////////////////////////////////////////////////////////
 exports.verifyEmail = async (req, res) => {
   if (Object.keys(req.body).length === 0) {
-    return res.status(400).json({message: ERROR_MESSAGES.EMPTY_BODY});
+    return res.status(400).json({ message: ERROR_MESSAGES.EMPTY_BODY });
   }
 
   const { token } = req.body;
@@ -84,7 +84,7 @@ exports.verifyEmail = async (req, res) => {
   } else {
     return res.status(400).send({
       message: ACCOUNT_CANT_FIND,
-    });  
+    });
   }
 }
 
@@ -92,5 +92,43 @@ exports.verifyEmail = async (req, res) => {
 ////////////////////////////// Login ////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.login = async (req, res) => {
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: ERROR_MESSAGES.EMPTY_BODY });
+  }
+
+  const { username, password } = req.body;
+
+  // Check user is existing with username.
+  const user = await User.findOne({ username });
+  if (!user) {
+    return res.status(400).send({ message: ERROR_MESSAGES.USERNAME_NOT_EXIST });
+  }
+
+  // Check user's email is verified.
+  if (!user.emailVerified) {
+    return res.status(400).send({ message: ERROR_MESSAGES.EMAIL_NOT_VERIFIED });
+  }
+
+  // Check user is blocked.
+  if (user.blocked) {
+    return res.status(400).send({ message: ERROR_MESSAGES.ACCOUNT_BLOCKED });
+  }
+
+  const salt = user.password.split('$')[0];
+  const hash = user.password.split('$')[1];
+  const newHash = crypto.createHmac('sha512', salt).update(password).digest("base64");
+  if (hash !== newHash) {
+    return res.status(400).send({ message: ERROR_MESSAGES.PASSWORD_INCORRECT });
+  }
+
+  const token = generateToken({ id: user._id }, Config.ACCESS_TOKEN_TIME);
+  user.password = undefined;
+  return res.status(200).send({ user, token });
+}
+
+/////////////////////////////////////////////////////////////////////////
+///////////////////////// Forgot Password ///////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.forgotPassword = async (req, res) => {
 
 }
