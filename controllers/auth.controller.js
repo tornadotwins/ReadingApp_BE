@@ -132,7 +132,58 @@ exports.login = async (req, res) => {
 ///////////////////////// Forgot Password ///////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.forgotPassword = async (req, res) => {
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: ERROR_MESSAGES.EMPTY_BODY });
+  }
 
+  const { email } = req.body;
+
+  // Check user is existing with email.
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(400).send({ message: ERROR_MESSAGES.USERNAME_NOT_EXIST });
+  }
+
+  // Generate Token.
+  const token = generateToken({ id: user._id }, Config.VERIFY_EMAIL_TIME);
+  const redirectUrl = Config.BASE_URL + '/reset_password?token=' + token;
+
+  // Send verification email.
+  let html = fs.readFileSync("./email_templates/reset_password_template.html", "utf8");
+  html = html.replace("{{redirect_url}}", redirectUrl);
+  console.log('token: ', token);
+
+  return res.status(200).send({ message: 'Success!' });
+}
+
+/////////////////////////////////////////////////////////////////////////
+///////////////////////// Reset Password ////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.resetPassword = async (req, res) => {
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: ERROR_MESSAGES.EMPTY_BODY });
+  }
+
+  const { password, token } = req.body;
+  const decodeData = decodeToken(token);
+  if (decodeData && decodeData.id) {
+    const user = await User.findById(decodeData.id);
+    if (user) {
+      const salt = crypto.randomBytes(16).toString('base64');
+      const hash = crypto.createHmac('sha512', salt).update(password).digest("base64");
+      user.password = salt + "$" + hash;
+      await user.save();
+      return res.status(200).send({ message: 'Success!' });
+    } else {
+      return res.status(400).send({
+        message: ACCOUNT_CANT_FIND,
+      });
+    }
+  } else {
+    return res.status(400).send({
+      message: ACCOUNT_CANT_FIND,
+    });
+  }
 }
 
 
@@ -145,14 +196,14 @@ exports.verifyRecaptchaToken = async (req, res) => {
     event: {
       token,
       expectedAction: action,
-      siteKey: Config.RECAPTCHA_SITE_KEY,
+      siteKey: process.env.RECAPTCHA_SITE_KEY,
     }
   };
 
-  const url = `https://recaptchaenterprise.googleapis.com/v1/projects/litenote-5a22c/assessments?key=${Config.GOOGLE_API_KEY}`;
+  const url = `https://recaptchaenterprise.googleapis.com/v1/projects/litenote-5a22c/assessments?key=${process.env.GOOGLE_API_KEY}`;
    axios.post(url, data)
   .then(function (response) {
-    return res.status(200).send({ response: response.data });
+    return res.status(200).send(response.data);
   })
   .catch(function (error) {
     return res.status(404).send({ error });
