@@ -1,5 +1,7 @@
 import crypto from 'crypto';
 import fs from 'fs';
+import axios from 'axios';
+
 import User from '../models/user.model';
 import ERROR_MESSAGES from '../config/error.message';
 import Config from '../config';
@@ -131,4 +133,28 @@ exports.login = async (req, res) => {
 /////////////////////////////////////////////////////////////////////////
 exports.forgotPassword = async (req, res) => {
 
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+//////////////////// Verify Recaptcha Token /////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.verifyRecaptchaToken = async (req, res) => {
+  const { token, action } = req.body;
+  const data = {
+    event: {
+      token,
+      expectedAction: action,
+      siteKey: Config.RECAPTCHA_SITE_KEY,
+    }
+  };
+
+  const url = `https://recaptchaenterprise.googleapis.com/v1/projects/litenote-5a22c/assessments?key=${Config.GOOGLE_API_KEY}`;
+   axios.post(url, data)
+  .then(function (response) {
+    return res.status(200).send({ response: response.data });
+  })
+  .catch(function (error) {
+    return res.status(404).send({ error });
+  });
 }
