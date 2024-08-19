@@ -46,13 +46,12 @@ exports.signup = async (req, res) => {
 
   // Generate Token.
   const token = generateToken({ id: user._id }, Config.VERIFY_EMAIL_TIME);
-  const redirectUrl = Config.BASE_URL + '/verify_email?token=' + token;
+  const redirectUrl = Config.BASE_URL + '/auth/login?token=' + token;
 
   // Send verification email.
   let html = fs.readFileSync("./email_templates/verify_email_template.html", "utf8");
   html = html.replace("{{redirect_url}}", redirectUrl);
-  console.log('html: ', html);
-  console.log('token: ', token);
+  console.log('redirectUrl: ', redirectUrl);
 
   user.password = undefined;
   return res.status(200).send({
@@ -69,7 +68,15 @@ exports.verifyEmail = async (req, res) => {
   }
 
   const { token } = req.body;
-  const decodeData = decodeToken(token);
+  let decodeData;
+  try {
+    decodeData = decodeToken(token);
+  } catch (error) {
+    return res.status(400).send({
+      message: ERROR_MESSAGES.TOKEN_NOT_VALID,
+    });
+  };
+  
   if (decodeData && decodeData.id) {
     const user = await User.findById(decodeData.id);
     if (user) {
@@ -146,12 +153,12 @@ exports.forgotPassword = async (req, res) => {
 
   // Generate Token.
   const token = generateToken({ id: user._id }, Config.VERIFY_EMAIL_TIME);
-  const redirectUrl = Config.BASE_URL + '/reset_password?token=' + token;
+  const redirectUrl = Config.BASE_URL + '/auth/reset?token=' + token;
 
   // Send verification email.
   let html = fs.readFileSync("./email_templates/reset_password_template.html", "utf8");
   html = html.replace("{{redirect_url}}", redirectUrl);
-  console.log('token: ', token);
+  console.log('redirectUrl: ', redirectUrl);
 
   return res.status(200).send({ message: 'Success!' });
 }

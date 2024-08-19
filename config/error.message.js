@@ -7,6 +7,7 @@ const ERROR_MESSAGES = {
   EMAIL_NOT_VERIFIED: 'Your email address could not be verified.',
   ACCOUNT_BLOCKED: 'Your account is blocked.',
   PASSWORD_INCORRECT: 'Your password is incorrect.',
+  TOKEN_NOT_VALID: 'Your token is not valid.',
 };
 
 export default ERROR_MESSAGES;
