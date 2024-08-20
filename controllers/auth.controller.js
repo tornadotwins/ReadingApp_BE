@@ -46,7 +46,7 @@ exports.signup = async (req, res) => {
 
   // Generate Token.
   const token = generateToken({ id: user._id }, Config.VERIFY_EMAIL_TIME);
-  const redirectUrl = Config.BASE_URL + '/auth/login?token=' + token;
+  const redirectUrl = Config.BASE_URL + '/auth/login?token=' + token + '&type=signup';
 
   // Send verification email.
   let html = fs.readFileSync("./email_templates/verify_email_template.html", "utf8");
