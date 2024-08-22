@@ -213,6 +213,7 @@ exports.verifyRecaptchaToken = async (req, res) => {
     return res.status(200).send(response.data);
   })
   .catch(function (error) {
+    console.log('error: ', error);
     return res.status(404).send({ error });
   });
 }
