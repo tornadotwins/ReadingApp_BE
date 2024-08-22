@@ -207,7 +207,10 @@ exports.verifyRecaptchaToken = async (req, res) => {
     }
   };
 
+  console.log('data: ', data);
   const url = `https://recaptchaenterprise.googleapis.com/v1/projects/litenote-5a22c/assessments?key=${process.env.GOOGLE_API_KEY}`;
+  
+  console.log('url: ', url);
    axios.post(url, data)
   .then(function (response) {
     return res.status(200).send(response.data);
