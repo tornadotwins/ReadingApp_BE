@@ -3,14 +3,7 @@ import ERROR_MESSAGES from '../config/error.message';
 
 exports.getLibraries = async (req, res) => {
   try {
-    console.log('library called');
-    let libraries;
-    try {
-      libraries = await Book.find().populate('library');
-    } catch (ex) {
-      console.log(ex);
-    }
-    console.log('library', libraries);
+    const libraries = await Book.find().populate('library');
 
     if (libraries.length > 0) {
       const sortedLibraries = sortAndGroupLibraries(libraries);
@@ -27,7 +20,6 @@ exports.getLibraries = async (req, res) => {
 
 // Sort and Group by its library
 const sortAndGroupLibraries = (libraries) => {
-  console.log('sort');
   // Group books by library
   const groupedLibraries = libraries.reduce((acc, book) => {
     const libraryId = book.library._id.toString();
