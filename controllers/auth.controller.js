@@ -87,12 +87,12 @@ exports.verifyEmail = async (req, res) => {
       });
     } else {
       return res.status(400).send({
-        message: ACCOUNT_CANT_FIND,
+        message: ERROR_MESSAGES.ACCOUNT_CANT_FIND,
       });
     }
   } else {
     return res.status(400).send({
-      message: ACCOUNT_CANT_FIND,
+      message: ERROR_MESSAGES.ACCOUNT_CANT_FIND,
     });
   }
 }
