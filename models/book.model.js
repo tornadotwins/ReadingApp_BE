@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-import Library from '../models/library.model';
+import Library from './library.model';
 
 const BookSchema = new Schema({
+  number: { type: Number },
   title: { type: Object },
   coverImage: { type: String },
   library: { type: Schema.Types.ObjectId, ref: 'Library' },

@@ -11,8 +11,11 @@ const ERROR_MESSAGES = {
   PASSWORD_INCORRECT: 'Your password is incorrect.',
   TOKEN_NOT_VALID: 'Your token is not valid.',
 
-  // Library
-  LIBRARY_NOT_FOUND: "Could't find books in library",
+  // Book
+  BOOK_NOT_FOUND: "Could't find books in library",
+  SUBBOOK_NOT_FOUND: "Could't find subBooks in book",
+  CHAPTER_NOT_FOUND: "Couldn't find chapters in sub book",
+  USER_HISTORY_NOT_FOUND: "Couldn't find history for this user."
 };
 
 export default ERROR_MESSAGES;

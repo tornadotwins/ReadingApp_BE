@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+import User from './user.model';
+import Chapter from './chapter.model';
 
 const HistorySchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User' },

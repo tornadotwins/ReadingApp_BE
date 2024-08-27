@@ -6,7 +6,8 @@ import mongoose from 'mongoose';
 import morgan from 'morgan';
 
 import authRoute from './routes/auth.route';
-import libraryRoute from './routes/library.route';
+import bookRoute from './routes/book.route';
+
 import dbConfig from './config/db.config';
 import path from 'path';
 
@@ -44,7 +45,7 @@ app.use(morgan('combined'));
 app.use('/', express.static(path.join(__dirname, '/public')));
 
 app.use('/auth', authRoute);
-app.use('/library', libraryRoute);
+app.use('/book', bookRoute);
 
 const port = process.env.PORT || 5000;
 const server = app.listen(port, () => {
