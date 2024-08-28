@@ -15,6 +15,7 @@ const ERROR_MESSAGES = {
   BOOK_NOT_FOUND: "Could't find books in library",
   SUBBOOK_NOT_FOUND: "Could't find subBooks in book",
   CHAPTER_NOT_FOUND: "Couldn't find chapters in sub book",
+  VERSE_NOT_FOUND: "Couldn't find chapters in verse",
   USER_HISTORY_NOT_FOUND: "Couldn't find history for this user."
 };
 

@@ -1,6 +1,7 @@
 import Book from '../models/book.model';
 import SubBook from '../models/subBook.model';
 import Chapter from '../models/chapter.model';
+import Verse from '../models/verse.model';
 import History from '../models/history.model';
 import ERROR_MESSAGES from '../config/error.message';
 
@@ -55,31 +56,56 @@ exports.getSubBooks = async (req, res) => {
 };
 
 /////////////////////////////////////////////////////////////////////////
+////////////////////////////// Get Verses ///////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.getVerses = async (req, res) => {
+  const { chapterId } = req.params;
+
+  try {
+    const verses = await Verse.find({
+      chapter: chapterId,
+    });
+
+    if (!verses.length) {
+      return res
+        .status(404)
+        .json({ message: ERROR_MESSAGES.VERSE_NOT_FOUND });
+    }
+
+    // Return the sub-books
+    return res.status(200).json(verses);
+  } catch (error) {
+    console.error('Error fetching verse:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+/////////////////////////////////////////////////////////////////////////
 //////////////////////////// Get All Chapters ///////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.getChapters = async (req, res) => {
   const { subBookId } = req.params;
 
   try {
-    const subBooks = await Chapter.find({
+    const chapters = await Chapter.find({
       subBook: subBookId,
     }).populate('subBook');
 
-    if (!subBooks.length) {
+    if (!chapters.length) {
       return res
         .status(404)
-        .json({ message: ERROR_MESSAGES.SUBBOOK_NOT_FOUND });
+        .json({ message: ERROR_MESSAGES.CHAPTER_NOT_FOUND });
     }
 
     // Sort subBooks by number
-    const sortedSubBooks = subBooks.sort(
+    const sortedChapters = chapters.sort(
       (a, b) => a.chapterNumber - b.chapterNumber,
     );
 
     // Return the sub-books
-    return res.status(200).json(sortedSubBooks);
+    return res.status(200).json(sortedChapters);
   } catch (error) {
-    console.error('Error fetching subbooks:', error);
+    console.error('Error fetching chapters:', error);
     return res.status(500).json({ message: 'Server error' });
   }
 };

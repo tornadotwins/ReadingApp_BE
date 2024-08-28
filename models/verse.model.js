@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const VerseSchema = new Schema({
-  subBook: { type: Schema.Types.ObjectId, ref: 'Chapter' },
+  chapter: { type: Schema.Types.ObjectId, ref: 'Chapter' },
   text: { type: Object },
   audio_start: { type: Number },
   header: { type: String },
