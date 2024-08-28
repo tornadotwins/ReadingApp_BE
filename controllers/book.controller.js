@@ -181,9 +181,9 @@ exports.getBookmarks = async (req, res) => {
           path: 'chapter',
           populate: {
             path: 'subBook',
-            select: 'title number'
+            select: 'title number _id'
           },
-          select: 'chapterNumber'
+          select: 'chapterNumber _id'
         },
         select: 'number'
       })
@@ -193,6 +193,7 @@ exports.getBookmarks = async (req, res) => {
       _id: bookmark._id,
       verseNumber: bookmark.verse.number,
       chapterNumber: bookmark.verse.chapter.chapterNumber,
+      subBookId: bookmark.verse.chapter.subBook._id,
       subBookTitle: bookmark.verse.chapter.subBook.title,
       subBookNumber: bookmark.verse.chapter.subBook.number,
     }));
