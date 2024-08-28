@@ -50,8 +50,7 @@ exports.getSubBooks = async (req, res) => {
     // Return the sub-books
     return res.status(200).json(sortedSubBooks);
   } catch (error) {
-    console.error('Error fetching subbooks:', error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -75,8 +74,7 @@ exports.getVerses = async (req, res) => {
     // Return the sub-books
     return res.status(200).json(verses);
   } catch (error) {
-    console.error('Error fetching verse:', error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -105,8 +103,7 @@ exports.getChapters = async (req, res) => {
     // Return the sub-books
     return res.status(200).json(sortedChapters);
   } catch (error) {
-    console.error('Error fetching chapters:', error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -164,8 +161,7 @@ exports.getHistory = async (req, res) => {
     // return result;
     return res.status(200).json(result)
   } catch (error) {
-    console.error('Error fetching book details:', error);
-    throw error;
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
 
