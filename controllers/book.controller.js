@@ -221,7 +221,8 @@ exports.saveBookmark = async (req, res) => {
     await bookmark.save();
 
     return res.status(200).json({
-      bookmark
+      bookmark,
+      message: ERROR_MESSAGES.BOOKMARK_ADDED
     });
   } catch (error) {
     console.log(error)

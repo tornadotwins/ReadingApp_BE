@@ -19,6 +19,7 @@ const ERROR_MESSAGES = {
   USER_HISTORY_NOT_FOUND: "Couldn't find history for this user.",
   INCORRECT_PARAMS: "Incorrect parameters",
   BOOKMARK_NOT_FOUND: "Couldn't find bookmarks.",
+  BOOKMARK_ADDED: "Bookmark added",
   BOOKMARK_DELETE: "Bookmark deleted",
 };
 
