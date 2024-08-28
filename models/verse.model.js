@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const VerseSchema = new Schema({
   chapter: { type: Schema.Types.ObjectId, ref: 'Chapter' },
   text: { type: Object },
+  number: { type: Number },
   audio_start: { type: Number },
   header: { type: String },
   reference: { type: Object },

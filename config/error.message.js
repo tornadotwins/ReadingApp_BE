@@ -16,7 +16,10 @@ const ERROR_MESSAGES = {
   SUBBOOK_NOT_FOUND: "Could't find subBooks in book",
   CHAPTER_NOT_FOUND: "Couldn't find chapters in sub book",
   VERSE_NOT_FOUND: "Couldn't find verses in chapter",
-  USER_HISTORY_NOT_FOUND: "Couldn't find history for this user."
+  USER_HISTORY_NOT_FOUND: "Couldn't find history for this user.",
+  INCORRECT_PARAMS: "Incorrect parameters",
+  BOOKMARK_NOT_FOUND: "Couldn't find bookmarks.",
+  BOOKMARK_DELETE: "Bookmark deleted",
 };
 
 export default ERROR_MESSAGES;

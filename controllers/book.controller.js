@@ -3,7 +3,9 @@ import SubBook from '../models/subBook.model';
 import Chapter from '../models/chapter.model';
 import Verse from '../models/verse.model';
 import History from '../models/history.model';
+import Bookmark from '../models/bookmark.model';
 import ERROR_MESSAGES from '../config/error.message';
+import mongoose from 'mongoose';
 
 /////////////////////////////////////////////////////////////////////////
 ///////////////////////////// Get All books /////////////////////////////
@@ -164,6 +166,124 @@ exports.getHistory = async (req, res) => {
     return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
+
+/////////////////////////////////////////////////////////////////////////
+////////////////////////////// Get Bookmark /////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.getBookmarks = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const bookmarks = await Bookmark.find({ user: userId })
+      .populate({
+        path: 'verse',
+        populate: {
+          path: 'chapter',
+          populate: {
+            path: 'subBook',
+            select: 'title number'
+          },
+          select: 'chapterNumber'
+        },
+        select: 'number'
+      })
+      .lean(); // Converts the documents to plain JavaScript objects
+
+    const formattedBookmarks = bookmarks.map(bookmark => ({
+      verseNumber: bookmark.verse.number,
+      chapterNumber: bookmark.verse.chapter.chapterNumber,
+      subBookTitle: bookmark.verse.chapter.subBook.title,
+      subBookNumber: bookmark.verse.chapter.subBook.number,
+    }));
+
+    return res.status(200).json(formattedBookmarks);
+  } catch (error) {
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////
+////////////////////////////// Set Bookmark /////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.saveBookmark = async (req, res) => {
+  const { userId, verseId } = req.body;
+
+  if (!userId || !verseId) {
+    return res.status(400).json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+  }
+
+  try {
+    const bookmark = new Bookmark({
+      user: userId,
+      verse: verseId
+    });
+
+    await bookmark.save();
+
+    return res.status(200).json({
+      bookmark
+    });
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////
+//////////////////////////// Search Bookmark ////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.filterBookmark = async (req, res) => {
+  const { userId, bookId } = req.params;
+
+  try {
+    const bookmarks = await Bookmark.find({ user: userId })
+      .populate({
+        path: 'verse',
+        populate: {
+          path: 'chapter',
+          populate: {
+            path: 'subBook',
+            match: { book: bookId }, // This filters subBooks by bookId
+            select: 'title number',  // Fetch the title and number of the subBook
+          },
+          select: 'chapter_number',
+        },
+        select: 'number',
+      })
+      .lean(); // Converts Mongoose documents to plain JavaScript objects
+
+    // Filter out bookmarks where the subBook is null (i.e., doesn't match the bookId)
+    const filteredBookmarks = bookmarks.filter(bookmark => bookmark.verse.chapter.subBook !== null);
+
+    return res.status(200).json(filteredBookmarks);
+  } catch (error) {
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////
+//////////////////////////// Remove Bookmark ////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.removeBookmark = async (req, res) => {
+  const { userId, verseId } = req.body;
+
+  if (!userId || !verseId) {
+    return res.status(400).json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+  }
+
+  try {
+    const bookmark = await Bookmark.findOneAndDelete({ user: userId, verse: verseId });
+
+    if (!bookmark) {
+      return res.status(404).json({ message: ERROR_MESSAGES.BOOKMARK_NOT_FOUND });
+    }
+
+    return res.status(200).json({ message: ERROR_MESSAGES.BOOKMARK_DELETE });
+  } catch (error) {
+    console.error("Error removing bookmark:", error);
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+}
 
 // Sort and Group by its library
 const sortAndGroupLibraries = (libraries) => {
