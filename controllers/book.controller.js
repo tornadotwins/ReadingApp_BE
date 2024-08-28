@@ -190,6 +190,7 @@ exports.getBookmarks = async (req, res) => {
       .lean(); // Converts the documents to plain JavaScript objects
 
     const formattedBookmarks = bookmarks.map(bookmark => ({
+      _id: bookmark._id,
       verseNumber: bookmark.verse.number,
       chapterNumber: bookmark.verse.chapter.chapterNumber,
       subBookTitle: bookmark.verse.chapter.subBook.title,
@@ -234,7 +235,7 @@ exports.saveBookmark = async (req, res) => {
 //////////////////////////// Search Bookmark ////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.filterBookmark = async (req, res) => {
-  const { userId, bookId } = req.params;
+  const { userId, subBookId } = req.params;
 
   try {
     const bookmarks = await Bookmark.find({ user: userId })
@@ -242,10 +243,10 @@ exports.filterBookmark = async (req, res) => {
         path: 'verse',
         populate: {
           path: 'chapter',
+          match: { subBook: subBookId },
           populate: {
             path: 'subBook',
-            match: { book: bookId }, // This filters subBooks by bookId
-            select: 'title number',  // Fetch the title and number of the subBook
+            select: 'title number',
           },
           select: 'chapter_number',
         },
@@ -254,7 +255,7 @@ exports.filterBookmark = async (req, res) => {
       .lean(); // Converts Mongoose documents to plain JavaScript objects
 
     // Filter out bookmarks where the subBook is null (i.e., doesn't match the bookId)
-    const filteredBookmarks = bookmarks.filter(bookmark => bookmark.verse.chapter.subBook !== null);
+    const filteredBookmarks = bookmarks.filter(bookmark => bookmark.verse.chapter !== null);
 
     return res.status(200).json(filteredBookmarks);
   } catch (error) {
@@ -274,6 +275,29 @@ exports.removeBookmark = async (req, res) => {
 
   try {
     const bookmark = await Bookmark.findOneAndDelete({ user: userId, verse: verseId });
+
+    if (!bookmark) {
+      return res.status(404).json({ message: ERROR_MESSAGES.BOOKMARK_NOT_FOUND });
+    }
+
+    return res.status(200).json({ message: ERROR_MESSAGES.BOOKMARK_DELETE });
+  } catch (error) {
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////
+////////////////////// Remove Bookmark by bookmarId /////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.removeBookmarkById = async (req, res) => {
+  const { bookmarkId } = req.body;
+
+  if (!bookmarkId) {
+    return res.status(400).json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+  }
+
+  try {
+    const bookmark = await Bookmark.findOneAndDelete({ _id: bookmarkId });
 
     if (!bookmark) {
       return res.status(404).json({ message: ERROR_MESSAGES.BOOKMARK_NOT_FOUND });
