@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const ChapterSchema = new Schema({
   chapterNumber: { type: Number },
   subBook: { type: Schema.Types.ObjectId, ref: 'SubBook' },
-  audio: { type: String },
+  audio: { type: Object },
   createdAt: { type: Number, default: Date.now() },
   updatedAt: { type: Number, default: Date.now() },
 });

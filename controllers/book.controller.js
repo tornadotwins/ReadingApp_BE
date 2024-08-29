@@ -57,30 +57,6 @@ exports.getSubBooks = async (req, res) => {
 };
 
 /////////////////////////////////////////////////////////////////////////
-////////////////////////////// Get Verses ///////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-exports.getVerses = async (req, res) => {
-  const { chapterId } = req.params;
-
-  try {
-    const verses = await Verse.find({
-      chapter: chapterId,
-    });
-
-    if (!verses.length) {
-      return res
-        .status(404)
-        .json({ message: ERROR_MESSAGES.VERSE_NOT_FOUND });
-    }
-
-    // Return the sub-books
-    return res.status(200).json(verses);
-  } catch (error) {
-    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
-  }
-};
-
-/////////////////////////////////////////////////////////////////////////
 //////////////////////////// Get All Chapters ///////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.getChapters = async (req, res) => {
@@ -108,6 +84,31 @@ exports.getChapters = async (req, res) => {
     return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
+
+/////////////////////////////////////////////////////////////////////////
+////////////////////////////// Get Verses ///////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.getVerses = async (req, res) => {
+  const { chapterId } = req.params;
+
+  try {
+    const verses = await Verse.find({
+      chapter: chapterId,
+    }).populate('chapter');
+
+    if (!verses.length) {
+      return res
+        .status(404)
+        .json({ message: ERROR_MESSAGES.VERSE_NOT_FOUND });
+    }
+
+    // Return the sub-books
+    return res.status(200).json(verses);
+  } catch (error) {
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+};
+
 
 /////////////////////////////////////////////////////////////////////////
 ////////////////////////////// Get History //////////////////////////////
@@ -187,6 +188,7 @@ exports.getBookmarks = async (req, res) => {
         },
         select: 'number'
       })
+      .sort({ createdAt: -1 })
       .lean(); // Converts the documents to plain JavaScript objects
 
     const formattedBookmarks = bookmarks.map(bookmark => ({
@@ -199,6 +201,52 @@ exports.getBookmarks = async (req, res) => {
     }));
 
     return res.status(200).json(formattedBookmarks);
+  } catch (error) {
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////
+//////////////////////// Get Bookmark Infomation ////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.getBookmark = async (req, res) => {
+  const { bookmarkId } = req.params;
+
+  try {
+    const bookmark = await Bookmark.findOne({ _id: bookmarkId })
+      .populate({
+        path: 'verse',
+        populate: {
+          path: 'chapter',
+          populate: {
+            path: 'subBook',
+            populate: {
+              path: 'book',
+              select: '_id title',
+            },
+            select: 'title number _id'
+          },
+          select: 'chapterNumber _id'
+        },
+        select: '_id number'
+      })
+      .sort({ createdAt: -1 })
+      .lean(); // Converts the documents to plain JavaScript objects
+
+    const formattedBookmark = {
+      _id: bookmark._id,
+      verseId: bookmark.verse._id,
+      verseNumber: bookmark.verse.number,
+      chapterId: bookmark.verse.chapter._id,
+      chapterNumber: bookmark.verse.chapter.chapterNumber,
+      subBookId: bookmark.verse.chapter.subBook._id,
+      subBookTitle: bookmark.verse.chapter.subBook.title,
+      subBookNumber: bookmark.verse.chapter.subBook.number,
+      bookId: bookmark.verse.chapter.subBook.book._id,
+      bookTitle: bookmark.verse.chapter.subBook.book.title,
+    };
+
+    return res.status(200).json(formattedBookmark);
   } catch (error) {
     return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
@@ -310,6 +358,40 @@ exports.removeBookmarkById = async (req, res) => {
     return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 }
+
+/////////////////////////////////////////////////////////////////////////
+////////////////////////////// Search Books /////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.searchByKeyword = async (req, res) => {
+  const { keyword } = req.body;
+
+  if (!keyword) {
+    return res.status(400).json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+  }
+
+  try {
+    const verses = await Verse.find({
+      $or: [
+        {
+          "text.en": {
+            $regex: keyword,
+            $options: 'i'
+          },
+        },
+        {
+          "text.ar": {
+            $regex: keyword,
+            $options: 'i'
+          },
+        }
+      ]
+    });
+
+    return res.status(200).json(verses);
+  } catch (error) {
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+};
 
 // Sort and Group by its library
 const sortAndGroupLibraries = (libraries) => {
