@@ -186,13 +186,14 @@ exports.getBookmarks = async (req, res) => {
           },
           select: 'chapterNumber _id'
         },
-        select: 'number'
+        select: '_id number'
       })
       .sort({ createdAt: -1 })
       .lean(); // Converts the documents to plain JavaScript objects
 
     const formattedBookmarks = bookmarks.map(bookmark => ({
       _id: bookmark._id,
+      verseId: bookmark.verse._id,
       verseNumber: bookmark.verse.number,
       chapterNumber: bookmark.verse.chapter.chapterNumber,
       subBookId: bookmark.verse.chapter.subBook._id,
@@ -269,9 +270,31 @@ exports.saveBookmark = async (req, res) => {
     });
 
     await bookmark.save();
+    const savedBookmark = await Bookmark.findOne({ user: userId, verse: verseId }).populate({
+      path: 'verse',
+      populate: {
+        path: 'chapter',
+        populate: {
+          path: 'subBook',
+          select: 'title number _id'
+        },
+        select: 'chapterNumber _id'
+      },
+      select: '_id number'
+    });
+
+    const formattedBookmark = {
+      _id: savedBookmark._id,
+      verseId: savedBookmark.verse._id,
+      verseNumber: savedBookmark.verse.number,
+      chapterNumber: savedBookmark.verse.chapter.chapterNumber,
+      subBookId: savedBookmark.verse.chapter.subBook._id,
+      subBookTitle: savedBookmark.verse.chapter.subBook.title,
+      subBookNumber: savedBookmark.verse.chapter.subBook.number,
+    };
 
     return res.status(200).json({
-      bookmark,
+      bookmark: formattedBookmark,
       message: ERROR_MESSAGES.BOOKMARK_ADDED
     });
   } catch (error) {
@@ -324,6 +347,7 @@ exports.removeBookmark = async (req, res) => {
 
   try {
     const bookmark = await Bookmark.findOneAndDelete({ user: userId, verse: verseId });
+    console.log({ bookmark })
 
     if (!bookmark) {
       return res.status(404).json({ message: ERROR_MESSAGES.BOOKMARK_NOT_FOUND });

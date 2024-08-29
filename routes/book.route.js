@@ -10,7 +10,7 @@ router.get('/:chapterId/verses', BookController.getVerses);
 router.get('/:userId/:bookId/history', BookController.getHistory);
 router.get('/:userId/bookmarks', BookController.getBookmarks);
 router.get('/:bookmarkId/bookmark', BookController.getBookmark);
-router.post('/setBookmark', BookController.saveBookmark);
+router.post('/saveBookmark', BookController.saveBookmark);
 router.get('/:userId/:subBookId/filterBookmark', BookController.filterBookmark);
 router.post('/removeBookmark', BookController.removeBookmark);
 router.post('/removeBookmarkById', BookController.removeBookmarkById);
