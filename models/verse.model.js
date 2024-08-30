@@ -8,8 +8,8 @@ const VerseSchema = new Schema({
     ar: { type: String }
   },
   number: { type: Number },
-  audio_start: { type: Number },
-  header: { type: String },
+  audioStart: { type: Object },
+  header: { type: Object },
   reference: { type: Object },
   createdAt: { type: Number, default: Date.now() },
   updatedAt: { type: Number, default: Date.now() },

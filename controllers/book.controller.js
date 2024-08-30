@@ -109,7 +109,6 @@ exports.getVerses = async (req, res) => {
   }
 };
 
-
 /////////////////////////////////////////////////////////////////////////
 ////////////////////////////// Get History //////////////////////////////
 /////////////////////////////////////////////////////////////////////////
@@ -163,6 +162,109 @@ exports.getHistory = async (req, res) => {
 
     // return result;
     return res.status(200).json(result)
+  } catch (error) {
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+};
+
+exports.getAllHistory = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Step 1: Find all books where the user has any reading history
+    const historyRecords = await History.find({ user: userId })
+      .populate({
+        path: 'chapter',
+        populate: {
+          path: 'subBook',
+          populate: {
+            path: 'book'
+          }
+        }
+      });
+
+    if (!historyRecords.length) {
+      return res.status(400).json({ message: 'No reading history found for this user.' });
+    }
+
+    let results = [];
+    for (const historyRecord of historyRecords) {
+      // Get total number of chapters in book
+      const subBooks = await SubBook.find({ book: historyRecord.chapter.subBook.book._id }).select('_id').exec();
+
+      if (!subBooks.length) {
+        return res.status(400).json({ message: 'No sub-books found for this book.' });
+      }
+
+      // Step 2: Get total chapter count for each sub-book
+      const chapterCounts = await Chapter.aggregate([
+        {
+          $match: { subBook: { $in: subBooks.map(subBook => subBook._id) } }
+        },
+        {
+          $group: {
+            _id: null,
+            totalChapters: { $sum: 1 }
+          }
+        }
+      ]);
+
+      // Step 3: Get the total chapter count
+      const totalChapters = chapterCounts.length > 0 ? chapterCounts[0].totalChapters : 0;
+
+      const structuredHistoryRecord = {
+        bookId: historyRecord.chapter.subBook.book._id,
+        bookTitle: historyRecord.chapter.subBook.book.title,
+        totalChapterCount: totalChapters,
+        subBookId: historyRecord.chapter.subBook._id,
+        subBookTitle: historyRecord.chapter.subBook.title,
+        subBookNumber: historyRecord.chapter.subBook.number,
+        chapterId: historyRecord.chapter._id,
+        chapterNumber: historyRecord.chapter.chapterNumber,
+      };
+
+      results.push(structuredHistoryRecord);
+    }
+
+    // Group by book
+    const groupedResult = results.reduce((acc, item) => {
+      const existingBook = acc.find(book => book.bookId === item.bookId);
+
+      if (existingBook) {
+        // If the book already exists, increment the readChapters count
+        existingBook.readChapters += 1;
+      } else {
+        // If the book doesn't exist, add it to the array with a readChapters field
+        acc.push({
+          bookId: item.bookId,
+          bookTitle: item.bookTitle,
+          totalChapterCount: item.totalChapterCount,
+          readChapters: 1, // Start with 1 read chapter
+          subBooks: []
+        });
+      }
+
+      // Find the subBook within the book
+      const subBook = existingBook ? existingBook.subBooks.find(sb => sb.subBookId === item.subBookId) : null;
+
+      if (subBook) {
+        // If the subBook exists, increment the readChapters count for it
+        subBook.readChapters += 1;
+      } else {
+        // If the subBook doesn't exist, add it
+        const bookToUpdate = existingBook || acc[acc.length - 1];
+        bookToUpdate.subBooks.push({
+          subBookId: item.subBookId,
+          subBookTitle: item.subBookTitle,
+          subBookNumber: item.subBookNumber,
+          readChapters: 1 // Start with 1 read chapter
+        });
+      }
+
+      return acc;
+    }, []);
+
+    return res.status(200).json(groupedResult);
   } catch (error) {
     return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
@@ -444,3 +546,67 @@ const sortAndGroupLibraries = (libraries) => {
     return a.library.title.en.localeCompare(b.library.title.en);
   });
 };
+
+// Create Subbook
+exports.createSubBook = async (req, res) => {
+  const { title, book, number } = req.body;
+
+  try {
+    const subBook = new SubBook({
+      number, book, title
+    });
+
+    await subBook.save();
+
+
+    return res.status(200).json({
+      message: ERROR_MESSAGES.BOOKMARK_ADDED
+    });
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+}
+
+
+// Create Chapter
+exports.createChapter = async (req, res) => {
+  const { subBook, chapterNumber, isTranslated, audio } = req.body;
+
+  try {
+    const chapter = new Chapter({
+      subBook, chapterNumber, isTranslated, audio
+    });
+
+    await chapter.save();
+
+
+    return res.status(200).json({
+      message: ERROR_MESSAGES.BOOKMARK_ADDED
+    });
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+}
+
+// Create Verse
+exports.createVerse = async (req, res) => {
+  const { chapter, text, number, audioStart, header, reference } = req.body;
+
+  try {
+    const verse = new Verse({
+      chapter, text, number, audioStart, header, reference
+    });
+
+    await verse.save();
+
+
+    return res.status(200).json({
+      message: ERROR_MESSAGES.BOOKMARK_ADDED
+    });
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+}
