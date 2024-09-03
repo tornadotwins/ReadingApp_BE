@@ -3,16 +3,23 @@ import BookController from '../controllers/book.controller';
 
 const router = express.Router();
 
+// Library
 router.get('/libraries', BookController.getLibraries);
+
+// Index
 router.get('/:bookId/subbooks', BookController.getSubBooks);
 router.get('/:subBookId/chapters', BookController.getChapters);
+
+// Reading
 router.get('/:chapterId/verses', BookController.getVerses);
 router.get('/:userId/:bookId/history', BookController.getHistory);
 router.get('/:userId/histories', BookController.getAllHistory);
-router.get('/:userId/bookmarks', BookController.getBookmarks);
-router.get('/:bookmarkId/bookmark', BookController.getBookmark);
+router.get('/:bookId/bookInfo', BookController.getBookInformation);
+router.get('/:subBookId/subBookInfo', BookController.getSubBookInfomation);
+
+// Bookmark
+router.post('/bookmarks', BookController.getBookmarks);
 router.post('/saveBookmark', BookController.saveBookmark);
-router.get('/:userId/:subBookId/filterBookmark', BookController.filterBookmark);
 router.post('/removeBookmark', BookController.removeBookmark);
 router.post('/removeBookmarkById', BookController.removeBookmarkById);
 router.post('/search', BookController.searchByKeyword);

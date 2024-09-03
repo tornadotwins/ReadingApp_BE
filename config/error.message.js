@@ -1,5 +1,6 @@
 const ERROR_MESSAGES = {
   EMPTY_BODY: 'Failed! Fields are not exists.',
+  SERVER_ERROR: 'Server Error',
 
   // Auth
   USERNAME_IN_USE: 'Failed! Username is already in use!',
@@ -21,6 +22,9 @@ const ERROR_MESSAGES = {
   BOOKMARK_NOT_FOUND: "Couldn't find bookmarks.",
   BOOKMARK_ADDED: "Bookmark added",
   BOOKMARK_DELETE: "Bookmark deleted",
+
+  // Authenticate
+  USER_NOT_PERMITTED: "You don't have permission to do this action."
 };
 
 export default ERROR_MESSAGES;
