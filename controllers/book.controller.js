@@ -102,8 +102,32 @@ exports.getVerses = async (req, res) => {
         .json({ message: ERROR_MESSAGES.VERSE_NOT_FOUND });
     }
 
+    // Filter Verses
+    let filteredVerses = {
+      subBookId: verses[0].chapter.subBook,
+      chapterId: verses[0].chapter._id,
+      chapterNumber: verses[0].chapter.chapterNumber,
+      chapterTranslated: verses[0].chapter.isTranslated,
+      chapterAudio: verses[0].chapter.audio,
+      verses: [],
+    };
+
+    let temp = [];
+    for (const verse of verses) {
+      temp.push({
+        verseId: verse._id,
+        verseNumber: verse.number,
+        verseHeader: verse.header,
+        verseReference: verse.reference,
+        verseText: verse.text,
+        verseAudioStart: verse.audiostart
+      })
+    };
+
+    filteredVerses.verses = temp;
+
     // Return the sub-books
-    return res.status(200).json(verses);
+    return res.status(200).json(filteredVerses);
   } catch (error) {
     return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
@@ -346,7 +370,19 @@ exports.getSubBookInfomation = async (req, res) => {
         verses: [],
       };
       const verses = await Verse.find({ chapter: chapter._id }).select('chapter text number audioStart header reference').exec();
-      chapterInfo.verses = verses;
+      let filteredVerses = [];
+      for (const verse of verses) {
+        filteredVerses.push({
+          verseId: verse._id,
+          verseNumber: verse.number,
+          verseHeader: verse.header,
+          verseReference: verse.reference,
+          verseText: verse.text,
+          verseAudioStart: verse.audiostart
+        })
+      }
+
+      chapterInfo.verses = filteredVerses;
       chapterInfos.push(chapterInfo);
     }));
 
