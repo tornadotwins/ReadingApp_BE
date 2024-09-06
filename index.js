@@ -7,6 +7,7 @@ import morgan from 'morgan';
 
 import authRoute from './routes/auth.route';
 import bookRoute from './routes/book.route';
+import bookmarkRoute from './routes/bookmark.route';
 
 import dbConfig from './config/db.config';
 import path from 'path';
@@ -45,7 +46,8 @@ app.use(morgan('combined'));
 app.use('/', express.static(path.join(__dirname, '/public')));
 
 app.use('/auth', authRoute);
-app.use('/book', bookRoute);
+app.use('/books', bookRoute);
+app.use('/bookmarks', bookmarkRoute);
 
 const port = process.env.PORT || 5000;
 const server = app.listen(port, () => {

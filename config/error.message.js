@@ -24,7 +24,8 @@ const ERROR_MESSAGES = {
   BOOKMARK_DELETE: "Bookmark deleted",
 
   // Authenticate
-  USER_NOT_PERMITTED: "You don't have permission to do this action."
+  USER_NOT_PERMITTED: "You don't have permission to do this action.",
+  USER_NOT_FOUND: "Could't find the user",
 };
 
 export default ERROR_MESSAGES;
