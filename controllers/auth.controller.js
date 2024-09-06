@@ -225,10 +225,15 @@ exports.updateSettings = async (req, res) => {
     return res.status(400).json({ message: ERROR_MESSAGES.EMPTY_BODY });
   }
 
-  const { settings } = req.body;
+  const { settings, soundSettings } = req.body;
   const user = await User.findById(req.currentUserId);
   if (user) {
-    user.settings = settings;
+    if (settings) {
+      user.settings = settings;
+    }
+    if (soundSettings) {
+      user.soundSettings = soundSettings;
+    }
     await user.save();
     user.password = undefined;
     return res.status(200).send(user);

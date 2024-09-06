@@ -24,9 +24,10 @@ const UserSchema = new Schema({
     pageControl: { type: String, default: Config.PAGES_CONTROLS_TYPE.RIGTH_TO_LEFT },
   },
   soundSettings: {
-    volumn: { type: Number, default: 0 },
+    volume: { type: Number, default: 0 },
     autoScrollText: { type: Boolean, default: true },
     language: { type: String, default: Config.SOUND_LANGUAGE.ORIGINAL },
+    other: { type: String }
   },
 });
 
