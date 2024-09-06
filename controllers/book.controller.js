@@ -120,7 +120,7 @@ exports.getVerses = async (req, res) => {
         verseHeader: verse.header,
         verseReference: verse.reference,
         verseText: verse.text,
-        verseAudioStart: verse.audiostart
+        verseAudioStart: verse.audioStart
       })
     };
 
@@ -520,7 +520,6 @@ exports.removeBookmark = async (req, res) => {
 
     try {
       const bookmark = await Bookmark.findOneAndDelete({ user: userId, verse: verseId });
-      console.log({ bookmark })
 
       if (!bookmark) {
         return res.status(404).json({ message: ERROR_MESSAGES.BOOKMARK_NOT_FOUND });

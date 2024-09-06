@@ -19,7 +19,7 @@ const ERROR_MESSAGES = {
   VERSE_NOT_FOUND: "Couldn't find verses in chapter",
   USER_HISTORY_NOT_FOUND: "Couldn't find history for this user.",
   INCORRECT_PARAMS: "Incorrect parameters",
-  BOOKMARK_NOT_FOUND: "Couldn't find bookmarks.",
+  BOOKMARK_NOT_FOUND: "Couldn't find bookmark.",
   BOOKMARK_ADDED: "Bookmark added",
   BOOKMARK_DELETE: "Bookmark deleted",
 
