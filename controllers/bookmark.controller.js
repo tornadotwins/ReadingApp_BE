@@ -31,7 +31,6 @@ exports.getAll = async (req, res) => {
         },
         select: '_id number'
       })
-      .sort({ createdAt: -1 })
       .lean(); // Converts the documents to plain JavaScript objects
 
     const formattedBookmarks = bookmarks.map(bookmark => ({
@@ -47,8 +46,11 @@ exports.getAll = async (req, res) => {
       bookTitle: bookmark.verse.chapter.subBook.book.title,
     }));
 
-    return res.status(200).json(formattedBookmarks);
+    const sortedFormattedBookmarks = formattedBookmarks.sort((a, b) => a.subBookId.toString().localeCompare(b.subBookId.toString()));
+
+    return res.status(200).json(sortedFormattedBookmarks);
   } catch (error) {
+    console.log(error)
     return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 }
