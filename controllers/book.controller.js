@@ -3,9 +3,7 @@ import SubBook from '../models/subBook.model';
 import Chapter from '../models/chapter.model';
 import Verse from '../models/verse.model';
 import History from '../models/history.model';
-import Bookmark from '../models/bookmark.model';
 import ERROR_MESSAGES from '../config/error.message';
-import { decodeToken } from '../utils'
 
 /////////////////////////////////////////////////////////////////////////
 ///////////////////////////// Get All books /////////////////////////////
@@ -416,7 +414,6 @@ const sortAndGroupLibraries = (libraries) => {
       _id: book._id,
       title: book.title,
       coverImage: book.coverImage,
-      bookTitle: book.title,
       createdAt: book.createdAt,
       updatedAt: book.updatedAt,
     });
