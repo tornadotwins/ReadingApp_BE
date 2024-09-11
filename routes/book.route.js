@@ -1,5 +1,6 @@
 import express from 'express';
 import BookController from '../controllers/book.controller';
+import { checkToken } from '../utils';
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ router.get('/:subBookId/chapters', BookController.getChapters);
 router.get('/:chapterId/verses', BookController.getVerses);
 router.get('/:userId/:bookId/history', BookController.getHistory);
 router.get('/:userId/histories', BookController.getAllHistory);
+router.post('/history', checkToken, BookController.createHistory);
 router.get('/:bookId/bookInfo', BookController.getBookInformation);
 router.get('/:subBookId/subBookInfo', BookController.getSubBookInfomation);
 

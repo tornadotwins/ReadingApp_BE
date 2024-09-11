@@ -18,6 +18,7 @@ const ERROR_MESSAGES = {
   CHAPTER_NOT_FOUND: "Couldn't find chapters in sub book",
   VERSE_NOT_FOUND: "Couldn't find verses in chapter",
   USER_HISTORY_NOT_FOUND: "Couldn't find history for this user.",
+  HISTORY_ADDED: "History added",
   INCORRECT_PARAMS: "Incorrect parameters",
   BOOKMARK_NOT_FOUND: "Couldn't find bookmark.",
   BOOKMARK_ADDED: "Bookmark added",

@@ -3,6 +3,7 @@ import SubBook from '../models/subBook.model';
 import Chapter from '../models/chapter.model';
 import Verse from '../models/verse.model';
 import History from '../models/history.model';
+import User from '../models/user.model';
 import ERROR_MESSAGES from '../config/error.message';
 
 /////////////////////////////////////////////////////////////////////////
@@ -250,6 +251,7 @@ exports.getAllHistory = async (req, res) => {
       if (existingBook) {
         // If the book already exists, increment the readChapters count
         existingBook.readChapters += 1;
+        existingBook.readChapterIds.push(item.chapterId);
       } else {
         // If the book doesn't exist, add it to the array with a readChapters field
         acc.push({
@@ -257,6 +259,7 @@ exports.getAllHistory = async (req, res) => {
           bookTitle: item.bookTitle,
           totalChapterCount: item.totalChapterCount,
           readChapters: 1, // Start with 1 read chapter
+          readChapterIds: [item.chapterId],
           subBooks: []
         });
       }
@@ -274,7 +277,7 @@ exports.getAllHistory = async (req, res) => {
           subBookId: item.subBookId,
           subBookTitle: item.subBookTitle,
           subBookNumber: item.subBookNumber,
-          readChapters: 1 // Start with 1 read chapter
+          readChapters: 1, // Start with 1 read chapter
         });
       }
 
@@ -286,6 +289,122 @@ exports.getAllHistory = async (req, res) => {
     return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////// Save User History ///////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.createHistory = async (req, res) => {
+  const { chapterId } = req.body;
+
+  if (!chapterId) {
+    return res.status(400).json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+  }
+
+  try {
+    const user = await User.findById(req.currentUserId);
+
+    if (!user) {
+      return res.status(400).json({ message: ERROR_MESSAGES.USER_NOT_FOUND });
+    }
+
+    const history = new History({
+      user: req.currentUserId,
+      chapter: chapterId
+    });
+
+    await history.save();
+
+    const historyRecords = await History.find({ user: req.currentUserId })
+      .populate({
+        path: 'chapter',
+        populate: {
+          path: 'subBook',
+          populate: {
+            path: 'book'
+          }
+        }
+      });
+
+    let results = [];
+    for (const historyRecord of historyRecords) {
+      // Get total number of chapters in book
+      const subBooks = await SubBook.find({ book: historyRecord.chapter.subBook.book._id }).select('_id').exec();
+
+      // Step 2: Get total chapter count for each sub-book
+      const chapterCounts = await Chapter.aggregate([
+        {
+          $match: { subBook: { $in: subBooks.map(subBook => subBook._id) } }
+        },
+        {
+          $group: {
+            _id: null,
+            totalChapters: { $sum: 1 }
+          }
+        }
+      ]);
+
+      // Step 3: Get the total chapter count
+      const totalChapters = chapterCounts.length > 0 ? chapterCounts[0].totalChapters : 0;
+
+      const structuredHistoryRecord = {
+        bookId: historyRecord.chapter.subBook.book._id,
+        bookTitle: historyRecord.chapter.subBook.book.title,
+        totalChapterCount: totalChapters,
+        subBookId: historyRecord.chapter.subBook._id,
+        subBookTitle: historyRecord.chapter.subBook.title,
+        subBookNumber: historyRecord.chapter.subBook.number,
+        chapterId: historyRecord.chapter._id,
+        chapterNumber: historyRecord.chapter.chapterNumber,
+      };
+
+      results.push(structuredHistoryRecord);
+    }
+
+    // Group by book
+    const groupedResult = results.reduce((acc, item) => {
+      const existingBook = acc.find(book => book.bookId === item.bookId);
+
+      if (existingBook) {
+        // If the book already exists, increment the readChapters count
+        existingBook.readChapters += 1;
+        existingBook.readChapterIds.push(item.chapterId);
+      } else {
+        // If the book doesn't exist, add it to the array with a readChapters field
+        acc.push({
+          bookId: item.bookId,
+          bookTitle: item.bookTitle,
+          totalChapterCount: item.totalChapterCount,
+          readChapters: 1, // Start with 1 read chapter
+          readChapterIds: [item.chapterId],
+          subBooks: []
+        });
+      }
+
+      // Find the subBook within the book
+      const subBook = existingBook ? existingBook.subBooks.find(sb => sb.subBookId === item.subBookId) : null;
+
+      if (subBook) {
+        // If the subBook exists, increment the readChapters count for it
+        subBook.readChapters += 1;
+      } else {
+        // If the subBook doesn't exist, add it
+        const bookToUpdate = existingBook || acc[acc.length - 1];
+        bookToUpdate.subBooks.push({
+          subBookId: item.subBookId,
+          subBookTitle: item.subBookTitle,
+          subBookNumber: item.subBookNumber,
+          readChapters: 1, // Start with 1 read chapter
+        });
+      }
+
+      return acc;
+    }, []);
+
+    return res.status(200).json(groupedResult);
+  } catch (error) {
+    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+}
 
 /////////////////////////////////////////////////////////////////////////
 ////////////////////////////// Get bookinfo /////////////////////////////
