@@ -208,18 +208,10 @@ exports.getAllHistory = async (req, res) => {
         }
       });
 
-    if (!historyRecords.length) {
-      return res.status(400).json({ message: 'No reading history found for this user.' });
-    }
-
     let results = [];
     for (const historyRecord of historyRecords) {
       // Get total number of chapters in book
       const subBooks = await SubBook.find({ book: historyRecord.chapter.subBook.book._id }).select('_id').exec();
-
-      if (!subBooks.length) {
-        return res.status(400).json({ message: 'No sub-books found for this book.' });
-      }
 
       // Step 2: Get total chapter count for each sub-book
       const chapterCounts = await Chapter.aggregate([
