@@ -25,22 +25,22 @@ const Config = {
   READING_CONTROLS_TYPE: {
     LEFT_HANDED: 'left_handed',
     RIGHT_HANDED: 'right_handed',
-  },  
+  },
   REFERENCE_LANGUAGE: {
-    ARABIC: 'Arabic',
-    ENGLISH: 'English',
+    ARABIC: 'ar',
+    ENGLISH: 'en',
   },
   READING_LANGUAGE: {
-    TAGALOG: 'Tagalog',
-    ENGLISH: 'English',
-  },  
+    ARABIC: 'ar',
+    ENGLISH: 'en',
+  },
   PAGES_CONTROLS_TYPE: {
     RIGTH_TO_LEFT: 'right_to_left',
     LEFT_TO_RIGHT: 'left_to_right',
   },
   SOUND_LANGUAGE: {
-    ORIGINAL: 'original',
-    TRANSLATION: 'translation',
+    ORIGINAL: 'ar',
+    TRANSLATION: 'en',
     OTHER: 'other',
   },
 };
