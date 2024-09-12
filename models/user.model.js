@@ -19,7 +19,7 @@ const UserSchema = new Schema({
     showQuranReferences: { type: Boolean, default: true },
     displayType: { type: String, default: Config.DISPLAY_TYPE.SPLIT_PANEL },
     referenceLanguage: { type: String, default: Config.REFERENCE_LANGUAGE.ARABIC },
-    readingLanguage: { type: String, default: Config.READING_LANGUAGE.TAGALOG },
+    readingLanguage: { type: String, default: Config.READING_LANGUAGE.ENGLISH },
     readingControls: { type: String, default: Config.READING_CONTROLS_TYPE.LEFT_HANDED },
     pageControl: { type: String, default: Config.PAGES_CONTROLS_TYPE.RIGTH_TO_LEFT },
   },
