@@ -429,7 +429,7 @@ exports.getBookInformation = async (req, res) => {
         subBookId: subBook._id,
         subBookTitle: subBook.title,
         subBookNumber: subBook.number,
-        chapters: chapters.map(chapter => ({
+        chapterInfos: chapters.map(chapter => ({
           chapterId: chapter._id,
           chapterNumber: chapter.chapterNumber,
           audio: chapter.audio,
