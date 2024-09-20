@@ -4,14 +4,13 @@ const Config = {
   ACCESS_TOKEN_TIME: '5h',
 
   // Settings.
-  DEFAULT_TEXT_SIZE: 16,
+  DEFAULT_TEXT_SIZE: 14,
   THEME: {
     DEFAULT: 'Default',
     DARK: 'Dark',
     BLACK_AND_WHITE: 'BlackAndWhite',
-    DARK_SAPPHIRE: 'DarkSapphire',
-    EASY_SUNRISE: 'EasySunrise',
-    EASY_OCEAN: 'EasyOcean',
+    SAPPHIRE: 'Sapphire',
+    EASY_OCEAN: 'EasyOcean'
   },
   AYA_NUMBER_FORMAT: {
     BEFORE: 'before',
