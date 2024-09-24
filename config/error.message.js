@@ -1,6 +1,7 @@
 const ERROR_MESSAGES = {
   EMPTY_BODY: 'Failed! Fields are not exists.',
   SERVER_ERROR: 'Server Error',
+  NO_TOKEN: 'No token',
 
   // Auth
   USERNAME_IN_USE: 'Failed! Username is already in use!',
@@ -11,6 +12,7 @@ const ERROR_MESSAGES = {
   ACCOUNT_BLOCKED: 'Your account is blocked.',
   PASSWORD_INCORRECT: 'Your password is incorrect.',
   TOKEN_NOT_VALID: 'Your token is not valid.',
+  TOKEN_EXPIRED: 'Token has been expired',
 
   // Book
   BOOK_NOT_FOUND: "Could't find books in library",

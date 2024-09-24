@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import ERROR_MESSAGES from '../config/error.message';
 
 /////////////////////////////////////////////////////////////////////////
 ////////// Generate Token by payload data and expiresIn  ////////////////
@@ -25,6 +26,7 @@ exports.checkToken = (req, res, next) => {
   if (!token) {
     return res.status(401).send({
       status: false,
+      message: ERROR_MESSAGES.NO_TOKEN,
     })
   }
 
@@ -39,9 +41,9 @@ exports.checkToken = (req, res, next) => {
     }
     return true
   } catch (error) {
-    console.log('error: ', error)
     return res.status(401).send({
       status: false,
+      message: ERROR_MESSAGES.TOKEN_EXPIRED,
     })
   }
 }
