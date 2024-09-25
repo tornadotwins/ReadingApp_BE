@@ -44,10 +44,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('combined'));
 
 app.use('/', express.static(path.join(__dirname, '/public')));
+app.use(express.static(path.join(__dirname, 'frontend')));
 
 app.use('/auth', authRoute);
 app.use('/books', bookRoute);
 app.use('/bookmarks', bookmarkRoute);
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "index.html"));
+});
 
 const port = process.env.PORT || 5000;
 const server = app.listen(port, () => {
