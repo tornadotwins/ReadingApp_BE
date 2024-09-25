@@ -5,7 +5,7 @@ import axios from 'axios';
 import User from '../models/user.model';
 import ERROR_MESSAGES from '../config/error.message';
 import Config from '../config';
-import { generateToken, decodeToken } from '../utils/utils';
+import { generateToken, decodeToken } from '../utils';
 
 /////////////////////////////////////////////////////////////////////////
 //////////////////////////// Sign Up ////////////////////////////////////
@@ -87,12 +87,12 @@ exports.verifyEmail = async (req, res) => {
       });
     } else {
       return res.status(400).send({
-        message: ACCOUNT_CANT_FIND,
+        message: ERROR_MESSAGES.ACCOUNT_CANT_FIND,
       });
     }
   } else {
     return res.status(400).send({
-      message: ACCOUNT_CANT_FIND,
+      message: ERROR_MESSAGES.ACCOUNT_CANT_FIND,
     });
   }
 }
@@ -219,4 +219,29 @@ exports.verifyRecaptchaToken = async (req, res) => {
     console.log('error: ', error);
     return res.status(404).send({ error });
   });
+}
+
+/////////////////////////////////////////////////////////////////////////
+//////////////////////// Update Settings ////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.updateSettings = async (req, res) => {
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: ERROR_MESSAGES.EMPTY_BODY });
+  }
+
+  const { settings, soundSettings } = req.body;
+  const user = await User.findById(req.currentUserId);
+  if (user) {
+    if (settings) {
+      user.settings = settings;
+    }
+    if (soundSettings) {
+      user.soundSettings = soundSettings;
+    }
+    await user.save();
+    user.password = undefined;
+    return res.status(200).send(user);
+  } else {
+    return res.status(404).send({ error: ERROR_MESSAGES.ACCOUNT_CANT_FIND });
+  }
 }
