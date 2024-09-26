@@ -203,7 +203,7 @@ exports.verifyRecaptchaToken = async (req, res) => {
     event: {
       token,
       expectedAction: action,
-      siteKey: process.env.RECAPTCHA_SITE_KEY || "6LcQTU8qAAAAAAFE_dWeLLx8fyYabgASQh9gvdZi",
+      siteKey: process.env.RECAPTCHA_SITE_KEY,
     }
   };
 
@@ -211,7 +211,7 @@ exports.verifyRecaptchaToken = async (req, res) => {
   console.log('token: ', token);
   console.log('GOOGLE_API_KEY: ', process.env.GOOGLE_API_KEY);
   console.log('site key: ', process.env.RECAPTCHA_SITE_KEY);
-  const url = `https://recaptchaenterprise.googleapis.com/v1/projects/litenote-5a22c/assessments?key=${process.env.GOOGLE_API_KEY || "AIzaSyAfikJncl0gZ_bwnXIa121qfqpQUHhvBZE"}`;
+  const url = `https://recaptchaenterprise.googleapis.com/v1/projects/litenote-5a22c/assessments?key=${process.env.GOOGLE_API_KEY}`;
   
   console.log('url: ', url);
    axios.post(url, data)
@@ -219,7 +219,7 @@ exports.verifyRecaptchaToken = async (req, res) => {
     return res.status(200).send(response.data);
   })
   .catch(function (error) {
-    console.log('error: ', error);
+    // console.log('error: ', error);
     return res.status(404).send({ error });
   });
 }
