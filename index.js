@@ -37,6 +37,9 @@ app.use(function (req, res, next) {
   );
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Allow-Credentials', true);
+  if (req.url.endsWith('.js')) {
+    res.setHeader('Content-Type', 'application/javascript');
+  }
   next();
 });
 app.use(bodyParser.json());
