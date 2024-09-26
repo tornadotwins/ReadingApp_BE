@@ -5,7 +5,7 @@ const ERROR_MESSAGES = require('../config/error.message');
 ////////// Generate Token by payload data and expiresIn  ////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.generateToken = (payload, expiresIn) => {
-  return jwt.sign(payload, process.env.CRYPTR_KEY, {
+  return jwt.sign(payload, (process.env.CRYPTR_KEY || "YTkxOGhcE1MjQtMzJkOMBC00MWJiLTg0NzAtZGZmOYIVHVJHVDI2ZDlhNzRh"), {
     expiresIn: expiresIn,
   });
 };
@@ -14,7 +14,7 @@ exports.generateToken = (payload, expiresIn) => {
 //////////////////////////// Decode token  //////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.decodeToken = (token) => {
-  const decoded = jwt.verify(token, process.env.CRYPTR_KEY);
+  const decoded = jwt.verify(token, (process.env.CRYPTR_KEY || "YTkxOGhcE1MjQtMzJkOMBC00MWJiLTg0NzAtZGZmOYIVHVJHVDI2ZDlhNzRh"));
   return decoded;
 };
 
@@ -34,7 +34,7 @@ exports.checkToken = (req, res, next) => {
     token = token.slice(7, token.length)
   }
   try {
-    const decoded = jwt.verify(token, process.env.CRYPTR_KEY)
+    const decoded = jwt.verify(token, (process.env.CRYPTR_KEY || "YTkxOGhcE1MjQtMzJkOMBC00MWJiLTg0NzAtZGZmOYIVHVJHVDI2ZDlhNzRh"))
     if (decoded.id) {
       req.currentUserId = decoded.id
       next()

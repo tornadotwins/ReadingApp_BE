@@ -203,12 +203,12 @@ exports.verifyRecaptchaToken = async (req, res) => {
     event: {
       token,
       expectedAction: action,
-      siteKey: process.env.RECAPTCHA_SITE_KEY,
+      siteKey: process.env.RECAPTCHA_SITE_KEY || "6LcQTU8qAAAAAAFE_dWeLLx8fyYabgASQh9gvdZi",
     }
   };
 
   console.log('data: ', data);
-  const url = `https://recaptchaenterprise.googleapis.com/v1/projects/litenote-5a22c/assessments?key=${process.env.GOOGLE_API_KEY}`;
+  const url = `https://recaptchaenterprise.googleapis.com/v1/projects/litenote-5a22c/assessments?key=${process.env.GOOGLE_API_KEY || "AIzaSyAdI4ZiOALebJoDBtBLBheNp9L7MEUl1F4"}`;
   
   console.log('url: ', url);
    axios.post(url, data)
