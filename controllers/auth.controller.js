@@ -211,7 +211,7 @@ exports.verifyRecaptchaToken = async (req, res) => {
   console.log('token: ', token);
   console.log('GOOGLE_API_KEY: ', process.env.GOOGLE_API_KEY);
   console.log('site key: ', process.env.RECAPTCHA_SITE_KEY);
-  const url = `https://recaptchaenterprise.googleapis.com/v1/projects/litenote-5a22c/assessments?key=${process.env.GOOGLE_API_KEY}`;
+  const url = `https://recaptchaenterprise.googleapis.com/v1/projects/${process.env.GOOGLE_PROJECT_ID}/assessments?key=${process.env.GOOGLE_API_KEY}`;
   
   console.log('url: ', url);
    axios.post(url, data)
