@@ -10,6 +10,5 @@ const ChapterSchema = new Schema({
   updatedAt: { type: Number, default: Date.now() },
 });
 
-const Chapter = mongoose.model('Chapter', ChapterSchema);
+module.exports = mongoose.model('Chapter', ChapterSchema);
 
-export default Chapter;

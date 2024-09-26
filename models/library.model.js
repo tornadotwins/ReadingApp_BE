@@ -7,6 +7,4 @@ const LibrarySchema = new Schema({
   updatedAt: { type: Number, default: Date.now() },
 });
 
-const Library = mongoose.model('Library', LibrarySchema);
-
-export default Library;
+module.exports = mongoose.model('Library', LibrarySchema);

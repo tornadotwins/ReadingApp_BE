@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-import Library from './library.model';
+const Library = require('./library.model');
 
 const BookSchema = new Schema({
   number: { type: Number },
@@ -11,6 +11,4 @@ const BookSchema = new Schema({
   updatedAt: { type: Number, default: Date.now() },
 });
 
-const Book = mongoose.model('Book', BookSchema);
-
-export default Book;
+module.exports = mongoose.model('Book', BookSchema);

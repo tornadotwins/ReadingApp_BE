@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-import User from './user.model';
-import Chapter from './chapter.model';
+
+const User = require('./user.model');
+const Chapter = require('./chapter.model');
 
 const HistorySchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -10,6 +11,4 @@ const HistorySchema = new Schema({
   updatedAt: { type: Number, default: Date.now() },
 });
 
-const History = mongoose.model('History', HistorySchema);
-
-export default History;
+module.exports = mongoose.model('History', HistorySchema);

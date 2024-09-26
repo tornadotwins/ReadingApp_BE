@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-import Book from './book.model';
+
+const Book = require('./book.model');
 
 const SubBookSchema = new Schema({
   number: { type: Number },
@@ -10,6 +11,4 @@ const SubBookSchema = new Schema({
   updatedAt: { type: Number, default: Date.now() },
 });
 
-const SubBook = mongoose.model('SubBook', SubBookSchema);
-
-export default SubBook;
+module.exports = mongoose.model('SubBook', SubBookSchema);

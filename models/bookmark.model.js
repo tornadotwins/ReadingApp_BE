@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-import User from '../models/user.model';
-import Verse from '../models/verse.model';
+
+const User = require('../models/user.model');
+const Verse = require('../models/verse.model');
 
 const BookmarkSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -10,6 +11,4 @@ const BookmarkSchema = new Schema({
   updatedAt: { type: Number, default: Date.now() },
 });
 
-const Bookmark = mongoose.model('Bookmark', BookmarkSchema);
-
-export default Bookmark;
+module.exports = mongoose.model('Bookmark', BookmarkSchema);

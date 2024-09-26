@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken';
-import ERROR_MESSAGES from '../config/error.message';
+const jwt = require('jsonwebtoken');
+const ERROR_MESSAGES = require('../config/error.message');
 
 /////////////////////////////////////////////////////////////////////////
 ////////// Generate Token by payload data and expiresIn  ////////////////

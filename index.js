@@ -1,16 +1,16 @@
-import 'dotenv/config';
-import express from 'express';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
-import morgan from 'morgan';
+require ('dotenv/config');
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const morgan = require('morgan');
 
-import authRoute from './routes/auth.route';
-import bookRoute from './routes/book.route';
-import bookmarkRoute from './routes/bookmark.route';
+const authRoute = require('./routes/auth.route');
+const bookRoute = require('./routes/book.route');
+const bookmarkRoute = require('./routes/bookmark.route');
 
-import dbConfig from './config/db.config';
-import path from 'path';
+const dbConfig = require('./config/db.config');
+const path = require('path');
 
 // Connect DB.
 mongoose

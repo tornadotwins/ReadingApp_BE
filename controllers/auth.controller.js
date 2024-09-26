@@ -1,11 +1,11 @@
-import crypto from 'crypto';
-import fs from 'fs';
-import axios from 'axios';
+const crypto = require('crypto');
+const fs = require('fs');
+const axios = require('axios');
 
-import User from '../models/user.model';
-import ERROR_MESSAGES from '../config/error.message';
-import Config from '../config';
-import { generateToken, decodeToken } from '../utils';
+const User = require('../models/user.model');
+const ERROR_MESSAGES = require('../config/error.message');
+const Config = require('../config');
+const { generateToken, decodeToken } = require('../utils');
 
 /////////////////////////////////////////////////////////////////////////
 //////////////////////////// Sign Up ////////////////////////////////////

@@ -1,10 +1,10 @@
-import Book from '../models/book.model';
-import SubBook from '../models/subBook.model';
-import Chapter from '../models/chapter.model';
-import Verse from '../models/verse.model';
-import History from '../models/history.model';
-import User from '../models/user.model';
-import ERROR_MESSAGES from '../config/error.message';
+const Book = require('../models/book.model');
+const SubBook = require('../models/subBook.model')
+const Chapter = require('../models/chapter.model');
+const Verse = require('../models/verse.model');
+const History = require('../models/history.model');
+const User = require('../models/user.model');
+const ERROR_MESSAGES = require('../config/error.message');
 
 /////////////////////////////////////////////////////////////////////////
 ///////////////////////////// Get All books /////////////////////////////

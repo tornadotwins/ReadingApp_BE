@@ -1,4 +1,4 @@
-const ERROR_MESSAGES = {
+module.exports = {
   EMPTY_BODY: 'Failed! Fields are not exists.',
   SERVER_ERROR: 'Server Error',
   NO_TOKEN: 'No token',
@@ -30,5 +30,3 @@ const ERROR_MESSAGES = {
   USER_NOT_PERMITTED: "You don't have permission to do this action.",
   USER_NOT_FOUND: "Could't find the user",
 };
-
-export default ERROR_MESSAGES;

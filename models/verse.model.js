@@ -18,6 +18,4 @@ const VerseSchema = new Schema({
 // Create a text index on the 'text' field
 VerseSchema.index({ 'text.en': 'text', 'text.ar': 'text' });
 
-const Verse = mongoose.model('Verse', VerseSchema);
-
-export default Verse;
+module.exports = mongoose.model('Verse', VerseSchema);

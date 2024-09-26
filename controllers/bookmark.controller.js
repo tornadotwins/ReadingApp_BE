@@ -1,7 +1,7 @@
-import Bookmark from '../models/bookmark.model';
-import User from '../models/user.model';
+const Bookmark = require('../models/bookmark.model');
+const User = require('../models/user.model');
 
-import ERROR_MESSAGES from '../config/error.message';
+const ERROR_MESSAGES = require('../config/error.message');
 
 /////////////////////////////////////////////////////////////////////////
 /////////////////////// Get All Bookmark by User ////////////////////////

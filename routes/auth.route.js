@@ -1,6 +1,6 @@
-import express from 'express';
-import AuthController from '../controllers/auth.controller';
-import { checkToken } from '../utils';
+const express = require('express');
+const AuthController = require('../controllers/auth.controller');
+const {checkToken} = require('../utils');
 
 const router = express.Router();
 
@@ -13,4 +13,4 @@ router.post('/verify_recaptcha_token', AuthController.verifyRecaptchaToken);
 
 router.post('/update_settings', checkToken, AuthController.updateSettings);
 
-export default router;
+module.exports = router;

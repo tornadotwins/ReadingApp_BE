@@ -1,6 +1,6 @@
-import express from 'express';
-import BookController from '../controllers/book.controller';
-import { checkToken } from '../utils';
+const express = require('express');
+const BookController = require('../controllers/book.controller');
+const {checkToken} = require('../utils');
 
 const router = express.Router();
 
@@ -23,4 +23,4 @@ router.post('/createSubBook', BookController.createSubBook);
 router.post('/createChapter', BookController.createChapter);
 router.post('/createVerse', BookController.createVerse);
 
-export default router;
+module.exports = router;
