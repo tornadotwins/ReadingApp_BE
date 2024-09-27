@@ -1,5 +1,5 @@
 module.exports = {
-  // BASE_URL: 'http://localhost:3000',
+  // BASE_URL: 'http://localhost:5000',
   BASE_URL: 'https://readingapp-d5944320053c.herokuapp.com',
   VERIFY_EMAIL_TIME: '3h',
   ACCESS_TOKEN_TIME: '5h',

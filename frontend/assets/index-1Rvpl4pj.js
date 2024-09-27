@@ -1,1 +1,0 @@
-import{b as a,j as t}from"./index-Bu54zGJb.js";import{S as i,g as x,a5 as m}from"./App-BDoDpamb.js";import{T as l}from"./images-CGstb9mi.js";function u({label:o,color:e="default",onClick:r}){const{theme:s}=a.useContext(i),{altTextColor:n}=x(s);return t.jsx(m,{color:e,onClick:r,children:t.jsx(l,{color:n,children:o})})}export{u as L};
