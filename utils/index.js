@@ -34,7 +34,7 @@ exports.checkToken = (req, res, next) => {
     token = token.slice(7, token.length)
   }
   try {
-    const decoded = jwt.verify(token, (process.env.CRYPTR_KEY || "YTkxOGhcE1MjQtMzJkOMBC00MWJiLTg0NzAtZGZmOYIVHVJHVDI2ZDlhNzRh"))
+    const decoded = jwt.verify(token, (process.env.CRYPTR_KEY))
     if (decoded.id) {
       req.currentUserId = decoded.id
       next()
