@@ -470,7 +470,9 @@ exports.getBookInformation = async (req, res) => {
     }
 
     // Step 2: Find all sub-books related to this book
-    const subBooks = await SubBook.find({ book: bookId }).lean().exec();
+    const subBooks = await SubBook.find({ book: bookId })
+      .lean()
+      .exec();
 
     // Step 3: For each sub-book, find the chapters
     const subBooksWithChapters = await Promise.all(
@@ -674,6 +676,44 @@ exports.createVerse = async (req, res) => {
 
     return res.status(200).json({
       message: ERROR_MESSAGES.BOOKMARK_ADDED,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+};
+
+// Create Chapters automatically
+exports.autoCreateChapter = async (req, res) => {
+  const { startNumber, bookId } = req;
+
+  try {
+    const subBooks = await SubBook.find({ book: bookId });
+
+    subBooks.forEach((subBook) => {
+      console.log(subBook);
+      const subBookNumber = subBook.number;
+      const subBookId = subBook._id;
+
+      if (subBookNumber >= startNumber) {
+        const chapter = new Chapter({
+          subBook: subBookId,
+          chapterNumber: 1,
+          isTranslated: true,
+          audio: {
+            en: '/audios/.mp3',
+            ar: '/audios/.mp3',
+          },
+        });
+
+        chapter.save();
+      }
+    });
+
+    return res.status(200).json({
+      message: 'Successfully added chapter',
     });
   } catch (error) {
     console.log(error);
