@@ -1,5 +1,5 @@
 const Book = require('../models/book.model');
-const SubBook = require('../models/subBook.model')
+const SubBook = require('../models/subBook.model');
 const Chapter = require('../models/chapter.model');
 const Verse = require('../models/verse.model');
 const History = require('../models/history.model');
@@ -51,7 +51,9 @@ exports.getSubBooks = async (req, res) => {
     // Return the sub-books
     return res.status(200).json(sortedSubBooks);
   } catch (error) {
-    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -80,7 +82,9 @@ exports.getChapters = async (req, res) => {
     // Return the sub-books
     return res.status(200).json(sortedChapters);
   } catch (error) {
-    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -119,16 +123,18 @@ exports.getVerses = async (req, res) => {
         verseHeader: verse.header,
         verseReference: verse.reference,
         verseText: verse.text,
-        verseAudioStart: verse.audioStart
-      })
-    };
+        verseAudioStart: verse.audioStart,
+      });
+    }
 
     filteredVerses.verses = temp;
 
     // Return the sub-books
     return res.status(200).json(filteredVerses);
   } catch (error) {
-    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -166,7 +172,11 @@ exports.getHistory = async (req, res) => {
       // Total chapters read by the user in the sub-book
       const readChaptersInSubBook = await History.countDocuments({
         user: userId,
-        chapter: { $in: await Chapter.find({ subBook: subBook._id }).select('_id').exec() },
+        chapter: {
+          $in: await Chapter.find({ subBook: subBook._id })
+            .select('_id')
+            .exec(),
+        },
       }).exec();
 
       // Accumulate total chapters in the book
@@ -184,9 +194,11 @@ exports.getHistory = async (req, res) => {
     }
 
     // return result;
-    return res.status(200).json(result)
+    return res.status(200).json(result);
   } catch (error) {
-    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -198,37 +210,45 @@ exports.getAllHistory = async (req, res) => {
     const { userId } = req.params;
 
     // Step 1: Find all books where the user has any reading history
-    const historyRecords = await History.find({ user: userId })
-      .populate({
-        path: 'chapter',
+    const historyRecords = await History.find({
+      user: userId,
+    }).populate({
+      path: 'chapter',
+      populate: {
+        path: 'subBook',
         populate: {
-          path: 'subBook',
-          populate: {
-            path: 'book'
-          }
-        }
-      });
+          path: 'book',
+        },
+      },
+    });
 
     let results = [];
     for (const historyRecord of historyRecords) {
       // Get total number of chapters in book
-      const subBooks = await SubBook.find({ book: historyRecord.chapter.subBook.book._id }).select('_id').exec();
+      const subBooks = await SubBook.find({
+        book: historyRecord.chapter.subBook.book._id,
+      })
+        .select('_id')
+        .exec();
 
       // Step 2: Get total chapter count for each sub-book
       const chapterCounts = await Chapter.aggregate([
         {
-          $match: { subBook: { $in: subBooks.map(subBook => subBook._id) } }
+          $match: {
+            subBook: { $in: subBooks.map((subBook) => subBook._id) },
+          },
         },
         {
           $group: {
             _id: null,
-            totalChapters: { $sum: 1 }
-          }
-        }
+            totalChapters: { $sum: 1 },
+          },
+        },
       ]);
 
       // Step 3: Get the total chapter count
-      const totalChapters = chapterCounts.length > 0 ? chapterCounts[0].totalChapters : 0;
+      const totalChapters =
+        chapterCounts.length > 0 ? chapterCounts[0].totalChapters : 0;
 
       const structuredHistoryRecord = {
         bookId: historyRecord.chapter.subBook.book._id,
@@ -246,7 +266,9 @@ exports.getAllHistory = async (req, res) => {
 
     // Group by book
     const groupedResult = results.reduce((acc, item) => {
-      const existingBook = acc.find(book => book.bookId === item.bookId);
+      const existingBook = acc.find(
+        (book) => book.bookId === item.bookId,
+      );
 
       if (existingBook) {
         // If the book already exists, increment the readChapters count
@@ -260,12 +282,16 @@ exports.getAllHistory = async (req, res) => {
           totalChapterCount: item.totalChapterCount,
           readChapters: 1, // Start with 1 read chapter
           readChapterIds: [item.chapterId],
-          subBooks: []
+          subBooks: [],
         });
       }
 
       // Find the subBook within the book
-      const subBook = existingBook ? existingBook.subBooks.find(sb => sb.subBookId === item.subBookId) : null;
+      const subBook = existingBook
+        ? existingBook.subBooks.find(
+            (sb) => sb.subBookId === item.subBookId,
+          )
+        : null;
 
       if (subBook) {
         // If the subBook exists, increment the readChapters count for it
@@ -286,7 +312,9 @@ exports.getAllHistory = async (req, res) => {
 
     return res.status(200).json(groupedResult);
   } catch (error) {
-    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -297,54 +325,66 @@ exports.createHistory = async (req, res) => {
   const { chapterId } = req.body;
 
   if (!chapterId) {
-    return res.status(400).json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+    return res
+      .status(400)
+      .json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
   }
 
   try {
     const user = await User.findById(req.currentUserId);
 
     if (!user) {
-      return res.status(400).json({ message: ERROR_MESSAGES.USER_NOT_FOUND });
+      return res
+        .status(400)
+        .json({ message: ERROR_MESSAGES.USER_NOT_FOUND });
     }
 
     const history = new History({
       user: req.currentUserId,
-      chapter: chapterId
+      chapter: chapterId,
     });
 
     await history.save();
 
-    const historyRecords = await History.find({ user: req.currentUserId })
-      .populate({
-        path: 'chapter',
+    const historyRecords = await History.find({
+      user: req.currentUserId,
+    }).populate({
+      path: 'chapter',
+      populate: {
+        path: 'subBook',
         populate: {
-          path: 'subBook',
-          populate: {
-            path: 'book'
-          }
-        }
-      });
+          path: 'book',
+        },
+      },
+    });
 
     let results = [];
     for (const historyRecord of historyRecords) {
       // Get total number of chapters in book
-      const subBooks = await SubBook.find({ book: historyRecord.chapter.subBook.book._id }).select('_id').exec();
+      const subBooks = await SubBook.find({
+        book: historyRecord.chapter.subBook.book._id,
+      })
+        .select('_id')
+        .exec();
 
       // Step 2: Get total chapter count for each sub-book
       const chapterCounts = await Chapter.aggregate([
         {
-          $match: { subBook: { $in: subBooks.map(subBook => subBook._id) } }
+          $match: {
+            subBook: { $in: subBooks.map((subBook) => subBook._id) },
+          },
         },
         {
           $group: {
             _id: null,
-            totalChapters: { $sum: 1 }
-          }
-        }
+            totalChapters: { $sum: 1 },
+          },
+        },
       ]);
 
       // Step 3: Get the total chapter count
-      const totalChapters = chapterCounts.length > 0 ? chapterCounts[0].totalChapters : 0;
+      const totalChapters =
+        chapterCounts.length > 0 ? chapterCounts[0].totalChapters : 0;
 
       const structuredHistoryRecord = {
         bookId: historyRecord.chapter.subBook.book._id,
@@ -362,7 +402,9 @@ exports.createHistory = async (req, res) => {
 
     // Group by book
     const groupedResult = results.reduce((acc, item) => {
-      const existingBook = acc.find(book => book.bookId === item.bookId);
+      const existingBook = acc.find(
+        (book) => book.bookId === item.bookId,
+      );
 
       if (existingBook) {
         // If the book already exists, increment the readChapters count
@@ -376,12 +418,16 @@ exports.createHistory = async (req, res) => {
           totalChapterCount: item.totalChapterCount,
           readChapters: 1, // Start with 1 read chapter
           readChapterIds: [item.chapterId],
-          subBooks: []
+          subBooks: [],
         });
       }
 
       // Find the subBook within the book
-      const subBook = existingBook ? existingBook.subBooks.find(sb => sb.subBookId === item.subBookId) : null;
+      const subBook = existingBook
+        ? existingBook.subBooks.find(
+            (sb) => sb.subBookId === item.subBookId,
+          )
+        : null;
 
       if (subBook) {
         // If the subBook exists, increment the readChapters count for it
@@ -402,9 +448,11 @@ exports.createHistory = async (req, res) => {
 
     return res.status(200).json(groupedResult);
   } catch (error) {
-    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
-}
+};
 
 /////////////////////////////////////////////////////////////////////////
 ////////////////////////////// Get bookinfo /////////////////////////////
@@ -416,40 +464,53 @@ exports.getBookInformation = async (req, res) => {
     // Step 1: Find the book by bookId
     const book = await Book.findById(bookId).exec();
     if (!book) {
-      return res.status(404).json({ message: ERROR_MESSAGES.BOOK_NOT_FOUND });
+      return res
+        .status(404)
+        .json({ message: ERROR_MESSAGES.BOOK_NOT_FOUND });
     }
 
     // Step 2: Find all sub-books related to this book
-    const subBooks = await SubBook.find({ book: bookId }).exec();
+    const subBooks = await SubBook.find({ book: bookId })
+      .lean()
+      .exec();
 
     // Step 3: For each sub-book, find the chapters
-    const subBooksWithChapters = await Promise.all(subBooks.map(async (subBook) => {
-      const chapters = await Chapter.find({ subBook: subBook._id }).select('chapterNumber audio isTranslated').exec();
-      return {
-        subBookId: subBook._id,
-        subBookTitle: subBook.title,
-        subBookNumber: subBook.number,
-        chapterInfos: chapters.map(chapter => ({
-          chapterId: chapter._id,
-          chapterNumber: chapter.chapterNumber,
-          audio: chapter.audio,
-          isTranslated: chapter.isTranslated
-        }))
-      };
-    }));
+    const subBooksWithChapters = await Promise.all(
+      subBooks.map(async (subBook) => {
+        const chapters = await Chapter.find({ subBook: subBook._id })
+          .select('chapterNumber audio isTranslated')
+          .lean()
+          .exec();
+        return {
+          subBookId: subBook._id,
+          subBookTitle: subBook.title,
+          subBookNumber: subBook.number,
+          noChapter: subBook.noChapter,
+          chapterInfos: chapters.map((chapter) => ({
+            chapterId: chapter._id,
+            chapterNumber: chapter.chapterNumber,
+            audio: chapter.audio,
+            isTranslated: chapter.isTranslated,
+          })),
+        };
+      }),
+    );
 
     // Step 4: Structure the response
     const result = {
       bookId: book._id,
       bookTitle: book.title,
       bookImage: book.coverImage,
-      subBooks: subBooksWithChapters
+      subBooks: subBooksWithChapters,
     };
 
     // Step 5: Return the result
     return res.status(200).json(result);
   } catch (error) {
-    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+    console.error('Error in getBookInformation:', error);
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -463,52 +524,62 @@ exports.getSubBookInfomation = async (req, res) => {
     const subBook = await SubBook.findById(subBookId);
 
     if (!subBook) {
-      return res.status(404).json({ message: ERROR_MESSAGES.SUBBOOK_NOT_FOUND });
+      return res
+        .status(404)
+        .json({ message: ERROR_MESSAGES.SUBBOOK_NOT_FOUND });
     }
 
     // Step 2: Find all chapters related to this book
     const chapters = await Chapter.find({ subBook: subBookId });
 
     let chapterInfos = [];
-    await Promise.all(chapters.map(async (chapter) => {
-      let chapterInfo = {
-        chapterId: chapter._id,
-        chapterNumber: chapter.chapterNumber,
-        chapterAudio: chapter.audio,
-        chapterTranslated: chapter.isTranslated,
-        verses: [],
-      };
-      const verses = await Verse.find({ chapter: chapter._id }).select('chapter text number audioStart header reference').exec();
-      let filteredVerses = [];
-      for (const verse of verses) {
-        filteredVerses.push({
-          verseId: verse._id,
-          verseNumber: verse.number,
-          verseHeader: verse.header,
-          verseReference: verse.reference,
-          verseText: verse.text,
-          verseAudioStart: verse.audiostart
-        })
-      }
+    await Promise.all(
+      chapters.map(async (chapter) => {
+        let chapterInfo = {
+          chapterId: chapter._id,
+          chapterNumber: chapter.chapterNumber,
+          chapterAudio: chapter.audio,
+          chapterTranslated: chapter.isTranslated,
+          verses: [],
+        };
+        const verses = await Verse.find({ chapter: chapter._id })
+          .select('chapter text number audioStart header reference')
+          .exec();
+        let filteredVerses = [];
+        for (const verse of verses) {
+          filteredVerses.push({
+            verseId: verse._id,
+            verseNumber: verse.number,
+            verseHeader: verse.header,
+            verseReference: verse.reference,
+            verseText: verse.text,
+            verseAudioStart: verse.audiostart,
+          });
+        }
 
-      chapterInfo.verses = filteredVerses;
-      chapterInfos.push(chapterInfo);
-    }));
+        chapterInfo.verses = filteredVerses;
+        chapterInfos.push(chapterInfo);
+      }),
+    );
 
     // Sort chapter information by its number
-    const sortedChapterInfos = chapterInfos.sort((a, b) => a.chapterNumber > b.chapterNumber ? 1 : -1);
+    const sortedChapterInfos = chapterInfos.sort((a, b) =>
+      a.chapterNumber > b.chapterNumber ? 1 : -1,
+    );
 
     const result = {
       subBookId: subBook._id,
       subBookTitle: subBook.title,
       subBookNumber: subBook.number,
       chapterInfos: sortedChapterInfos,
-    }
+    };
     res.status(200).json(result);
   } catch (error) {
-    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR })
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
-}
+};
 
 // Sort and Group by its library
 const sortAndGroupLibraries = (libraries) => {
@@ -543,20 +614,23 @@ exports.createSubBook = async (req, res) => {
 
   try {
     const subBook = new SubBook({
-      number, book, title
+      number,
+      book,
+      title,
     });
 
     await subBook.save();
 
-
     return res.status(200).json({
-      message: ERROR_MESSAGES.BOOKMARK_ADDED
+      message: ERROR_MESSAGES.BOOKMARK_ADDED,
     });
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
-}
+};
 
 // Create Chapter
 exports.createChapter = async (req, res) => {
@@ -564,38 +638,49 @@ exports.createChapter = async (req, res) => {
 
   try {
     const chapter = new Chapter({
-      subBook, chapterNumber, isTranslated, audio
+      subBook,
+      chapterNumber,
+      isTranslated,
+      audio,
     });
 
     await chapter.save();
 
-
     return res.status(200).json({
-      message: ERROR_MESSAGES.BOOKMARK_ADDED
+      message: ERROR_MESSAGES.BOOKMARK_ADDED,
     });
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
-}
+};
 
 // Create Verse
 exports.createVerse = async (req, res) => {
-  const { chapter, text, number, audioStart, header, reference } = req.body;
+  const { chapter, text, number, audioStart, header, reference } =
+    req.body;
 
   try {
     const verse = new Verse({
-      chapter, text, number, audioStart, header, reference
+      chapter,
+      text,
+      number,
+      audioStart,
+      header,
+      reference,
     });
 
     await verse.save();
 
-
     return res.status(200).json({
-      message: ERROR_MESSAGES.BOOKMARK_ADDED
+      message: ERROR_MESSAGES.BOOKMARK_ADDED,
     });
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({ message: ERROR_MESSAGES.SERVER_ERROR });
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
-}
+};

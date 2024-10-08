@@ -84,7 +84,7 @@ exports.create = async (req, res) => {
         path: 'chapter',
         populate: {
           path: 'subBook',
-          select: 'title number _id'
+          select: 'title number _id noChapter'
         },
         select: 'chapterNumber _id'
       },
@@ -99,6 +99,7 @@ exports.create = async (req, res) => {
       subBookId: savedBookmark.verse.chapter.subBook._id,
       subBookTitle: savedBookmark.verse.chapter.subBook.title,
       subBookNumber: savedBookmark.verse.chapter.subBook.number,
+      noChapter: savedBookmark.verse.chapter.subBook.noChapter,
     };
 
     return res.status(200).json({
