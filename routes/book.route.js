@@ -23,4 +23,6 @@ router.post('/createSubBook', BookController.createSubBook);
 router.post('/createChapter', BookController.createChapter);
 router.post('/createVerse', BookController.createVerse);
 
+router.get('/:chapterId/intro', BookController.getIntroVerses);
+
 module.exports = router;
