@@ -1,8 +1,4 @@
-<<<<<<<< Updated upstream:frontend/assets/VerifyRecaptchaProvider-qAS57b-2.js
-import{b as f,j as v,L as K}from"./index-Dibo9daf.js";import{S as U,g as W,a7 as X,a8 as Y,a9 as Z,aa as ee,ab as te}from"./App-OdTok9eR.js";import{T as re}from"./images-DnnUPU9h.js";import{a as oe}from"./auth.service-DyFIPSgW.js";function xe(e){const{theme:t}=f.useContext(U),{altTextColor:n}=W(t);return v.jsxs(X,{children:[v.jsxs(Y,{children:[v.jsx(Z,{src:e.imgSrc}),v.jsx(re,{color:n,children:e.label})]}),v.jsx(ee,{onClick:e.onClick,bordercolor:n,children:e.checkImgSrc&&v.jsx(te,{src:e.checkImgSrc})})]})}var ne={};/*! *****************************************************************************
-========
 import{b as f,j as v,L as K}from"./index-DiZbyTx4.js";import{S as U,g as W,$ as X,a0 as Y,a1 as Z,a2 as ee,a3 as te}from"./App-C3cg7l-F.js";import{T as re}from"./images-CdwsV4BQ.js";import{a as oe}from"./auth.service-BLGzcuEQ.js";function xe(e){const{theme:t}=f.useContext(U),{altTextColor:n}=W(t);return v.jsxs(X,{children:[v.jsxs(Y,{children:[v.jsx(Z,{src:e.imgSrc}),v.jsx(re,{color:n,children:e.label})]}),v.jsx(ee,{onClick:e.onClick,bordercolor:n,children:e.checkImgSrc&&v.jsx(te,{src:e.checkImgSrc})})]})}var ne={};/*! *****************************************************************************
->>>>>>>> Stashed changes:frontend/assets/VerifyRecaptchaProvider-BEt5IBrD.js
 Copyright (c) Microsoft Corporation.
 
 Permission to use, copy, modify, and/or distribute this software for any
