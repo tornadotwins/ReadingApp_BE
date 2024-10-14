@@ -2,6 +2,7 @@ const Book = require('../models/book.model');
 const SubBook = require('../models/subBook.model');
 const Chapter = require('../models/chapter.model');
 const Verse = require('../models/verse.model');
+const Introduction = require('../models/introduction.model');
 const History = require('../models/history.model');
 const User = require('../models/user.model');
 const ERROR_MESSAGES = require('../config/error.message');
@@ -519,19 +520,15 @@ exports.getBookInformation = async (req, res) => {
 /////////////////////////////////////////////////////////////////////////
 exports.getSubBookInfomation = async (req, res) => {
   const { subBookId } = req.params;
-
   try {
     const subBook = await SubBook.findById(subBookId);
-
     if (!subBook) {
       return res
         .status(404)
         .json({ message: ERROR_MESSAGES.SUBBOOK_NOT_FOUND });
     }
-
     // Step 2: Find all chapters related to this book
     const chapters = await Chapter.find({ subBook: subBookId });
-
     let chapterInfos = [];
     await Promise.all(
       chapters.map(async (chapter) => {
@@ -542,31 +539,48 @@ exports.getSubBookInfomation = async (req, res) => {
           chapterTranslated: chapter.isTranslated,
           verses: [],
         };
-        const verses = await Verse.find({ chapter: chapter._id })
-          .select('chapter text number audioStart header reference')
-          .exec();
-        let filteredVerses = [];
-        for (const verse of verses) {
-          filteredVerses.push({
+
+        if (chapter.chapterNumber === 0) {
+          // Fetch data from Introduction model
+          const introVerses = await Introduction.find({
+            chapter: chapter._id,
+          })
+            .select(
+              'chapter text image number isCollapse title content',
+            )
+            .exec();
+
+          chapterInfo.verses = introVerses.map((intro) => ({
+            id: intro._id,
+            text: intro.text,
+            image: intro.image,
+            number: intro.number,
+            isCollapse: intro.isCollapse,
+            title: intro.title,
+            content: intro.content,
+          }));
+        } else {
+          // Existing code for regular verses
+          const verses = await Verse.find({ chapter: chapter._id })
+            .select('chapter text number audioStart header reference')
+            .exec();
+          chapterInfo.verses = verses.map((verse) => ({
             verseId: verse._id,
             verseNumber: verse.number,
             verseHeader: verse.header,
             verseReference: verse.reference,
             verseText: verse.text,
-            verseAudioStart: verse.audiostart,
-          });
+            verseAudioStart: verse.audioStart,
+          }));
         }
 
-        chapterInfo.verses = filteredVerses;
         chapterInfos.push(chapterInfo);
       }),
     );
-
     // Sort chapter information by its number
     const sortedChapterInfos = chapterInfos.sort((a, b) =>
       a.chapterNumber > b.chapterNumber ? 1 : -1,
     );
-
     const result = {
       subBookId: subBook._id,
       subBookTitle: subBook.title,
@@ -575,6 +589,60 @@ exports.getSubBookInfomation = async (req, res) => {
     };
     res.status(200).json(result);
   } catch (error) {
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+};
+
+/////////////////////////////////////////////////////////////////////////
+//////////////////////////// Get Introduction ///////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.getIntroVerses = async (req, res) => {
+  const { chapterId } = req.params;
+
+  try {
+    const introVerses = await Introduction.find({
+      chapter: chapterId,
+    }).populate('chapter');
+
+    // If no information about introduction, return 404
+    if (!introVerses.length) {
+      return res
+        .status(404)
+        .json({ message: ERROR_MESSAGES.VERSE_NOT_FOUND });
+    }
+
+    // Filter verses
+    let filteredVerses = {
+      subBookId: introVerses[0].chapter.subBook,
+      chapterId: introVerses[0].chapter._id,
+      chapterNumber: introVerses[0].chapter.chapterNumber,
+      chapterTranslated: introVerses[0].chapter.isTranslated,
+      chapterAudio: introVerses[0].chapter.audio,
+      verses: [],
+    };
+
+    let temp = [];
+
+    for (const introVerse of introVerses) {
+      temp.push({
+        id: introVerse._id,
+        image: introVerse.image,
+        number: introVerse.number,
+        text: introVerse.text,
+        isCollapse: introVerse.isCollapse,
+        title: introVerse.title,
+        content: introVerse.content,
+      });
+    }
+
+    filteredVerses.verses = temp;
+
+    // Return the verses
+    return res.status(200).json(filteredVerses);
+  } catch (error) {
+    console.log(error);
     return res
       .status(500)
       .json({ message: ERROR_MESSAGES.SERVER_ERROR });
