@@ -20,13 +20,14 @@ module.exports = {
   CHAPTER_NOT_FOUND: "Couldn't find chapters in sub book",
   VERSE_NOT_FOUND: "Couldn't find verses in chapter",
   USER_HISTORY_NOT_FOUND: "Couldn't find history for this user.",
-  HISTORY_ADDED: "History added",
-  INCORRECT_PARAMS: "Incorrect parameters",
+  HISTORY_ADDED: 'History added',
+  INCORRECT_PARAMS: 'Incorrect parameters',
   BOOKMARK_NOT_FOUND: "Couldn't find bookmark.",
-  BOOKMARK_ADDED: "Bookmark added",
-  BOOKMARK_DELETE: "Bookmark deleted",
+  BOOKMARK_ADDED: 'Bookmark added',
+  BOOKMARK_DELETE: 'Bookmark deleted',
 
   // Authenticate
   USER_NOT_PERMITTED: "You don't have permission to do this action.",
   USER_NOT_FOUND: "Could't find the user",
+  UNAUTHORIZED_USER: 'You are not permitted for the action.',
 };
