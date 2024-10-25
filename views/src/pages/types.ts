@@ -1,15 +1,17 @@
 type RoleType = {
-  [key: string]: string;
-}
+  language: string;
+  role: string;
+};
 
 type UserType = {
   id: string;
-  role: Array<RoleType>;
   username: string;
+  password: string;
+  role: Array<RoleType>;
   isAdmin: boolean;
-  token: string;
-}
+  lastLoggedAt: number;
+};
 
 export type {
   UserType,
-}
+};

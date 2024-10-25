@@ -34,7 +34,6 @@ class AuthService {
         .get(url)
         .then((response) => {
           if(response.data.users) {
-            console.log('fetch successfully users', response.data.users);
             resolve(response.data.users);
           } else {
             console.log('fetch failed', response.data.error);

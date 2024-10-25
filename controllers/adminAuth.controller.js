@@ -2,7 +2,7 @@ const AdminUser = require('../models/adminUser.model');
 const ERROR_MESSAGES = require('../config/error.message');
 const Config = require('../config');
 const crypto = require('crypto');
-const { generateToken, decodeToken } = require('../utils');
+const { generateToken } = require('../utils');
 
 /////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// Login /////////////////////////////////
@@ -17,7 +17,11 @@ exports.login = async (req, res) => {
   const { username, password } = req.body;
 
   // Check user is existing with username.
-  const user = await AdminUser.findOne({ username });
+  const user = await AdminUser.findOneAndUpdate(
+    { username },
+    { lastLoggedInAt: Date.now() },
+  );
+  
   if (!user) {
     return res
       .status(400)

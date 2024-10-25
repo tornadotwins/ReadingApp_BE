@@ -27,7 +27,7 @@ function LoginForm(props: LoginFormType) {
   const focusButton = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      buttonRef.current?.focus();
+      buttonRef.current?.click();
     }
   }
 

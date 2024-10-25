@@ -8,7 +8,7 @@ const AdminUserSchema = new Schema({
   role: { type: Array },
   createdAt: { type: Number, default: Date.now() },
   updatedAt: { type: Number, default: Date.now() },
-  loggedIn: { type: Number, default: Date.now() },
+  lastLoggedInAt: { type: Number },
 });
 
 module.exports = mongoose.model('AdminUser', AdminUserSchema);
