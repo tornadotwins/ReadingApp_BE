@@ -22,6 +22,7 @@ exports.decodeToken = (token) => {
 //////////////////////////// Check token  ///////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.checkToken = (req, res, next) => {
+  console.log(req.header);
   let token = req.headers['x-access-token'] || req.headers['authorization']
   if (!token) {
     return res.status(401).send({

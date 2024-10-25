@@ -1,22 +1,40 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'material-react-toastify';
+import 'material-react-toastify/dist/ReactToastify.css';
+
 import Header from '@/components/Header';
 import Meta from '@/components/Meta';
 import { HEADER_TRANSLATION_PORTAL } from '@/config/messages';
 import useOrientation from '@/hooks/useOrientation';
-import { useNavigate } from 'react-router-dom';
 
 import { StyledLoginContainer, StyledLoginBody } from './styles';
 import LoginBox from '@/components/Login';
 
 import authService from '../../../services/auth.services';
+import { LoadingOverlay } from '@/components/Base';
+import { UserType } from '../types';
 
 function Login() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const isPortrait = useOrientation();
   const navigate = useNavigate();
 
   const handleLogin = (username: string, password: string) => {
-    console.log('clicked login in Login page');
-    authService.login({ username, password });
-    navigate('/admin/admin-portal');
+    setIsLoading(true);
+    authService
+      .login({ username, password })
+      .then((user: UserType) => {
+        if (user.isAdmin)
+          navigate('/admin/admin-portal');
+      })
+      .catch((error) => {
+        toast.error(error, { position: 'top-right', draggable: true });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   return (
@@ -31,6 +49,9 @@ function Login() {
           <LoginBox onLogIn={handleLogin} />
         </StyledLoginBody>
       </StyledLoginContainer>
+
+      <ToastContainer />
+      {isLoading && <LoadingOverlay />}
     </>
   );
 }

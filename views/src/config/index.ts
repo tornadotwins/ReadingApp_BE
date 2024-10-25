@@ -54,6 +54,8 @@ const defaultMetaTags = {
 };
 const giphy404 = 'https://giphy.com/embed/xTiN0L7EW5trfOvEk0';
 
+const ACCESS_TOKEN = "token";
+
 const DEFAULT_TEXT_SIZE = 14;
 const THEME = {
   DEFAULT: 'Default',
@@ -119,6 +121,8 @@ export {
   title,
   defaultMetaTags,
   giphy404,
+
+  ACCESS_TOKEN,
 
   DEFAULT_TEXT_SIZE,
   THEME,

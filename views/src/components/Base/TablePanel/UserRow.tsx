@@ -56,7 +56,7 @@ const UserRow: React.FC<UserRowType> = ({
             lineHeight={24}
             color='#155D74'
           >
-            {user.userName}
+            {user.username}
           </Text>
         );
 

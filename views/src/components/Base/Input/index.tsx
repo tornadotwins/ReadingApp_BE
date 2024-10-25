@@ -21,6 +21,7 @@ function Input(props: InputType) {
           inputRef={props.reference}
           placeholder={props.placeholder}
           onKeyDown={handleKeyDown}
+          onChange={props.onChange}
         />
       </StyledInputContainer>
       {props.error && <ErrorText>{props.error}</ErrorText>}

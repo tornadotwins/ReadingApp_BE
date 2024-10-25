@@ -27,6 +27,7 @@ function LoginForm(props: LoginFormType) {
   const focusButton = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault();
+      buttonRef.current?.focus();
     }
   }
 
@@ -38,7 +39,6 @@ function LoginForm(props: LoginFormType) {
           password: '',
         }}
         onSubmit={(values) => {
-          console.log('Clicked Submit button');
           props.onLogIn(values);
         }}
         validationSchema={yup.object().shape({

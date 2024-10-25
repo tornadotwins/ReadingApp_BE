@@ -15,8 +15,8 @@ const routes: Routes = {
     title: 'Login',
     icon: HomeIcon,
   },
-  [Pages.Page1]: {
-    component: asyncComponentLoader(() => import('@/pages/AdminPortal')),
+  [Pages.AdminPortal]: {
+    component: asyncComponentLoader(() => import('@/pages/AdminPortal/AdminPortal')),
     path: '/admin/admin-portal',
     title: 'Admin Portal',
     icon: GitHubIcon,

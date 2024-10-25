@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import Meta from '@/components/Meta';
 import Header from '@/components/Header';
 import UserCount from '@/components/UserCount';
@@ -12,33 +14,18 @@ import {
   StyledDelButton,
   StyledAdminText,
 } from './styles';
+import { AdminPortalType } from './types';
 import PersonInfoDialog from '@/components/Base/PersonInfoDialog';
 import { Button } from '@mui/material';
 import { UserInfoType } from '@/components/Base/TablePanel/types';
-import { Text } from '@/components/Base';
+import { LoadingOverlay, Text } from '@/components/Base';
+import { ACCESS_TOKEN } from '@/config';
+import authService from '../../../services/auth.services';
 
-function AdminPortal() {
+function AdminPortal(props: AdminPortalType) {
+  const [isLoading, setIsLoading] = useState(false);
   const [showAddPersonDlg, setShowAddPersonDlg] = useState(false);
-
-  const [users, setUsers] = useState<UserInfoType[]>([
-    {
-      userName: 'JohnTronton',
-      password: 'password',
-      isAdmin: false,
-      lastLogin: '20241020',
-      english: 'translator',
-      arabic: 'translator',
-    },
-    {
-      userName: 'AliceAlison',
-      password: 'password1',
-      isAdmin: false,
-      lastLogin: '20241015',
-      english: 'none',
-      arabic: 'publisher',
-    },
-  ]);
-  
+  const [users, setUsers] = useState<UserInfoType[]>([]);
   const [tableHeaders, setTableHeaders] = useState<string[]>([
     'UserName',
     'Password',
@@ -48,6 +35,29 @@ function AdminPortal() {
     'English',
     'Arabic'
   ]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // Fetch users
+  const fetchUsers = useCallback(async () => {
+    setIsLoading(true);
+
+    authService
+      .fetchUsers()
+      .then((users): UserInfoType => {
+        setUsers(users);
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+      .finally(() => {
+        setIsLoading(false);
+      })
+  }, []);
+
+  const navigate = useNavigate();
 
   const addTableColumn = () => {
     if (!tableHeaders.includes('German')) {
@@ -64,14 +74,20 @@ function AdminPortal() {
     }
   };
 
+  // Navigate to Login page
+  const onLogout = () => {
+    localStorage.removeItem(ACCESS_TOKEN);
+    navigate('/admin/login');
+  }
+
   return (
     <>
       <Meta title="Admin Portal" />
       <StyledAdminPortalContainer>
-        <Header header='Admin Portal' isLoggedIn={true} username='Abraham' onLogOut={() => { }} />
+        <Header header='Admin Portal' isLoggedIn={true} username='Abraham' onLogOut={onLogout} />
 
         <StyledAdminPortalBodyContainer>
-          <UserCount userNumber={3} />
+          <UserCount userNumber={users.length || 0} />
 
           <StyledTablePanelContainer>
             <TablePanel
@@ -101,6 +117,7 @@ function AdminPortal() {
 
         <PersonInfoDialog isOpen={showAddPersonDlg} onSave={() => { }} onCancel={() => setShowAddPersonDlg(false)} />
       </StyledAdminPortalContainer>
+      {isLoading && <LoadingOverlay />}
     </>
   );
 }
