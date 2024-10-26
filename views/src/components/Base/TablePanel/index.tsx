@@ -12,13 +12,16 @@ import {
   StyledTableHeadCell,
   StyledTableBody
 } from './styles';
-import { TablePanelType, UserInfoType } from './types';
+import { TablePanelType } from './types';
 import UserRow from './UserRow';
+
+import { UserType } from '@/pages/types';
 
 const TablePanel: React.FC<TablePanelType> = (props) => {
   const [headers, setHeaders] = useState<string[]>([]);
 
   useEffect(() => {
+    console.log(props.headers);
     setHeaders(props.headers);
   }, [props.headers]);
 
@@ -38,14 +41,13 @@ const TablePanel: React.FC<TablePanelType> = (props) => {
 
   const renderTableBody = () => (
     <StyledTableBody>
-      {props.users.map((user: UserInfoType, index: number) => (
+      {props.users.map((user: UserType, index: number) => (
         <UserRow
           key={index}
           user={user}
           headers={headers}
           onEditUser={props.onEditUser}
           onDeleteUser={props.onDeleteUser}
-          onUpdateUserRole={props.onUpdateUserRole}
         />
       ))}
     </StyledTableBody>

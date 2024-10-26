@@ -27,7 +27,7 @@ class AuthService {
     this.setSession('');
   };
 
-  fetchUsers = () => {
+  fetchUsers = (): Promise<UserType[]> => {
     return new Promise ((resolve, reject) => {
       const url = API_URL + '/admin/auth/users';
       axios
@@ -36,7 +36,6 @@ class AuthService {
           if(response.data.users) {
             resolve(response.data.users);
           } else {
-            console.log('fetch failed', response.data.error);
             reject(response.data.error);
           }
         })

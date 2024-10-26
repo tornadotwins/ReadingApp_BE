@@ -1315,6 +1315,11 @@ clone-deep@^4.0.1:
     kind-of "^6.0.2"
     shallow-clone "^3.0.0"
 
+clsx@^2.1.0:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/clsx/-/clsx-2.1.1.tgz#eed397c9fd8bd882bfb18deab7102049a2f32999"
+  integrity sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==
+
 color-convert@^1.9.0:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-1.9.3.tgz#bb71850690e1f136567de629d2d5471deda4c1e8"
@@ -2249,6 +2254,13 @@ make-dir@^2.0.0, make-dir@^2.1.0:
   dependencies:
     pify "^4.0.1"
     semver "^5.6.0"
+
+material-react-toastify@^10.0.5:
+  version "10.0.5"
+  resolved "https://registry.yarnpkg.com/material-react-toastify/-/material-react-toastify-10.0.5.tgz#8a589e46fc6ab0f4cdf51488ae2f1da09a71aa32"
+  integrity sha512-0Cg6MD8jJvIYfSQB0cqJYighI+uIWQQWxKXIuZMFP5eRifVfX8El9RSSpq640/pq8lSi0PqkPkmn6vNPy+fnWA==
+  dependencies:
+    clsx "^2.1.0"
 
 media-typer@0.3.0:
   version "0.3.0"

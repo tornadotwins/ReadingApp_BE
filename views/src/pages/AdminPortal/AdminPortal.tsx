@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'material-react-toastify';
 
 import Meta from '@/components/Meta';
 import Header from '@/components/Header';
@@ -17,24 +18,24 @@ import {
 import { AdminPortalType } from './types';
 import PersonInfoDialog from '@/components/Base/PersonInfoDialog';
 import { Button } from '@mui/material';
-import { UserInfoType } from '@/components/Base/TablePanel/types';
 import { LoadingOverlay, Text } from '@/components/Base';
 import { ACCESS_TOKEN } from '@/config';
 import authService from '../../../services/auth.services';
+import { UserType } from '../types';
 
 function AdminPortal(props: AdminPortalType) {
   const [isLoading, setIsLoading] = useState(false);
   const [showAddPersonDlg, setShowAddPersonDlg] = useState(false);
-  const [users, setUsers] = useState<UserInfoType[]>([]);
+  const [users, setUsers] = useState<UserType[]>([]);
   const [tableHeaders, setTableHeaders] = useState<string[]>([
     'UserName',
     'Password',
     'isAdmin',
     'Actions',
-    'Last Login',
-    'English',
-    'Arabic'
+    'Last Login'
   ]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUsers();
@@ -46,18 +47,19 @@ function AdminPortal(props: AdminPortalType) {
 
     authService
       .fetchUsers()
-      .then((users): UserInfoType => {
+      .then((users: UserType[]) => {
         setUsers(users);
+        users[0].role.map(
+          (role) => setTableHeaders((prevTableHeaders) => [...prevTableHeaders, role.language])
+        );
       })
       .catch((error) => {
-        console.log(error)
+        toast.error(error, { position: 'top-right', draggable: true });
       })
       .finally(() => {
         setIsLoading(false);
       })
   }, []);
-
-  const navigate = useNavigate();
 
   const addTableColumn = () => {
     if (!tableHeaders.includes('German')) {

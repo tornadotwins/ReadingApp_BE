@@ -18,6 +18,7 @@ function Input(props: InputType) {
         <Text fontFamily='"Baloo Da 2"' fontWeight="400" fontSize={16} lineHeight={24} textAlign="center">{props.label}</Text>
         <TextField
           required={props.required}
+          type={props.type}
           inputRef={props.reference}
           placeholder={props.placeholder}
           onKeyDown={handleKeyDown}

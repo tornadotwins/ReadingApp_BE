@@ -4,6 +4,7 @@ type InputType = {
   required?: boolean;
   label?: string;
   value?: string;
+  type?: string;
   reference?: RefObject<HTMLDivElement>;
   placeholder?: string;
   error?: string;

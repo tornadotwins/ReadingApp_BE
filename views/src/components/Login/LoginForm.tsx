@@ -64,6 +64,7 @@ function LoginForm(props: LoginFormType) {
               <Input
                 label='Password : '
                 value={values.password}
+                type='password'
                 error={touched.password ? errors.password : ''}
                 onChange={handleChange('password')}
                 onBlur={handleBlur('password')}

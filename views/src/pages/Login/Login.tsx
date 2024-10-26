@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'material-react-toastify';
+import { Bounce, toast, ToastContainer } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
 
 import Header from '@/components/Header';
@@ -30,7 +30,16 @@ function Login() {
           navigate('/admin/admin-portal');
       })
       .catch((error) => {
-        toast.error(error, { position: 'top-right', draggable: true });
+        toast.error(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
       })
       .finally(() => {
         setIsLoading(false);

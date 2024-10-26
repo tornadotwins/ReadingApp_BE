@@ -35,8 +35,7 @@ const StyledTableBody = styled(TableBody)({
   '& tr:nth-of-type(even)': {
     backgroundColor: '#F0F5FB',
   },
-
-})
+});
 
 const StyledTableBodyCell = styled(TableCell) ({
   boxSizing: 'border-box',
@@ -82,6 +81,36 @@ const StyledActionButton = styled(Box) ({
     textDecoration: 'underline',
     textUnderlineOffset: '2px',
   }
+});
+
+const StyledSmallSizedCell = styled(Box) ({
+  width: '50px',
+  
+  '& .MuiBox-root': {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  }
+});
+
+const StyledMiddleSizedCell = styled(Box) ({
+  width: '100px',
+
+  '& .MuiBox-root': {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  }
+});
+
+const StyledLargeSizedCell = styled(Box) ({
+  width: '200px',
+  
+  '& .MuiBox-root': {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  }
 })
 
 export {
@@ -92,4 +121,7 @@ export {
   StyledTableBodyCell,
   StyledActionButtonGroup,
   StyledActionButton,
+  StyledSmallSizedCell,
+  StyledMiddleSizedCell,
+  StyledLargeSizedCell,
 }
