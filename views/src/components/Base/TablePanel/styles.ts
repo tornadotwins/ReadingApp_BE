@@ -46,7 +46,12 @@ const StyledTableBodyCell = styled(TableCell) ({
   '& .MuiBox-root': {
     textAlign: 'center',
     display: 'flex',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    justifySelf: 'center',
+  },
+
+  '& .MuiFormControlLabel-root': {
+    margin: '0px'
   },
 
   '& .MuiInputBase-root': {
@@ -71,7 +76,7 @@ const StyledActionButtonGroup = styled(Box) ({
   '& >.MuiBox-root: first-of-type': {
     marginRight: '15px'
   }
-})
+});
 
 const StyledActionButton = styled(Box) ({
   padding: '0px',
@@ -85,6 +90,10 @@ const StyledActionButton = styled(Box) ({
 
 const StyledSmallSizedCell = styled(Box) ({
   width: '50px',
+
+  '& .td': {
+    justifyItems: 'center',
+  },
   
   '& .MuiBox-root': {
     overflow: 'hidden',
@@ -96,6 +105,10 @@ const StyledSmallSizedCell = styled(Box) ({
 const StyledMiddleSizedCell = styled(Box) ({
   width: '100px',
 
+  '& .td': {
+    justifyItems: 'center',
+  },
+
   '& .MuiBox-root': {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -103,8 +116,25 @@ const StyledMiddleSizedCell = styled(Box) ({
   }
 });
 
+const StyledPasswordCell = styled(Box)({
+  width: '100px',
+
+  '& .td': {
+    justifyItems: 'left',
+  },
+
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  textAlign: 'left'
+})
+
 const StyledLargeSizedCell = styled(Box) ({
   width: '200px',
+
+  '& .td': {
+    justifyItems: 'center',
+  },
   
   '& .MuiBox-root': {
     overflow: 'hidden',
@@ -123,5 +153,6 @@ export {
   StyledActionButton,
   StyledSmallSizedCell,
   StyledMiddleSizedCell,
+  StyledPasswordCell,
   StyledLargeSizedCell,
 }

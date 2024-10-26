@@ -12,6 +12,7 @@ import {
   StyledSmallSizedCell,
   StyledMiddleSizedCell,
   StyledLargeSizedCell,
+  StyledPasswordCell,
 } from './styles';
 import { UserRowType } from './types';
 import { UserType } from '@/pages/types';
@@ -53,6 +54,7 @@ const UserRow: React.FC<UserRowType> = (props: UserRowType) => {
               fontSize={16}
               lineHeight={24}
               color='#155D74'
+              textAlign='left'
             >
               {props.user.username}
             </Text>
@@ -61,7 +63,7 @@ const UserRow: React.FC<UserRowType> = (props: UserRowType) => {
 
       case 'Password':
         return (
-          <StyledMiddleSizedCell>
+          <StyledPasswordCell>
             <Text
               fontFamily='"Baloo Da 2"'
               fontWeight='400'
@@ -71,7 +73,7 @@ const UserRow: React.FC<UserRowType> = (props: UserRowType) => {
             >
               {props.user.password}
             </Text>
-          </StyledMiddleSizedCell>
+          </StyledPasswordCell>
         );
 
       case 'isAdmin':
