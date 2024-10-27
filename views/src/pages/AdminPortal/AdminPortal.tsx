@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'material-react-toastify';
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
 import Meta from '@/components/Meta';
 import Header from '@/components/Header';
@@ -10,6 +11,8 @@ import TablePanel from '@/components/Base/TablePanel';
 import {
   StyledAdminPortalContainer,
   StyledAdminPortalBodyContainer,
+  StyledSaveButton,
+  StyledTablePanelHeader,
   StyledTablePanelContainer,
   StyledButtonGroup,
   StyledButton,
@@ -28,6 +31,7 @@ function AdminPortal(props: AdminPortalPropsType) {
   const [isLoading, setIsLoading] = useState(false);
   const [showAddPersonDlg, setShowAddPersonDlg] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
+  const [isChangedUsers, setIsChangedUsers] = useState(false);
   const [tableHeaders, setTableHeaders] = useState<string[]>([
     'UserName',
     'Password',
@@ -92,7 +96,12 @@ function AdminPortal(props: AdminPortalPropsType) {
         <Header header='Admin Portal' isLoggedIn={true} username={props.currentUser.username} onLogOut={onLogout} />
 
         <StyledAdminPortalBodyContainer>
-          <UserCount userNumber={users.length || 0} />
+          <StyledTablePanelHeader>
+            <UserCount userNumber={users.length || 0} />
+            <StyledSaveButton disable={isChangedUsers ? 'false' : 'true'}>
+              <Button onClick={() => { }} disabled={isChangedUsers}>Save</Button>
+            </StyledSaveButton>
+          </StyledTablePanelHeader>
 
           <StyledTablePanelContainer>
             <TablePanel
@@ -127,7 +136,7 @@ function AdminPortal(props: AdminPortalPropsType) {
   );
 }
 
-function mapDispatchToProps(dispatch: any) {
+function mapDispatchToProps(dispatch: Dispatch) {
   return {
     dispatch,
   };
