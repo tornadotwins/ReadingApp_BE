@@ -21,7 +21,6 @@ const TablePanel: React.FC<TablePanelType> = (props) => {
   const [headers, setHeaders] = useState<string[]>([]);
 
   useEffect(() => {
-    console.log(props.headers);
     setHeaders(props.headers);
   }, [props.headers]);
 

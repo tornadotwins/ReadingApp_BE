@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
 import Text from "../Text";
@@ -30,9 +30,12 @@ const RoleOptions = [
   { value: 'none', label: 'None' },
   { value: 'translator', label: 'Translator' },
   { value: 'publisher', label: 'Publisher' }
-]
+];
 
 const UserRow: React.FC<UserRowType> = (props: UserRowType) => {
+  const [isAdmin, setIsAdmin] = useState(props.user.isAdmin);
+  
+
   const getStringValue = (obj: UserType, key: string): string => {
     const value = obj[key.toLowerCase()];
     if (typeof value === 'string') {
@@ -81,8 +84,8 @@ const UserRow: React.FC<UserRowType> = (props: UserRowType) => {
           <StyledSmallSizedCell>
             <Checkbox
               label=''
-              onChange={() => { }}
-              checked={props.user.isAdmin}
+              onChange={() => setIsAdmin(!isAdmin)}
+              checked={isAdmin}
             />
           </StyledSmallSizedCell>
         );

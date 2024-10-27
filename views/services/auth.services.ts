@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, {AxiosError} from "axios";
 import { API_URL, ACCESS_TOKEN, } from "../config";
 import { LoginType } from "./types";
 import { UserType } from "@/pages/types";
@@ -12,7 +12,7 @@ class AuthService {
         .then((response) => {
           if (response.data.user) {
             this.setSession(response.data.token);
-            resolve(response.data.user as UserType); // Explicitly cast to UserType
+            resolve(response.data.user as UserType);
           } else {
             reject(response.data.error);
           }
@@ -30,6 +30,8 @@ class AuthService {
   fetchUsers = (): Promise<UserType[]> => {
     return new Promise ((resolve, reject) => {
       const url = API_URL + '/admin/auth/users';
+      const token = this.getAccessToken();
+      token && this.setSession(token);
       axios
         .get(url)
         .then((response) => {
@@ -67,10 +69,13 @@ class AuthService {
   /////////////////////////////////////////////////////////////////////////
   /////////////////////////// Get Error Message ///////////////////////////
   /////////////////////////////////////////////////////////////////////////
-  getErrorMessage(error: any): string {
+  getErrorMessage(error: AxiosError): string {
     let message = error.message;
-    if (error.response && error.response.data && error.response.data.message) {
-      message = error.response.data.message;
+    if (error.response && error.response.data && typeof error.response.data === 'object') {
+      const data = error.response.data as { message?: string };
+      if (data.message) {
+        message = data.message;
+      }
     }
     return message;
   }

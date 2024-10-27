@@ -40,7 +40,7 @@ const StyledTableBody = styled(TableBody)({
 const StyledTableBodyCell = styled(TableCell) ({
   boxSizing: 'border-box',
   border: 'none',
-  padding: '7px 18px',
+  padding: '3px 10px',
   justifyContent: 'space-between',
 
   '& .MuiBox-root': {
@@ -118,19 +118,21 @@ const StyledMiddleSizedCell = styled(Box) ({
 
 const StyledPasswordCell = styled(Box)({
   width: '100px',
+  display: 'flex',
+  justifyContent: 'left !important',
 
-  '& .td': {
-    justifyItems: 'left',
-  },
-
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-  textAlign: 'left'
-})
+  '& .MuiBox-root': {
+    width: '100px',
+    display: 'block',
+    justifyContent: 'left',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  }
+});
 
 const StyledLargeSizedCell = styled(Box) ({
-  width: '200px',
+  width: '150px',
 
   '& .td': {
     justifyItems: 'center',
@@ -140,6 +142,10 @@ const StyledLargeSizedCell = styled(Box) ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+
+  '& .MuiSelect-select': {
+    padding: '3px 5px',
   }
 })
 

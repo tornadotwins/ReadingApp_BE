@@ -15,7 +15,6 @@ import {
   StyledDelButton,
   StyledAdminText,
 } from './styles';
-import { AdminPortalType } from './types';
 import PersonInfoDialog from '@/components/Base/PersonInfoDialog';
 import { Button } from '@mui/material';
 import { LoadingOverlay, Text } from '@/components/Base';
@@ -23,7 +22,7 @@ import { ACCESS_TOKEN } from '@/config';
 import authService from '../../../services/auth.services';
 import { UserType } from '../types';
 
-function AdminPortal(props: AdminPortalType) {
+function AdminPortal() {
   const [isLoading, setIsLoading] = useState(false);
   const [showAddPersonDlg, setShowAddPersonDlg] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
@@ -58,7 +57,9 @@ function AdminPortal(props: AdminPortalType) {
       })
       .finally(() => {
         setIsLoading(false);
-      })
+      });
+
+    setIsLoading(false)
   }, []);
 
   const addTableColumn = () => {
