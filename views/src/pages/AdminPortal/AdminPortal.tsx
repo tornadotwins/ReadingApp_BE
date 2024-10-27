@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'material-react-toastify';
+import { connect } from 'react-redux';
 
 import Meta from '@/components/Meta';
 import Header from '@/components/Header';
@@ -20,9 +21,10 @@ import { Button } from '@mui/material';
 import { LoadingOverlay, Text } from '@/components/Base';
 import { ACCESS_TOKEN } from '@/config';
 import authService from '../../../services/auth.services';
+import { AdminPortalPropsType } from './types';
 import { UserType } from '../types';
 
-function AdminPortal() {
+function AdminPortal(props: AdminPortalPropsType) {
   const [isLoading, setIsLoading] = useState(false);
   const [showAddPersonDlg, setShowAddPersonDlg] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
@@ -80,14 +82,14 @@ function AdminPortal() {
   // Navigate to Login page
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
-    navigate('/admin/login');
+    navigate('/');
   }
 
   return (
     <>
       <Meta title="Admin Portal" />
       <StyledAdminPortalContainer>
-        <Header header='Admin Portal' isLoggedIn={true} username='Abraham' onLogOut={onLogout} />
+        <Header header='Admin Portal' isLoggedIn={true} username={props.currentUser.username} onLogOut={onLogout} />
 
         <StyledAdminPortalBodyContainer>
           <UserCount userNumber={users.length || 0} />
@@ -125,4 +127,16 @@ function AdminPortal() {
   );
 }
 
-export default AdminPortal;
+function mapDispatchToProps(dispatch: any) {
+  return {
+    dispatch,
+  };
+}
+
+function mapStateToProps(state: any) {
+  return {
+    currentUser: state.user.currentUser,
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AdminPortal);

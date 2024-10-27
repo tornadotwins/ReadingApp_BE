@@ -1,4 +1,9 @@
-type AdminPortalType = {
+import { UserType } from "../types";
+
+type AdminPortalPropsType = {
+  currentUser: UserType;
+  dispatch: any;
+
   onSave: () => void;
   onAddPerson: () => void;
   onAddLang: () => void;
@@ -7,5 +12,5 @@ type AdminPortalType = {
 }
 
 export type {
-  AdminPortalType,
+  AdminPortalPropsType,
 }

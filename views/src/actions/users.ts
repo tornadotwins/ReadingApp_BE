@@ -1,0 +1,4 @@
+export default {
+  SET_CURRENT_USER: 'SET_CURRENT_USER',
+  RESET_USER: 'RESET_USER',
+};
