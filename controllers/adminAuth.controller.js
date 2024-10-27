@@ -128,16 +128,17 @@ exports.updateUser = async (req, res) => {
 //////////////////////////// Delete User Info ///////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.deleteUser = async (req, res) => {
-  const { userId } = req.body;
+  const { id } = req.params;
 
-  if (!userId)
+  if (!id)
     return res
       .status(400)
       .send({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
 
-  const result = await AdminUser.findByIdAndDelete(userId);
+  const user = await AdminUser.findByIdAndDelete(id);
+  user.password = '';
 
-  return res.status(200).send(result);
+  return res.status(200).send({ user });
 };
 
 /////////////////////////////////////////////////////////////////////////

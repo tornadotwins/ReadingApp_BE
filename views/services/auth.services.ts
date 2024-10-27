@@ -1,4 +1,5 @@
 import axios, {AxiosError} from "axios";
+
 import { API_URL, ACCESS_TOKEN, } from "../config";
 import { UserRequestType } from "./types";
 import { UserType } from "@/pages/types";
@@ -55,6 +56,27 @@ class AuthService {
 
       axios
         .post(url, data)
+        .then((response) => {
+          if(response.data.user) {
+            resolve(response.data.user);
+          } else {
+            reject(response.data.error)
+          }
+        })
+        .catch((error) => {
+          reject(this.getErrorMessage(error));
+        });
+    })
+  }
+
+  deleteUser = (id: string):Promise<UserType> => {
+    return new Promise((resolve, reject) => {
+      const url = API_URL + `/admin/auth/${id}`;
+      const token = this.getAccessToken();
+      token && this.setSession(token);
+
+      axios
+        .delete(url)
         .then((response) => {
           if(response.data.user) {
             resolve(response.data.user);

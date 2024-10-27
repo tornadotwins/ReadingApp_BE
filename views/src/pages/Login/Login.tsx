@@ -45,7 +45,6 @@ function Login(props: LoginPropsType) {
           transition: Bounce,
           closeOnClick: true,
           pauseOnHover: true,
-          hideProgressBar: false,
           autoClose: 3000
         });
 
@@ -60,7 +59,6 @@ function Login(props: LoginPropsType) {
           transition: Bounce,
           closeOnClick: true,
           pauseOnHover: true,
-          hideProgressBar: false,
           autoClose: 3000
         });
       })

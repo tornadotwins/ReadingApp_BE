@@ -4,7 +4,7 @@ type RoleType = {
 };
 
 type UserType = {
-  id: string;
+  _id: string;
   username: string;
   password: string;
   roles: RoleType[];

@@ -26,7 +26,7 @@ import authService from '../../../services/auth.services';
 import { AdminPortalPropsType } from './types';
 import { RoleType, UserType } from '../types';
 import { AppStateType } from '@/reducers/types';
-import { ADD_PERSON_SUCCESS } from '@/config/messages';
+import { ADD_PERSON_SUCCESS, DELETE_PERSON_SUCCESS } from '@/config/messages';
 
 function AdminPortal(props: AdminPortalPropsType) {
   const [isLoading, setIsLoading] = useState(false);
@@ -110,7 +110,6 @@ function AdminPortal(props: AdminPortalPropsType) {
           transition: Bounce,
           closeOnClick: true,
           pauseOnHover: true,
-          hideProgressBar: false,
           autoClose: 3000,
         });
         setShowAddPersonDlg(false);
@@ -123,11 +122,40 @@ function AdminPortal(props: AdminPortalPropsType) {
           transition: Bounce,
           closeOnClick: true,
           pauseOnHover: true,
-          hideProgressBar: false,
           autoClose: 3000,
         });
       });
     setIsLoading(false);
+  }
+
+  const handleDeletePerson = (id: string) => {
+    authService
+      .deleteUser(id)
+      .then(() => {
+        const updatedUsers = users.filter((user) => user._id !== id);
+        setUsers(updatedUsers);
+
+        toast.success(DELETE_PERSON_SUCCESS, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          autoClose: 3000,
+        });
+      })
+      .catch((error) => {
+        toast.success(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          autoClose: 3000,
+        });
+      })
   }
 
   return (
@@ -148,6 +176,7 @@ function AdminPortal(props: AdminPortalPropsType) {
             <TablePanel
               headers={tableHeaders}
               users={users}
+              onDeleteUser={handleDeletePerson}
             />
           </StyledTablePanelContainer>
 
@@ -165,7 +194,7 @@ function AdminPortal(props: AdminPortalPropsType) {
             </StyledButton>
 
             <StyledDelButton>
-              <Button>Del Language...</Button>
+              <Button onClick={() => handleDeletePerson}>Del Language...</Button>
             </StyledDelButton>
           </StyledButtonGroup>
         </StyledAdminPortalBodyContainer>

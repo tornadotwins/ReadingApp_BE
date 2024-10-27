@@ -67,7 +67,7 @@ const StyledSaveButton = styled(Box)<{disable: string}>(({disable}) => ({
 }));
 
 const StyledTablePanelContainer = styled(Box) ({
-  width: '100%',
+  // width: '100%',
   marginTop: '16px',
   display: 'flex',
   justifyContent: 'left',

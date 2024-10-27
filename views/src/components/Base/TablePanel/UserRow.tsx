@@ -99,7 +99,7 @@ const UserRow = (props: UserRowType) => {
                   edit
                 </Text>
               </StyledActionButton>
-              <StyledActionButton onClick={() => props.onDeleteUser?.(props.user.username)}>
+              <StyledActionButton onClick={() => props.onDeleteUser?.(props.user._id)}>
                 <Text
                   fontFamily='"Baloo Da 2"'
                   fontWeight='400'
