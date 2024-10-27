@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 import Text from '../Text';
 import Checkbox from '../Checkbox';
@@ -20,6 +20,31 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const isAdminRef = useRef<HTMLInputElement>(null);
+  const saveRef = useRef<HTMLButtonElement>(null);
+
+  const focusPassword = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      passwordRef.current?.focus();
+    }
+  };
+
+  const focusIsAdmin = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      isAdminRef.current?.focus();
+    }
+  };
+
+  const focusSaveBtn = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      saveRef.current?.click();
+    }
+  };
 
   const handleSave = () => {
     props.onSave(username, password, isAdmin);
@@ -52,6 +77,7 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
           </Text>
           <Input
             value={username}
+            onKeyDown={focusPassword}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
           />
         </StyledForm>
@@ -68,6 +94,9 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
           </Text>
           <Input
             value={password}
+            type='password'
+            reference={passwordRef}
+            onKeyDown={focusIsAdmin}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
           />
         </StyledForm>
@@ -85,6 +114,8 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
           <Checkbox
             checked={isAdmin}
             label=''
+            reference={isAdminRef}
+            onKeyDown={focusSaveBtn}
             onChange={() => setIsAdmin(!isAdmin)}
           />
         </StyledCheckForm>
@@ -95,7 +126,7 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
           </StyledButtonContainer>
 
           <StyledButtonContainer>
-            <Button label='Save' onClick={handleSave} />
+            <Button label='Save' onClick={handleSave} reference={saveRef} />
           </StyledButtonContainer>
         </StyledButtonGroup>
       </StyledDialogContent>
