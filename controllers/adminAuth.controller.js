@@ -61,7 +61,7 @@ exports.saveUser = async (req, res) => {
       .json({ message: ERROR_MESSAGES.EMPTY_BODY });
   }
 
-  const { username, password, isAdmin, role } = req.body;
+  const { username, password, isAdmin, roles } = req.body;
 
   // Validate username is unique.
   const userByUsername = await AdminUser.findOne({ username });
@@ -80,7 +80,7 @@ exports.saveUser = async (req, res) => {
   const user = new AdminUser();
   user.username = username;
   user.isAdmin = isAdmin;
-  user.role = role;
+  user.roles = roles;
   user.password = salt + '$' + hash;
   user.createdAt = Date.now();
   user.loginAt = Date.now();
@@ -195,7 +195,7 @@ exports.deleteLanguage = async (req, res) => {
       {},
       {
         $pull: {
-          role: {
+          roles: {
             language: language,
           },
         },

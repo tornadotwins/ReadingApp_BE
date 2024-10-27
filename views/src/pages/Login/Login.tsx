@@ -18,6 +18,7 @@ import { LoadingOverlay } from '@/components/Base';
 import actionTypes from '@/actions/actionTypes';
 import { UserType } from '../types';
 import { LoginPropsType } from './types';
+import { AppStateType } from '@/reducers/types';
 
 function Login(props: LoginPropsType) {
   const [isLoading, setIsLoading] = useState(false);
@@ -82,7 +83,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
   };
 }
 
-function mapStateToProps(state: any) {
+function mapStateToProps(state: AppStateType) {
   return {
     currentUser: state.user.currentUser,
   };

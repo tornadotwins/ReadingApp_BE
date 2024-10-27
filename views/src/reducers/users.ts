@@ -1,5 +1,6 @@
 import { createReducer } from 'reduxsauce';
 import Types from '../actions/actionTypes';
+import { StateType, UserActionType } from './types';
 
 export const initialState = {
   currentUser: null,
@@ -8,7 +9,7 @@ export const initialState = {
 //////////////////////////////////////////////////////////////////
 /////////////////////// Set Current User /////////////////////////
 //////////////////////////////////////////////////////////////////
-const setCurrentUser = (state: any, action: any) => {
+const setCurrentUser = (state: StateType, action: UserActionType) => {
   const { user } = action.payload;
   const newState = { ...state, currentUser: user };
   
@@ -18,7 +19,7 @@ const setCurrentUser = (state: any, action: any) => {
 //////////////////////////////////////////////////////////////////
 /////////////////////////// Reset User ///////////////////////////
 //////////////////////////////////////////////////////////////////
-const resetUser = (state: any) => ({
+const resetUser = (state: StateType,) => ({
   ...state,
 
   currentUser: null,

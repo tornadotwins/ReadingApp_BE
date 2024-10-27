@@ -5,7 +5,7 @@ const AdminUserSchema = new Schema({
   username: { type: String },
   password: { type: String },
   isAdmin: { type: Boolean },
-  role: { type: Array },
+  roles: { type: Array },
   createdAt: { type: Number, default: Date.now() },
   updatedAt: { type: Number, default: Date.now() },
   lastLoggedInAt: { type: Number },

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'material-react-toastify';
+import { toast, Bounce, ToastContainer, } from 'material-react-toastify';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
@@ -25,7 +25,8 @@ import { LoadingOverlay, Text } from '@/components/Base';
 import { ACCESS_TOKEN } from '@/config';
 import authService from '../../../services/auth.services';
 import { AdminPortalPropsType } from './types';
-import { UserType } from '../types';
+import { RoleType, UserType } from '../types';
+import { AppStateType } from '@/reducers/types';
 
 function AdminPortal(props: AdminPortalPropsType) {
   const [isLoading, setIsLoading] = useState(false);
@@ -49,17 +50,31 @@ function AdminPortal(props: AdminPortalPropsType) {
   // Fetch users
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
+    const tableHeaders: string[] = ['UserName', 'Password', 'isAdmin', 'Actions', 'Last Login'];
 
     authService
       .fetchUsers()
       .then((users: UserType[]) => {
+        users.forEach((user: UserType) => {
+          user.roles.map((role: RoleType) => {
+            !tableHeaders.includes(role.language) && tableHeaders.push(role.language);
+          })
+        });
+
+        setTableHeaders(tableHeaders);
         setUsers(users);
-        users[0].role.map(
-          (role) => setTableHeaders((prevTableHeaders) => [...prevTableHeaders, role.language])
-        );
       })
       .catch((error) => {
-        toast.error(error, { position: 'top-right', draggable: true });
+        toast.error(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
       })
       .finally(() => {
         setIsLoading(false);
@@ -68,20 +83,20 @@ function AdminPortal(props: AdminPortalPropsType) {
     setIsLoading(false)
   }, []);
 
-  const addTableColumn = () => {
-    if (!tableHeaders.includes('German')) {
-      // Update headers
-      setTableHeaders(prevHeaders => [...prevHeaders, 'German']);
+  // const addTableColumn = () => {
+  //   if (!tableHeaders.includes('German')) {
+  //     // Update headers
+  //     setTableHeaders(prevHeaders => [...prevHeaders, 'German']);
 
-      // Update users with new column
-      setUsers(prevUsers =>
-        prevUsers.map(user => ({
-          ...user,
-          german: 'none'
-        }))
-      );
-    }
-  };
+  //     // Update users with new column
+  //     setUsers(prevUsers =>
+  //       prevUsers.map(user => ({
+  //         ...user,
+  //         german: 'none'
+  //       }))
+  //     );
+  //   }
+  // };
 
   // Navigate to Login page
   const onLogout = () => {
@@ -120,7 +135,7 @@ function AdminPortal(props: AdminPortalPropsType) {
             </StyledButton>
 
             <StyledButton>
-              <Button onClick={() => { addTableColumn() }}>New Language</Button>
+              <Button onClick={() => { }}>New Language</Button>
             </StyledButton>
 
             <StyledDelButton>
@@ -131,6 +146,8 @@ function AdminPortal(props: AdminPortalPropsType) {
 
         <PersonInfoDialog isOpen={showAddPersonDlg} onSave={() => { }} onCancel={() => setShowAddPersonDlg(false)} />
       </StyledAdminPortalContainer>
+
+      <ToastContainer />
       {isLoading && <LoadingOverlay />}
     </>
   );
@@ -142,7 +159,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
   };
 }
 
-function mapStateToProps(state: any) {
+function mapStateToProps(state: AppStateType) {
   return {
     currentUser: state.user.currentUser,
   };

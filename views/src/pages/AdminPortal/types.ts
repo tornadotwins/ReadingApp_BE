@@ -1,8 +1,9 @@
+import { Dispatch } from "redux";
 import { UserType } from "../types";
 
 type AdminPortalPropsType = {
   currentUser: UserType;
-  dispatch: any;
+  dispatch: Dispatch;
 
   onSave: () => void;
   onAddPerson: () => void;
