@@ -2,20 +2,42 @@ import { useState } from 'react';
 
 import Text from "../Text";
 import Checkbox from "../Checkbox";
+import SelectBox from '../Select';
 import {
   StyledActionButtonGroup,
   StyledActionButton,
   StyledSmallSizedCell,
   StyledMiddleSizedCell,
   StyledPasswordCell,
+  StyledLargeSizedCell,
   StyledTableRow,
   StyledTableBodyCell,
 } from './styles';
 import { UserRowType } from './types';
 import { convertNumber2Date } from '@/utils';
+import { RoleType } from '@/pages/types';
 
 const UserRow = (props: UserRowType) => {
   const [isAdmin, setIsAdmin] = useState(props.user.isAdmin);
+  const [roles, setRoles] = useState<RoleType[]>(props.user.roles);
+
+  const RoleOptions = [
+    { label: 'None', value: 'none' },
+    { label: 'Translator', value: 'translator' },
+    { label: 'Publisher', value: 'publisher' }
+  ];
+
+  const handleRoleChange = (newValue: string, language: string) => {
+    // Update roles state
+    const updatedRoles = roles.map(role =>
+      role.language === language ? { ...role, role: newValue } : role
+    );
+    setRoles(updatedRoles);
+
+    if (props.onUpdateUserRole) {
+      props.onUpdateUserRole(props.user.username, language.toLowerCase(), newValue);
+    }
+  };
 
   const renderCell = (header: string) => {
     switch (header) {
@@ -109,24 +131,20 @@ const UserRow = (props: UserRowType) => {
           </StyledMiddleSizedCell>
         );
 
-      default:
-      // eslint-disable-next-line no-case-declarations
-      // const value = getStringValue(props.user, key);
-      // return (
-      //   <StyledLargeSizedCell>
-      //     <SelectBox
-      //       label=""
-      //       options={RoleOptions}
-      //       value={value}
-      //       textColor="#155D74"
-      //       onChange={(newValue) => {
-      //         if (onUpdateUserRole) {
-      //           onUpdateUserRole(props.user.username, key.toLowerCase(), newValue);
-      //         }
-      //       }}
-      //     />
-      //   </StyledLargeSizedCell>
-      // );
+      default: {
+        const role = roles.find((role: RoleType) => role.language == header);
+        return (
+          <StyledLargeSizedCell>
+            <SelectBox
+              label=""
+              options={RoleOptions}
+              value={role ? role.role : 'none'}
+              textColor="#155D74"
+              onChange={(e) => handleRoleChange(e.target.value as string, header)}
+            />
+          </StyledLargeSizedCell>
+        );
+      }
     }
   };
 
@@ -135,7 +153,6 @@ const UserRow = (props: UserRowType) => {
       {props.headers.map((header, index) => (
         <StyledTableBodyCell
           key={index}
-          width={(header !== "UserName" && header !== "Password" && header !== "isAdmin" && header !== "Actions" && header !== "Last Login") ? 200 : undefined}
         >
           {renderCell(header)}
         </StyledTableBodyCell>

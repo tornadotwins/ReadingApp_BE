@@ -13,6 +13,7 @@ type UserRowType = {
   headers: string[],
   onEditUser?: (user: UserType) => void;
   onDeleteUser?: (userName: string) => void;
+  onUpdateUserRole?: (userName: string, language: string, role: string) => void;
 }
 
 export type {

@@ -146,7 +146,11 @@ const StyledLargeSizedCell = styled(Box) ({
   },
 
   '& .MuiSelect-select': {
-    padding: '3px 5px',
+    padding: '3px 10px',
+
+    '& .MuiBox-root': {
+      placeSelf: 'start'
+    }
   }
 })
 

@@ -11,6 +11,7 @@ import { SelectBoxProps } from './types';
 import Text from '../Text';
 
 function SelectBox(props: SelectBoxProps) {
+
   return (
     <StyledFormControl variant="outlined">
       <InputLabel>{props.label}</InputLabel>

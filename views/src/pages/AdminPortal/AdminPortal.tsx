@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { toast, Bounce, ToastContainer, } from 'material-react-toastify';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+import { Button } from '@mui/material';
 
 import Meta from '@/components/Meta';
 import Header from '@/components/Header';
 import UserCount from '@/components/UserCount';
-import TablePanel from '@/components/Base/TablePanel';
 import {
   StyledAdminPortalContainer,
   StyledAdminPortalBodyContainer,
@@ -20,8 +20,7 @@ import {
   StyledAdminText,
 } from './styles';
 import PersonInfoDialog from '@/components/Base/PersonInfoDialog';
-import { Button } from '@mui/material';
-import { LoadingOverlay, Text } from '@/components/Base';
+import { LoadingOverlay, Text, TablePanel } from '@/components/Base';
 import { ACCESS_TOKEN } from '@/config';
 import authService from '../../../services/auth.services';
 import { AdminPortalPropsType } from './types';
@@ -82,21 +81,6 @@ function AdminPortal(props: AdminPortalPropsType) {
 
     setIsLoading(false)
   }, []);
-
-  // const addTableColumn = () => {
-  //   if (!tableHeaders.includes('German')) {
-  //     // Update headers
-  //     setTableHeaders(prevHeaders => [...prevHeaders, 'German']);
-
-  //     // Update users with new column
-  //     setUsers(prevUsers =>
-  //       prevUsers.map(user => ({
-  //         ...user,
-  //         german: 'none'
-  //       }))
-  //     );
-  //   }
-  // };
 
   // Navigate to Login page
   const onLogout = () => {
