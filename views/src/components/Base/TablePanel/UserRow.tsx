@@ -1,52 +1,23 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-import PropTypes from 'prop-types';
 import Text from "../Text";
 import Checkbox from "../Checkbox";
-import SelectBox from "../Select";
 import {
-  StyledTableRow,
-  StyledTableBodyCell,
   StyledActionButtonGroup,
   StyledActionButton,
   StyledSmallSizedCell,
   StyledMiddleSizedCell,
-  StyledLargeSizedCell,
   StyledPasswordCell,
+  StyledTableRow,
+  StyledTableBodyCell,
 } from './styles';
 import { UserRowType } from './types';
-import { UserType } from '@/pages/types';
 import { convertNumber2Date } from '@/utils';
 
-// Create a type-safe prop-types validator for the user object
-const userPropType = PropTypes.exact({
-  username: PropTypes.string.isRequired,
-  password: PropTypes.string.isRequired,
-  isAdmin: PropTypes.bool.isRequired,
-  lastLoggedInAt: PropTypes.string.isRequired,
-});
-
-const RoleOptions = [
-  { value: 'none', label: 'None' },
-  { value: 'translator', label: 'Translator' },
-  { value: 'publisher', label: 'Publisher' }
-];
-
-const UserRow: React.FC<UserRowType> = (props: UserRowType) => {
+const UserRow = (props: UserRowType) => {
   const [isAdmin, setIsAdmin] = useState(props.user.isAdmin);
-  
-
-  const getStringValue = (obj: UserType, key: string): string => {
-    const value = obj[key.toLowerCase()];
-    if (typeof value === 'string') {
-      return value;
-    }
-    return 'none';
-  };
 
   const renderCell = (header: string) => {
-    const key = header.toLowerCase().replace(/\s+/g, '');
-
     switch (header) {
       case 'UserName':
         return (
@@ -90,23 +61,6 @@ const UserRow: React.FC<UserRowType> = (props: UserRowType) => {
           </StyledSmallSizedCell>
         );
 
-      case 'Last Login':
-        console.log(props.user.lastLoggedAt, typeof (props.user.lastLoggedAt));
-        return (
-          <StyledMiddleSizedCell>
-            <Text
-              fontFamily='"Baloo Da 2"'
-              fontWeight='400'
-              fontSize={16}
-              lineHeight={24}
-              color='#155D74'
-              hasUnderline
-            >
-              {convertNumber2Date(Number(props.user.lastLoggedAt)).toString()}
-            </Text>
-          </StyledMiddleSizedCell>
-        );
-
       case 'Actions':
         return (
           <StyledMiddleSizedCell>
@@ -139,24 +93,40 @@ const UserRow: React.FC<UserRowType> = (props: UserRowType) => {
           </StyledMiddleSizedCell>
         );
 
-      default:
-        // eslint-disable-next-line no-case-declarations
-        const value = getStringValue(props.user, key);
+      case 'Last Login':
         return (
-          <StyledLargeSizedCell>
-            <SelectBox
-              label=""
-              options={RoleOptions}
-              value={value}
-              textColor="#155D74"
-              onChange={(newValue) => {
-                if (onUpdateUserRole) {
-                  onUpdateUserRole(props.user.username, key.toLowerCase(), newValue);
-                }
-              }}
-            />
-          </StyledLargeSizedCell>
+          <StyledMiddleSizedCell>
+            <Text
+              fontFamily='"Baloo Da 2"'
+              fontWeight='400'
+              fontSize={16}
+              lineHeight={24}
+              color='#155D74'
+              hasUnderline
+            >
+              {convertNumber2Date(Number(props.user.lastLoggedInAt)).toString()}
+            </Text>
+          </StyledMiddleSizedCell>
         );
+
+      default:
+      // eslint-disable-next-line no-case-declarations
+      // const value = getStringValue(props.user, key);
+      // return (
+      //   <StyledLargeSizedCell>
+      //     <SelectBox
+      //       label=""
+      //       options={RoleOptions}
+      //       value={value}
+      //       textColor="#155D74"
+      //       onChange={(newValue) => {
+      //         if (onUpdateUserRole) {
+      //           onUpdateUserRole(props.user.username, key.toLowerCase(), newValue);
+      //         }
+      //       }}
+      //     />
+      //   </StyledLargeSizedCell>
+      // );
     }
   };
 
@@ -165,7 +135,7 @@ const UserRow: React.FC<UserRowType> = (props: UserRowType) => {
       {props.headers.map((header, index) => (
         <StyledTableBodyCell
           key={index}
-          width={header === 'English' || header === 'Arabic' || header === 'German' ? 200 : undefined}
+          width={(header !== "UserName" && header !== "Password" && header !== "isAdmin" && header !== "Actions" && header !== "Last Login") ? 200 : undefined}
         >
           {renderCell(header)}
         </StyledTableBodyCell>
@@ -173,24 +143,5 @@ const UserRow: React.FC<UserRowType> = (props: UserRowType) => {
     </StyledTableRow>
   );
 };
-
-// Define prop types with exact types matching the TypeScript interface
-UserRow.propTypes = {
-  user: userPropType.isRequired,
-  headers: PropTypes.arrayOf(
-    PropTypes.string.isRequired
-  ).isRequired,
-  onEditUser: PropTypes.func,
-  onDeleteUser: PropTypes.func,
-  onUpdateUserRole: PropTypes.func
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-} as any; // Using 'as any' to bypass the type mismatch between PropTypes and TypeScript
-
-// Define default props
-// UserRow.defaultProps = {
-//   onEditUser: undefined,
-//   onDeleteUser: undefined,
-//   onUpdateUserRole: undefined
-// };
 
 export default UserRow;

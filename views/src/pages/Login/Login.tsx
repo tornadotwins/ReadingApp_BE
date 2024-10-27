@@ -27,7 +27,7 @@ function Login() {
       .login({ username, password })
       .then((user: UserType) => {
         if (user.isAdmin)
-          navigate('/admin/admin-portal');
+          navigate('/admin');
       })
       .catch((error) => {
         toast.error(error, {

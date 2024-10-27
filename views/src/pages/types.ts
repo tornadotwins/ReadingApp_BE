@@ -9,7 +9,7 @@ type UserType = {
   password: string;
   role: Array<RoleType>;
   isAdmin: boolean;
-  lastLoggedAt: number;
+  lastLoggedInAt: number;
 };
 
 export type {

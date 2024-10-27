@@ -81,6 +81,7 @@ const StyledActionButtonGroup = styled(Box) ({
 const StyledActionButton = styled(Box) ({
   padding: '0px',
   boxSizing: 'border-box',
+  cursor: 'pointer',
 
   '& > .MuiBox-root': {
     textDecoration: 'underline',
