@@ -126,7 +126,7 @@ const UserRow = (props: UserRowType) => {
               color='#155D74'
               hasUnderline
             >
-              {convertNumber2Date(Number(props.user.lastLoggedInAt)).toString()}
+              {props.user.lastLoggedInAt ? convertNumber2Date(Number(props.user.lastLoggedInAt)).toString() : ''}
             </Text>
           </StyledMiddleSizedCell>
         );

@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { Bounce, toast, ToastContainer } from 'material-react-toastify';
+import { Bounce, toast } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
 
 import Header from '@/components/Header';
 import Meta from '@/components/Meta';
-import { HEADER_TRANSLATION_PORTAL } from '@/config/messages';
+import { HEADER_TRANSLATION_PORTAL, LOGIN_SUCCESS } from '@/config/messages';
 import useOrientation from '@/hooks/useOrientation';
 
 import { StyledLoginContainer, StyledLoginBody } from './styles';
@@ -36,6 +36,17 @@ function Login(props: LoginPropsType) {
           payload: {
             user: user,
           },
+        });
+
+        toast.success(LOGIN_SUCCESS, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
         });
 
         if (user.isAdmin)
@@ -71,7 +82,6 @@ function Login(props: LoginPropsType) {
         </StyledLoginBody>
       </StyledLoginContainer>
 
-      <ToastContainer />
       {isLoading && <LoadingOverlay />}
     </>
   );

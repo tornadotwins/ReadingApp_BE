@@ -8,6 +8,7 @@ import { store, persistor } from './store';
 import { withErrorHandler } from '@/error-handling';
 import AppErrorBoundaryFallback from '@/error-handling/fallbacks/App';
 import Pages from '@/routes/Pages';
+import { ToastContainer } from 'material-react-toastify';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Fragment>
           <BrowserRouter>
             <Pages />
+            <ToastContainer />
           </BrowserRouter>
         </Fragment>
       </PersistGate>

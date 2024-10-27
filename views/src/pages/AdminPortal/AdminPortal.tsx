@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast, Bounce, ToastContainer, } from 'material-react-toastify';
+import { toast, Bounce } from 'material-react-toastify';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { Button } from '@mui/material';
@@ -26,6 +26,7 @@ import authService from '../../../services/auth.services';
 import { AdminPortalPropsType } from './types';
 import { RoleType, UserType } from '../types';
 import { AppStateType } from '@/reducers/types';
+import { ADD_PERSON_SUCCESS } from '@/config/messages';
 
 function AdminPortal(props: AdminPortalPropsType) {
   const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +81,7 @@ function AdminPortal(props: AdminPortalPropsType) {
       });
 
     setIsLoading(false)
-  }, [users]);
+  }, []);
 
   // Navigate to Login page
   const onLogout = () => {
@@ -88,7 +89,8 @@ function AdminPortal(props: AdminPortalPropsType) {
     navigate('/');
   }
 
-  const handleSaveUser = (username: string, password: string, isAdmin: boolean) => {
+  // Save Person
+  const handleSavePerson = (username: string, password: string, isAdmin: boolean) => {
     const data = {
       username,
       password,
@@ -96,10 +98,21 @@ function AdminPortal(props: AdminPortalPropsType) {
     };
 
     setIsLoading(true);
+
     authService
       .saveUser(data)
       .then((user: UserType) => {
-        console.log('successfully saved: ', user);
+        setUsers([...users, user]);
+        toast.success(ADD_PERSON_SUCCESS, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000,
+        });
         setShowAddPersonDlg(false);
       })
       .catch((error) => {
@@ -111,7 +124,7 @@ function AdminPortal(props: AdminPortalPropsType) {
           closeOnClick: true,
           pauseOnHover: true,
           hideProgressBar: false,
-          autoClose: 3000
+          autoClose: 3000,
         });
       });
     setIsLoading(false);
@@ -159,12 +172,11 @@ function AdminPortal(props: AdminPortalPropsType) {
 
         <PersonInfoDialog
           isOpen={showAddPersonDlg}
-          onSave={(username, password, isAdmin) => handleSaveUser(username, password, isAdmin)}
+          onSave={(username, password, isAdmin) => handleSavePerson(username, password, isAdmin)}
           onCancel={() => setShowAddPersonDlg(false)}
         />
       </StyledAdminPortalContainer>
 
-      <ToastContainer />
       {isLoading && <LoadingOverlay />}
     </>
   );

@@ -1,10 +1,10 @@
 import axios, {AxiosError} from "axios";
 import { API_URL, ACCESS_TOKEN, } from "../config";
-import { AddUserType, LoginType } from "./types";
+import { UserRequestType } from "./types";
 import { UserType } from "@/pages/types";
 
 class AuthService {
-  login = (data: LoginType): Promise<UserType> => {
+  login = (data: UserRequestType): Promise<UserType> => {
     return new Promise((resolve, reject) => {
       const url = API_URL + '/admin/auth/login';
       axios
@@ -47,7 +47,7 @@ class AuthService {
     })
   };
 
-  saveUser = (data: AddUserType):Promise<UserType> => {
+  saveUser = (data: UserRequestType):Promise<UserType> => {
     return new Promise((resolve, reject) => {
       const url = API_URL + '/admin/auth/save-user';
       const token = this.getAccessToken();
