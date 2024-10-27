@@ -21,7 +21,7 @@ exports.login = async (req, res) => {
     { username },
     { lastLoggedInAt: Date.now() },
   );
-  
+
   if (!user) {
     return res
       .status(400)
@@ -54,42 +54,51 @@ exports.login = async (req, res) => {
 /////////////////////////////// Save User ///////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.saveUser = async (req, res) => {
-  // Check if fields are existing.
-  if (Object.keys(req.body).length === 0) {
+  try {
+    // Check if fields are existing.
+    if (Object.keys(req.body).length === 0) {
+      return res
+        .status(400)
+        .json({ message: ERROR_MESSAGES.EMPTY_BODY });
+    }
+
+    const { username, password, isAdmin } = req.body;
+    console.log({ username, password, isAdmin });
+
+    // Validate username is unique.
+    const userByUsername = await AdminUser.findOne({ username });
+    if (userByUsername) {
+      return res
+        .status(400)
+        .send({ message: ERROR_MESSAGES.USERNAME_IN_USE });
+    }
+
+    const salt = crypto.randomBytes(16).toString('base64');
+    const hash = crypto
+      .createHmac('sha512', salt)
+      .update(password)
+      .digest('base64');
+
+    const user = new AdminUser();
+    user.username = username;
+    user.isAdmin = isAdmin;
+    user.roles = [];
+    user.password = salt + '$' + hash;
+    user.createdAt = Date.now();
+    user.loginAt = Date.now();
+    user.lastLoggedInAt = '';
+
+    await user.save();
+
+    user.password = undefined;
+    return res.status(200).send({
+      user,
+    });
+  } catch (error) {
     return res
-      .status(400)
-      .json({ message: ERROR_MESSAGES.EMPTY_BODY });
+      .status(500)
+      .json({ message: ERROR_MESSAGES.NETWORK_ERROR });
   }
-
-  const { username, password, isAdmin, roles } = req.body;
-
-  // Validate username is unique.
-  const userByUsername = await AdminUser.findOne({ username });
-  if (userByUsername) {
-    return res
-      .status(400)
-      .send({ message: ERROR_MESSAGES.USERNAME_IN_USE });
-  }
-
-  const salt = crypto.randomBytes(16).toString('base64');
-  const hash = crypto
-    .createHmac('sha512', salt)
-    .update(password)
-    .digest('base64');
-
-  const user = new AdminUser();
-  user.username = username;
-  user.isAdmin = isAdmin;
-  user.roles = roles;
-  user.password = salt + '$' + hash;
-  user.createdAt = Date.now();
-  user.loginAt = Date.now();
-  await user.save();
-
-  user.password = undefined;
-  return res.status(200).send({
-    user,
-  });
 };
 
 /////////////////////////////////////////////////////////////////////////

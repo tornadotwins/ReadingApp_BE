@@ -1,6 +1,6 @@
 import axios, {AxiosError} from "axios";
 import { API_URL, ACCESS_TOKEN, } from "../config";
-import { LoginType } from "./types";
+import { AddUserType, LoginType } from "./types";
 import { UserType } from "@/pages/types";
 
 class AuthService {
@@ -36,13 +36,37 @@ class AuthService {
         .get(url)
         .then((response) => {
           if(response.data.users) {
-            resolve(response.data.users);
+            resolve(response.data.users as UserType[]);
           } else {
             reject(response.data.error);
           }
         })
+        .catch((error) => {
+          reject(this.getErrorMessage(error));
+        });
     })
   };
+
+  saveUser = (data: AddUserType):Promise<UserType> => {
+    return new Promise((resolve, reject) => {
+      const url = API_URL + '/admin/auth/save-user';
+      const token = this.getAccessToken();
+      token && this.setSession(token);
+
+      axios
+        .post(url, data)
+        .then((response) => {
+          if(response.data.user) {
+            resolve(response.data.user);
+          } else {
+            reject(response.data.error)
+          }
+        })
+        .catch((error) => {
+          reject(this.getErrorMessage(error));
+        });
+    })
+  }
 
   setSession = (accessToken: string) => {
     if (accessToken) {

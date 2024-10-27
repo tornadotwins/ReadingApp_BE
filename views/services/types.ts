@@ -3,6 +3,13 @@ type LoginType = {
   password: string;
 }
 
+type AddUserType = {
+  username: string;
+  password: string;
+  isAdmin: boolean;
+}
+
 export type {
-  LoginType
+  LoginType,
+  AddUserType,
 }

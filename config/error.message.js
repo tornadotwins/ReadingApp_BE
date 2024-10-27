@@ -2,6 +2,7 @@ module.exports = {
   EMPTY_BODY: 'Failed! Fields are not exists.',
   SERVER_ERROR: 'Server Error',
   NO_TOKEN: 'No token',
+  NETWORK_ERROR: 'Network Error',
 
   // Auth
   USERNAME_IN_USE: 'Failed! Username is already in use!',

@@ -80,12 +80,41 @@ function AdminPortal(props: AdminPortalPropsType) {
       });
 
     setIsLoading(false)
-  }, []);
+  }, [users]);
 
   // Navigate to Login page
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
     navigate('/');
+  }
+
+  const handleSaveUser = (username: string, password: string, isAdmin: boolean) => {
+    const data = {
+      username,
+      password,
+      isAdmin,
+    };
+
+    setIsLoading(true);
+    authService
+      .saveUser(data)
+      .then((user: UserType) => {
+        console.log('successfully saved: ', user);
+        setShowAddPersonDlg(false);
+      })
+      .catch((error) => {
+        toast.error(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+      });
+    setIsLoading(false);
   }
 
   return (
@@ -128,7 +157,11 @@ function AdminPortal(props: AdminPortalPropsType) {
           </StyledButtonGroup>
         </StyledAdminPortalBodyContainer>
 
-        <PersonInfoDialog isOpen={showAddPersonDlg} onSave={() => { }} onCancel={() => setShowAddPersonDlg(false)} />
+        <PersonInfoDialog
+          isOpen={showAddPersonDlg}
+          onSave={(username, password, isAdmin) => handleSaveUser(username, password, isAdmin)}
+          onCancel={() => setShowAddPersonDlg(false)}
+        />
       </StyledAdminPortalContainer>
 
       <ToastContainer />
