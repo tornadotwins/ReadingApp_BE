@@ -36,7 +36,7 @@ function AdminPortal(props: AdminPortalPropsType) {
   const [isChangedUsers, setIsChangedUsers] = useState(false);
   const [personToDeleteId, setPersonToDeleteId] = useState<string>('');
 
-  const [showAddPersonDlg, setShowAddPersonDlg] = useState(false);
+  const [showEditPersonDlg, setShowEditPersonDlg] = useState(false);
   const [showDeletePersonDlg, setShowDeletePersonDlg] = useState(false);
   const [showDeleteConfirmDlg, setShowDeleteConfirmDlg] = useState(false);
 
@@ -119,7 +119,7 @@ function AdminPortal(props: AdminPortalPropsType) {
           pauseOnHover: true,
           autoClose: 3000,
         });
-        setShowAddPersonDlg(false);
+        setShowEditPersonDlg(false);
       })
       .catch((error) => {
         toast.error(error, {
@@ -135,6 +135,7 @@ function AdminPortal(props: AdminPortalPropsType) {
     setIsLoading(false);
   }
 
+  // Delete Person
   const handleDeletePerson = (id: string, confirmed: boolean = false) => {
     if (!confirmed) {
       setShowDeletePersonDlg(true);
@@ -176,6 +177,11 @@ function AdminPortal(props: AdminPortalPropsType) {
     setIsLoading(false);
   }
 
+  // Edit Person
+  const handleEditPerson = () => {
+
+  }
+
   return (
     <>
       <Meta title="Admin Portal" />
@@ -194,6 +200,7 @@ function AdminPortal(props: AdminPortalPropsType) {
             <TablePanel
               headers={tableHeaders}
               users={users}
+              onEditUser={handleEditPerson}
               onDeleteUser={handleDeletePerson}
             />
           </StyledTablePanelContainer>
@@ -204,7 +211,7 @@ function AdminPortal(props: AdminPortalPropsType) {
 
           <StyledButtonGroup>
             <StyledButton>
-              <Button onClick={() => setShowAddPersonDlg(true)}>New Person</Button>
+              <Button onClick={() => setShowEditPersonDlg(true)}>New Person</Button>
             </StyledButton>
 
             <StyledButton>
@@ -218,9 +225,9 @@ function AdminPortal(props: AdminPortalPropsType) {
         </StyledAdminPortalBodyContainer>
 
         <PersonInfoDialog
-          isOpen={showAddPersonDlg}
+          isOpen={showEditPersonDlg}
           onSave={(username, password, isAdmin) => handleSavePerson(username, password, isAdmin)}
-          onCancel={() => setShowAddPersonDlg(false)}
+          onCancel={() => setShowEditPersonDlg(false)}
         />
 
         <DeleteDialog

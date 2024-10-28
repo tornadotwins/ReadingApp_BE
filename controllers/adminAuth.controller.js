@@ -107,21 +107,37 @@ exports.getAllUsers = async (req, res) => {
 //////////////////////////// Update User Info ///////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.updateUser = async (req, res) => {
-  const updatedUserInfo = req.body;
+  const newUser = req.body;
 
-  if (!updatedUserInfo)
+  if (!newUser)
     return res
       .status(400)
       .send({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
 
-  const userId = updatedUserInfo.id;
+  const salt = crypto.randomBytes(16).toString('base64');
+  const hash = crypto
+    .createHmac('sha512', salt)
+    .update(newUser.password)
+    .digest('base64');
 
-  const result = await AdminUser.findByIdAndUpdate(
-    userId,
-    updatedUserInfo,
-  );
+  const userId = newUser.id;
 
-  return res.status(200).send(result);
+  const existingUser = await AdminUser.findById(userId);
+
+  if (!existingUser) {
+    return res
+      .status(404)
+      .send({ message: ERROR_MESSAGES.USER_NOT_FOUND });
+  }
+
+  existingUser.roles = newUser.roles;
+  existingUser.username = newUser.username;
+  existingUser.password = salt + '$' + hash;
+  existingUser.isAdmin = newUser.isAdmin;
+
+  const updatedUser = await existingUser.save();
+
+  return res.status(200).send({ user: updatedUser });
 };
 
 /////////////////////////////////////////////////////////////////////////
