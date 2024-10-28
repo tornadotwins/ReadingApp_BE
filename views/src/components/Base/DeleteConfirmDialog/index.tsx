@@ -38,7 +38,7 @@ function DeleteConfirmDialog(props: DeleteConfirmDialogPropsType) {
     }
   };
 
-  const handleSave = () => {
+  const handleDeleteConfirm = () => {
     props.onConfirm();
   };
 
@@ -75,7 +75,12 @@ function DeleteConfirmDialog(props: DeleteConfirmDialogPropsType) {
           </StyledButtonContainer>
 
           <StyledDeleteButtonContainer isdisable={isDisable ? 'true' : 'false'}>
-            <Button label='Delete forever' onClick={handleSave} reference={saveRef} disabled={isDisable} />
+            <Button
+              label='Delete forever'
+              onClick={handleDeleteConfirm}
+              reference={saveRef}
+              disabled={isDisable}
+            />
           </StyledDeleteButtonContainer>
         </StyledButtonGroup>
       </StyledDialogContent>

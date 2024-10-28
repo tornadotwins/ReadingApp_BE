@@ -34,6 +34,7 @@ function AdminPortal(props: AdminPortalPropsType) {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [isChangedUsers, setIsChangedUsers] = useState(false);
+  const [personToDeleteId, setPersonToDeleteId] = useState<string>('');
 
   const [showAddPersonDlg, setShowAddPersonDlg] = useState(false);
   const [showDeletePersonDlg, setShowDeletePersonDlg] = useState(false);
@@ -134,35 +135,45 @@ function AdminPortal(props: AdminPortalPropsType) {
     setIsLoading(false);
   }
 
-  const handleDeletePerson = (id: string) => {
-    setShowDeletePersonDlg(true);
-    // authService
-    //   .deleteUser(id)
-    //   .then(() => {
-    //     const updatedUsers = users.filter((user) => user._id !== id);
-    //     setUsers(updatedUsers);
+  const handleDeletePerson = (id: string, confirmed: boolean = false) => {
+    if (!confirmed) {
+      setShowDeletePersonDlg(true);
+      // Store the ID of the person to be deleted
+      setPersonToDeleteId(id); // Add this state variable
+      return;
+    }
 
-    //     toast.success(DELETE_PERSON_SUCCESS, {
-    //       position: 'top-right',
-    //       draggable: true,
-    //       theme: 'colored',
-    //       transition: Bounce,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       autoClose: 3000,
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     toast.success(error, {
-    //       position: 'top-right',
-    //       draggable: true,
-    //       theme: 'colored',
-    //       transition: Bounce,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       autoClose: 3000,
-    //     });
-    //   })
+    setIsLoading(true);
+    authService
+      .deleteUser(id)
+      .then(() => {
+        const updatedUsers = users.filter((user) => user._id !== id);
+        setUsers(updatedUsers);
+
+        toast.success(DELETE_PERSON_SUCCESS, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          autoClose: 3000,
+        });
+      })
+      .catch((error) => {
+        toast.success(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          autoClose: 3000,
+        });
+      });
+
+    setShowDeleteConfirmDlg(false);
+    setIsLoading(false);
   }
 
   return (
@@ -225,7 +236,7 @@ function AdminPortal(props: AdminPortalPropsType) {
 
         <DeleteConfirmDialog
           isOpen={showDeleteConfirmDlg}
-          onConfirm={() => { }}
+          onConfirm={() => handleDeletePerson(personToDeleteId, true)}
           onCancel={() => setShowDeleteConfirmDlg(false)}
         />
       </StyledAdminPortalContainer>
