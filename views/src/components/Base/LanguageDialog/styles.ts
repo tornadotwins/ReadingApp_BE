@@ -9,6 +9,10 @@ import {
 const StyledDialog = styled(Dialog) ({
   borderRadius: '0px',
 
+  '& .MuiDialog-paper': {
+    borderRadius: '0px'
+  },
+
   '& .MuiDialogContent-root > .MuiBox-root:first-of-type': {
     width: '100%'
   },

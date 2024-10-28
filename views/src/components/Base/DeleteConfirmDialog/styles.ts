@@ -8,6 +8,10 @@ import {
 
 const StyledDialog = styled(Dialog) ({
   borderRadius: '0px',
+
+  '& .MuiDialog-paper': {
+    borderRadius: '0px'
+  }
 });
 
 const StyledDialogTitle = styled (DialogTitle) ({

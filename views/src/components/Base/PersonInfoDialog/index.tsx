@@ -21,8 +21,6 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
   const [password, setPassword] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
 
-  console.log(props.user)
-
   useEffect(() => {
     if (props.user) {
       setUsername(props.user?.username || '');
