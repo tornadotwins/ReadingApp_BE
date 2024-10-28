@@ -18,7 +18,7 @@ const StyledPersonInfoContainer = styled(Box) ({
 
 const StyledDialog = styled(Dialog) ({
   borderRadius: '0px',
-})
+});
 
 const StyledDialogTitle = styled (DialogTitle) ({
   backgroundColor: '#2D87A4',
@@ -31,7 +31,7 @@ const StyledDialogTitle = styled (DialogTitle) ({
 const StyledDialogContent = styled(DialogContent) ({
   backgroundColor: '#155D74',
   padding: '12px',
-})
+});
 
 const StyledPersonInfoFormContainer = styled(Box) ({
   backgroundColor: '#155D74',
@@ -115,7 +115,7 @@ const StyledButtonContainer = styled(Box) ({
       fontSize: '16px !important'
     }
   }
-})
+});
 
 export {
   StyledPersonInfoContainer,
