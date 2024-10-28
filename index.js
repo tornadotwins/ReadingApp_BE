@@ -59,7 +59,7 @@ app.use('/bookmarks', bookmarkRoute);
 app.use('/admin/auth', adminAuthRoute);
 
 app.get('/admin/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin/index.html'));
+  res.sendFile(path.join(__dirname, 'admin', 'index.html'));
 });
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
