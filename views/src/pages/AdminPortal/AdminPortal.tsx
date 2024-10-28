@@ -367,6 +367,7 @@ function AdminPortal(props: AdminPortalPropsType) {
         });
       });
 
+    setIsUsersChanged(false);
     setIsLoading(false);
   }
 

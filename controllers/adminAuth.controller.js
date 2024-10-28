@@ -77,10 +77,21 @@ exports.saveUser = async (req, res) => {
     .update(password)
     .digest('base64');
 
+  console.log(password, hash);
+
   const user = new AdminUser();
   user.username = username;
   user.isAdmin = isAdmin;
-  user.roles = [];
+
+  const anyUser = await AdminUser.findOne();
+  const roles = anyUser.roles;
+  let newUserRoles = [];
+  roles.map((role) =>
+    newUserRoles.push({ language: role.language, role: 'none' }),
+  );
+
+  user.roles = newUserRoles;
+
   user.password = salt + '$' + hash;
   user.createdAt = Date.now();
   user.loginAt = Date.now();

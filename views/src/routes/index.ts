@@ -21,6 +21,12 @@ const routes: Routes = {
     title: 'Admin Portal',
     icon: GitHubIcon,
   },
+  [Pages.Translator]: {
+    component: asyncComponentLoader(() => import('@/pages/Translator')),
+    path: '/tarnslator',
+    title: 'Translator Portal',
+    icon: AddTaskIcon,
+  },
   [Pages.Page2]: {
     component: asyncComponentLoader(() => import('@/pages/Page2')),
     path: '/page-2',

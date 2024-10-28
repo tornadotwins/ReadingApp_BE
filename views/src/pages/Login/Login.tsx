@@ -50,6 +50,8 @@ function Login(props: LoginPropsType) {
 
         if (user.isAdmin)
           navigate('/admin');
+        else
+          navigate('/tarnslator');
       })
       .catch((error) => {
         toast.error(error, {
