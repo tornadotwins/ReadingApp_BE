@@ -17,7 +17,7 @@ import {
 
 function DeleteDialog(props: DeleteDialogPropsType) {
 
-  const handleSave = () => {
+  const handleDelete = () => {
     props.onDelete();
   };
 
@@ -49,7 +49,7 @@ function DeleteDialog(props: DeleteDialogPropsType) {
           </StyledButtonContainer>
 
           <StyledDeleteButtonContainer>
-            <Button label='Delete' onClick={() => handleSave} />
+            <Button label='Delete' onClick={handleDelete} />
           </StyledDeleteButtonContainer>
         </StyledButtonGroup>
       </StyledDialogContent>

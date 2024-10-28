@@ -28,6 +28,7 @@ import { RoleType, UserType } from '../types';
 import { AppStateType } from '@/reducers/types';
 import { ADD_PERSON_SUCCESS, DELETE_PERSON_SUCCESS } from '@/config/messages';
 import DeleteDialog from '@/components/Base/DeleteDialog';
+import DeleteConfirmDialog from '@/components/Base/DeleteConfirmDialog';
 
 function AdminPortal(props: AdminPortalPropsType) {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +37,7 @@ function AdminPortal(props: AdminPortalPropsType) {
 
   const [showAddPersonDlg, setShowAddPersonDlg] = useState(false);
   const [showDeletePersonDlg, setShowDeletePersonDlg] = useState(false);
+  const [showDeleteConfirmDlg, setShowDeleteConfirmDlg] = useState(false);
 
   const [tableHeaders, setTableHeaders] = useState<string[]>([
     'UserName',
@@ -214,8 +216,17 @@ function AdminPortal(props: AdminPortalPropsType) {
           title='Delete Person'
           content='Removing a team member cannot be undone!'
           isOpen={showDeletePersonDlg}
-          onDelete={() => { }}
+          onDelete={() => {
+            setShowDeletePersonDlg(false);
+            setShowDeleteConfirmDlg(true);
+          }}
           onCancel={() => setShowDeletePersonDlg(false)}
+        />
+
+        <DeleteConfirmDialog
+          isOpen={showDeleteConfirmDlg}
+          onConfirm={() => { }}
+          onCancel={() => setShowDeleteConfirmDlg(false)}
         />
       </StyledAdminPortalContainer>
 
