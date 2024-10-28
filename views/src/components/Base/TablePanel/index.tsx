@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Table,
   TableContainer,
@@ -17,7 +17,7 @@ import UserRow from './UserRow';
 
 import { UserType } from '@/pages/types';
 
-const TablePanel: React.FC<TablePanelType> = (props) => {
+const TablePanel = (props: TablePanelType) => {
   const [headers, setHeaders] = useState<string[]>([]);
 
   useEffect(() => {
