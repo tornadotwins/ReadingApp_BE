@@ -2,6 +2,7 @@ module.exports = {
   EMPTY_BODY: 'Failed! Fields are not exists.',
   SERVER_ERROR: 'Server Error',
   NO_TOKEN: 'No token',
+  NETWORK_ERROR: 'Network Error',
 
   // Auth
   USERNAME_IN_USE: 'Failed! Username is already in use!',
@@ -13,6 +14,7 @@ module.exports = {
   PASSWORD_INCORRECT: 'Your password is incorrect.',
   TOKEN_NOT_VALID: 'Your token is not valid.',
   TOKEN_EXPIRED: 'Token has been expired',
+  UPDATE_FAILED: 'Failed to update',
 
   // Book
   BOOK_NOT_FOUND: "Could't find books in library",
@@ -20,13 +22,14 @@ module.exports = {
   CHAPTER_NOT_FOUND: "Couldn't find chapters in sub book",
   VERSE_NOT_FOUND: "Couldn't find verses in chapter",
   USER_HISTORY_NOT_FOUND: "Couldn't find history for this user.",
-  HISTORY_ADDED: "History added",
-  INCORRECT_PARAMS: "Incorrect parameters",
+  HISTORY_ADDED: 'History added',
+  INCORRECT_PARAMS: 'Incorrect parameters',
   BOOKMARK_NOT_FOUND: "Couldn't find bookmark.",
-  BOOKMARK_ADDED: "Bookmark added",
-  BOOKMARK_DELETE: "Bookmark deleted",
+  BOOKMARK_ADDED: 'Bookmark added',
+  BOOKMARK_DELETE: 'Bookmark deleted',
 
   // Authenticate
   USER_NOT_PERMITTED: "You don't have permission to do this action.",
   USER_NOT_FOUND: "Could't find the user",
+  UNAUTHORIZED_USER: 'You are not permitted for the action.',
 };

@@ -9,6 +9,8 @@ const authRoute = require('./routes/auth.route');
 const bookRoute = require('./routes/book.route');
 const bookmarkRoute = require('./routes/bookmark.route');
 
+const adminAuthRoute = require('./routes/adminAuth.route');
+
 const dbConfig = require('./config/db.config');
 const path = require('path');
 
@@ -52,6 +54,8 @@ app.use(express.static(path.join(__dirname, 'frontend')));
 app.use('/auth', authRoute);
 app.use('/books', bookRoute);
 app.use('/bookmarks', bookmarkRoute);
+
+app.use('/admin/auth', adminAuthRoute);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "index.html"));
