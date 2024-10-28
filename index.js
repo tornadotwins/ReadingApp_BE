@@ -1,4 +1,4 @@
-require ('dotenv/config');
+require('dotenv/config');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -50,6 +50,7 @@ app.use(morgan('combined'));
 
 app.use('/', express.static(path.join(__dirname, '/public')));
 app.use(express.static(path.join(__dirname, 'frontend')));
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 app.use('/auth', authRoute);
 app.use('/books', bookRoute);
@@ -57,8 +58,11 @@ app.use('/bookmarks', bookmarkRoute);
 
 app.use('/admin/auth', adminAuthRoute);
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "index.html"));
+app.get('/admin/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin/index.html'));
+});
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
 const port = process.env.PORT || 5000;
