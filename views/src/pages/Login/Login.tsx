@@ -49,9 +49,9 @@ function Login(props: LoginPropsType) {
         });
 
         if (user.isAdmin)
-          navigate('/admin');
+          navigate('/admin/admin-portal');
         else
-          navigate('/tarnslator');
+          navigate('/admin/tarnslator');
       })
       .catch((error) => {
         toast.error(error, {

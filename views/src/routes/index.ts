@@ -11,19 +11,19 @@ import { Pages, Routes } from './types';
 const routes: Routes = {
   [Pages.Welcome]: {
     component: asyncComponentLoader(() => import('@/pages/Login')),
-    path: '/',
+    path: '/admin',
     title: 'Login',
     icon: HomeIcon,
   },
   [Pages.AdminPortal]: {
     component: asyncComponentLoader(() => import('@/pages/AdminPortal/AdminPortal')),
-    path: '/admin',
+    path: '/admin/admin-portal',
     title: 'Admin Portal',
     icon: GitHubIcon,
   },
   [Pages.Translator]: {
     component: asyncComponentLoader(() => import('@/pages/Translator')),
-    path: '/tarnslator',
+    path: '/admin/tarnslator',
     title: 'Translator Portal',
     icon: AddTaskIcon,
   },
