@@ -8,6 +8,7 @@ class AuthService {
   login = (data: UserRequestType): Promise<UserType> => {
     return new Promise((resolve, reject) => {
       const url = API_URL + '/admin/auth/login';
+      console.log(url)
       axios
         .post(url, data)
         .then((response) => {
