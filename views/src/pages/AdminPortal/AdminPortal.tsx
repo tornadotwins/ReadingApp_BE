@@ -413,7 +413,7 @@ function AdminPortal(props: AdminPortalPropsType) {
             </StyledButton>
 
             <StyledDelButton>
-              <Button onClick={() => handleDeleteLanguage("german")}>Del Language...</Button>
+              <Button onClick={() => handleDeleteLanguage("hindi")}>Del Language...</Button>
             </StyledDelButton>
           </StyledButtonGroup>
         </StyledAdminPortalBodyContainer>
@@ -448,7 +448,7 @@ function AdminPortal(props: AdminPortalPropsType) {
           onConfirm={() =>
             deletePerson ?
               handleDeletePerson(personToDeleteId, true) :
-              handleDeleteLanguage('german', true)
+              handleDeleteLanguage('hindi', true)
           }
           onCancel={() => setShowDeleteConfirmDlg(false)}
         />

@@ -21,6 +21,8 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
   const [password, setPassword] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
 
+  console.log(props.user)
+
   useEffect(() => {
     if (props.user) {
       setUsername(props.user?.username || '');
@@ -71,7 +73,6 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
 
     props.onSave(username, password, isAdmin);
   };
-
 
   const handleCancel = () => {
     // Reset form state

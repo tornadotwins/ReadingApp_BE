@@ -1,23 +1,43 @@
-import { StyledCheckbox, StyledFormControlLabel } from './styled';
+import { useState } from 'react';
+import {
+  StyledCheckBoxContainer,
+  StyledCheckBoxLabel,
+  StyledCheckBox,
+  StyledCheckBoxImgContainer,
+  StyledCheckBoxImg
+} from './styled';
 import { CheckboxProps } from './types';
 import Text from '../Text';
+import Images from '@/config/images';
 
 function Checkbox(props: CheckboxProps) {
+  // State to keep track of whether the checkbox is checked
+  const [isChecked, setIsChecked] = useState(props.checked || false);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLLabelElement>) => {
-    if (props.onKeyDown) {
-      props.onKeyDown(event as React.KeyboardEvent<HTMLLabelElement>);
+  // Handle checkbox click
+  const handleCheckboxChange = () => {
+    setIsChecked(!isChecked); // Toggle the checked state
+    if (props.onChange) {
+      props.onChange(!isChecked);
     }
   };
 
   return (
-    <StyledFormControlLabel
-      control={<StyledCheckbox checked={props.checked} bordercolor='#155D74' onChange={props.onChange} />}
-      label={<Text color='#155D74' >{props.label}</Text>}
-      style={{ color: '#155D74' }}
-      bordercolor='#155D74'
-      onKeyDown={handleKeyDown}
-    />
+    <StyledCheckBoxContainer>
+      {props.label && (
+        <StyledCheckBoxLabel>
+          <Text fontFamily='"Baloo Da 2"' fontSize={16} lineHeight={24} textAlign='center'>
+            {props.label}
+          </Text>
+        </StyledCheckBoxLabel>
+      )}
+
+      <StyledCheckBox onClick={handleCheckboxChange}>
+        <StyledCheckBoxImgContainer>
+          {isChecked && <StyledCheckBoxImg src={Images.icon_check} />}
+        </StyledCheckBoxImgContainer>
+      </StyledCheckBox>
+    </StyledCheckBoxContainer>
   );
 }
 
