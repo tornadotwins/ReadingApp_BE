@@ -97,7 +97,7 @@ function AdminPortal(props: AdminPortalPropsType) {
   // Navigate to Login page
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
-    navigate('/');
+    navigate('/admin');
   };
 
   // Save Person
@@ -413,7 +413,7 @@ function AdminPortal(props: AdminPortalPropsType) {
             </StyledButton>
 
             <StyledDelButton>
-              <Button onClick={() => handleDeleteLanguage("hindi")}>Del Language...</Button>
+              <Button onClick={() => handleDeleteLanguage("miguel")}>Del Language...</Button>
             </StyledDelButton>
           </StyledButtonGroup>
         </StyledAdminPortalBodyContainer>
@@ -448,7 +448,7 @@ function AdminPortal(props: AdminPortalPropsType) {
           onConfirm={() =>
             deletePerson ?
               handleDeletePerson(personToDeleteId, true) :
-              handleDeleteLanguage('hindi', true)
+              handleDeleteLanguage('miguel', true)
           }
           onCancel={() => setShowDeleteConfirmDlg(false)}
         />
