@@ -4,11 +4,12 @@
   "description": "Back-End",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "cd ./views && vite",
     "dev:backend": "nodemon --exec babel-node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/index.js",
+  "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client && npm install --prefix admin && npm run build --prefix admin",
+    "name": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
