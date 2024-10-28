@@ -26,9 +26,10 @@ import authService from '../../../services/auth.services';
 import { AdminPortalPropsType } from './types';
 import { RoleType, UserType } from '../types';
 import { AppStateType } from '@/reducers/types';
-import { ADD_PERSON_SUCCESS, DELETE_PERSON_SUCCESS } from '@/config/messages';
+import { ADD_PERSON_SUCCESS, DELETE_LANGUAGE_MESSAGE, DELETE_PERSON_MESSAGE, DELETE_PERSON_SUCCESS } from '@/config/messages';
 import DeleteDialog from '@/components/Base/DeleteDialog';
 import DeleteConfirmDialog from '@/components/Base/DeleteConfirmDialog';
+import LanguageDialog from '@/components/Base/LanguageDialog';
 
 function AdminPortal(props: AdminPortalPropsType) {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,10 +37,12 @@ function AdminPortal(props: AdminPortalPropsType) {
   const [isChangedUsers, setIsChangedUsers] = useState(false);
   const [personToEdit, setPersonToEdit] = useState<UserType>();
   const [personToDeleteId, setPersonToDeleteId] = useState<string>('');
+  const [languageToDelete, setLanguageToDelete] = useState<string>('');
 
   const [showEditPersonDlg, setShowEditPersonDlg] = useState(false);
   const [showDeletePersonDlg, setShowDeletePersonDlg] = useState(false);
   const [showDeleteConfirmDlg, setShowDeleteConfirmDlg] = useState(false);
+  const [showLanguageDlg, setShowLanguageDlg] = useState(false);
 
   const [tableHeaders, setTableHeaders] = useState<string[]>([
     'UserName',
@@ -233,6 +236,89 @@ function AdminPortal(props: AdminPortalPropsType) {
     setIsLoading(false);
   }
 
+  // Add language
+  const handleAddLanguage = (language: string) => {
+    setShowLanguageDlg(false);
+
+    users.map((user: UserType) => {
+      user.roles.push({ language: language, role: 'none' });
+    });
+
+    setIsLoading(true);
+
+    authService
+      .updateUsers(users)
+      .then((users: UserType[]) => {
+        setUsers(users);
+        setTableHeaders([...tableHeaders, language]);
+
+        toast.success('Updated successfully', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          autoClose: 3000,
+        });
+      })
+      .catch((error) => {
+        toast.error(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          autoClose: 3000,
+        });
+      })
+
+    setIsLoading(false);
+  }
+
+  // Delete language
+  const handleDeleteLanguage = (language: string, confirmed: boolean) => {
+    if (!confirmed) {
+      setShowDeletePersonDlg(true);
+      // Store the ID of the person to be deleted
+      setLanguageToDelete(language);
+      return;
+    } else {
+      setIsLoading(true);
+      // authService
+      //   .deleteUser(id)
+      //   .then(() => {
+      //     const updatedUsers = users.filter((user) => user._id !== id);
+      //     setUsers(updatedUsers);
+
+      //     toast.success(DELETE_PERSON_SUCCESS, {
+      //       position: 'top-right',
+      //       draggable: true,
+      //       theme: 'colored',
+      //       transition: Bounce,
+      //       closeOnClick: true,
+      //       pauseOnHover: true,
+      //       autoClose: 3000,
+      //     });
+      //   })
+      //   .catch((error) => {
+      //     toast.success(error, {
+      //       position: 'top-right',
+      //       draggable: true,
+      //       theme: 'colored',
+      //       transition: Bounce,
+      //       closeOnClick: true,
+      //       pauseOnHover: true,
+      //       autoClose: 3000,
+      //     });
+      //   });
+    }
+
+    setShowDeleteConfirmDlg(false);
+    setIsLoading(false);
+  }
+
   return (
     <>
       <Meta title="Admin Portal" />
@@ -266,7 +352,7 @@ function AdminPortal(props: AdminPortalPropsType) {
             </StyledButton>
 
             <StyledButton>
-              <Button onClick={() => { }}>New Language</Button>
+              <Button onClick={() => setShowLanguageDlg(true)}>New Language</Button>
             </StyledButton>
 
             <StyledDelButton>
@@ -292,7 +378,7 @@ function AdminPortal(props: AdminPortalPropsType) {
 
         <DeleteDialog
           title='Delete Person'
-          content='Removing a team member cannot be undone!'
+          content={showDeletePersonDlg ? DELETE_PERSON_MESSAGE : DELETE_LANGUAGE_MESSAGE}
           isOpen={showDeletePersonDlg}
           onDelete={() => {
             setShowDeletePersonDlg(false);
@@ -305,6 +391,13 @@ function AdminPortal(props: AdminPortalPropsType) {
           isOpen={showDeleteConfirmDlg}
           onConfirm={() => handleDeletePerson(personToDeleteId, true)}
           onCancel={() => setShowDeleteConfirmDlg(false)}
+        />
+
+        <LanguageDialog
+          isOpen={showLanguageDlg}
+          languages={tableHeaders}
+          onConfirm={(language) => handleAddLanguage(language)}
+          onCancel={() => setShowLanguageDlg(false)}
         />
       </StyledAdminPortalContainer>
 

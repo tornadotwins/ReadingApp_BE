@@ -14,6 +14,7 @@ module.exports = {
   PASSWORD_INCORRECT: 'Your password is incorrect.',
   TOKEN_NOT_VALID: 'Your token is not valid.',
   TOKEN_EXPIRED: 'Token has been expired',
+  UPDATE_FAILED: 'Failed to update',
 
   // Book
   BOOK_NOT_FOUND: "Could't find books in library",

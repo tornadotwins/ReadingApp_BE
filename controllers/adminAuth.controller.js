@@ -172,32 +172,36 @@ exports.updateUsers = async (req, res) => {
 
   try {
     // Use Promise.all to handle multiple updates concurrently
-    const updatePromises = updatedUserInfos.map(async (userInfo) => {
-      if (!userInfo.id) {
-        throw new Error(`User ID is required for updates`);
+    updatedUserInfos.map(async (userInfo) => {
+      if (!userInfo._id) {
+        return res.status(400).send({
+          message:
+            ERROR_MESSAGES.USER_NOT_FOUND + ': ' + userInfo._id,
+        });
       }
 
-      const result = await AdminUser.findByIdAndUpdate(
-        userInfo.id,
-        userInfo,
-        { new: true }, // Return the updated document
-      );
+      const existingUser = await AdminUser.findById(userInfo._id);
+      existingUser.username = userInfo.username;
+      existingUser.password = userInfo.password;
+      existingUser.roles = userInfo.roles;
+      existingUser.isAdmin = userInfo.isAdmin;
+      existingUser.updatedAt = Date.now();
 
-      if (!result) {
-        throw new Error(`User with ID ${userInfo.id} not found`);
+      const updatedUser = await existingUser.save();
+
+      if (!updatedUser) {
+        return res.status(400).send({
+          message: ERROR_MESSAGES.UPDATE_FAILED,
+        });
       }
-
-      return result;
     });
 
-    const updatedUsers = await Promise.all(updatePromises);
+    const allUsers = await AdminUser.find();
 
     return res.status(200).send({
-      users: updatedUsers,
-      message: 'Users updated successfully',
+      users: allUsers,
     });
   } catch (error) {
-    console.error('Error updating users:', error);
     return res.status(400).send({
       message: error.message || ERROR_MESSAGES.UPDATE_FAILED,
     });
