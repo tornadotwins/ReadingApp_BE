@@ -80,7 +80,7 @@ function LanguageDialog(props: LanguageDialogPropsType) {
 
           <StyledButtonContainer isvalidate={(isValidate && language != '') ? 'true' : 'false'}>
             <Button
-              label='Save'
+              label={'Save'}
               onClick={handleSave}
               reference={saveRef}
               disabled={!isValidate}

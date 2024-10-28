@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 
 import Text from '../Text';
+import UserRow from './UserRow';
 
 import {
   StyledTableHead,
@@ -13,16 +14,33 @@ import {
   StyledTableBody
 } from './styles';
 import { TablePanelType } from './types';
-import UserRow from './UserRow';
 
 import { UserType } from '@/pages/types';
 
 const TablePanel = (props: TablePanelType) => {
   const [headers, setHeaders] = useState<string[]>([]);
+  const [users, setUsers] = useState<UserType[]>(props.users);
 
   useEffect(() => {
     setHeaders(props.headers);
   }, [props.headers]);
+
+  useEffect(() => {
+    setUsers(props.users);
+  }, [props.users]);
+
+  const handleUserChange = (updatedUser: UserType) => {
+    // Update the users state with the modified user data
+    const updatedUsers = users.map(user =>
+      user.username === updatedUser.username ? updatedUser : user
+    );
+    setUsers(updatedUsers);
+
+    // Optionally, you can also notify a parent component if needed
+    if (props.onUserChange) {
+      props.onUserChange(updatedUsers);
+    }
+  };
 
   const renderTableHeader = () => (
     <StyledTableHead>
@@ -40,13 +58,14 @@ const TablePanel = (props: TablePanelType) => {
 
   const renderTableBody = () => (
     <StyledTableBody>
-      {props.users.map((user: UserType, index: number) => (
+      {users.map((user: UserType, index: number) => (
         <UserRow
           key={index}
           user={user}
           headers={headers}
           onEditUser={props.onEditUser}
           onDeleteUser={props.onDeleteUser}
+          onUserChange={handleUserChange} // Pass the callback to handle changes
         />
       ))}
     </StyledTableBody>

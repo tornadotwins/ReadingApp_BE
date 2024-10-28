@@ -34,10 +34,9 @@ import LanguageDialog from '@/components/Base/LanguageDialog';
 function AdminPortal(props: AdminPortalPropsType) {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
-  const [isChangedUsers, setIsChangedUsers] = useState(false);
+  const [isUsersChanged, setIsUsersChanged] = useState(false);
   const [personToEdit, setPersonToEdit] = useState<UserType>();
   const [personToDeleteId, setPersonToDeleteId] = useState<string>('');
-  const [languageToDelete, setLanguageToDelete] = useState<string>('');
   const [deletePerson, setDeletePerson] = useState(false);
 
   const [showEditPersonDlg, setShowEditPersonDlg] = useState(false);
@@ -275,7 +274,7 @@ function AdminPortal(props: AdminPortalPropsType) {
           pauseOnHover: true,
           autoClose: 3000,
         });
-      })
+      });
 
     setIsLoading(false);
   };
@@ -284,7 +283,6 @@ function AdminPortal(props: AdminPortalPropsType) {
   const handleDeleteLanguage = (language: string, confirmed: boolean = false) => {
     if (!confirmed) {
       setShowDeleteLanguageDlg(true);
-      setLanguageToDelete(language);
       return;
     } else {
       setIsLoading(true);
@@ -300,6 +298,7 @@ function AdminPortal(props: AdminPortalPropsType) {
         };
       });
 
+      // Update database (remove the language from their roles)
       authService
         .updateUsers(updatedUsers)
         .then((users: UserType[]) => {
@@ -335,6 +334,40 @@ function AdminPortal(props: AdminPortalPropsType) {
       setShowDeleteConfirmDlg(false);
       setShowDeleteLanguageDlg(false);
     }
+  };
+
+  // Save changes
+  const handleSaveChanges = () => {
+    console.log(users)
+    setIsLoading(true);
+    setIsUsersChanged(true);
+
+    authService
+      .updateUsers(users)
+      .then(() => {
+        toast.success('Updated successfully', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          autoClose: 3000,
+        });
+      })
+      .catch((error) => {
+        toast.error(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          autoClose: 3000,
+        });
+      });
+
+    setIsLoading(false);
   }
 
   return (
@@ -346,8 +379,8 @@ function AdminPortal(props: AdminPortalPropsType) {
         <StyledAdminPortalBodyContainer>
           <StyledTablePanelHeader>
             <UserCount userNumber={users.length || 0} />
-            <StyledSaveButton disable={isChangedUsers ? 'false' : 'true'}>
-              <Button onClick={() => { }} disabled={isChangedUsers}>Save</Button>
+            <StyledSaveButton disable={isUsersChanged ? 'false' : 'true'}>
+              <Button onClick={handleSaveChanges} disabled={!isUsersChanged}>Save</Button>
             </StyledSaveButton>
           </StyledTablePanelHeader>
 
@@ -357,6 +390,11 @@ function AdminPortal(props: AdminPortalPropsType) {
               users={users}
               onEditUser={handleEditPerson}
               onDeleteUser={handleDeletePerson}
+              onUserChange={(updatedUsers: UserType[]) => {
+                // handleSaveChanges(updatedUsers);
+                setIsUsersChanged(true);
+                setUsers(updatedUsers);
+              }}
             />
           </StyledTablePanelContainer>
 

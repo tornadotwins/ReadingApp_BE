@@ -4,14 +4,10 @@ const FlexBox = styled(Box)({
   display: 'flex',
 });
 
-const CenteredFlexBox = styled(FlexBox)({
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-
-const StyledAdminPortalContainer = styled(CenteredFlexBox) ({
+const StyledAdminPortalContainer = styled(FlexBox) ({
   width: '100vw',
   height: '100vh',
+  alignItems: 'center',
 
   '& >.MuiBox-root: first-of-type': {
     backgroundColor: '#1B7695',
@@ -19,7 +15,6 @@ const StyledAdminPortalContainer = styled(CenteredFlexBox) ({
 });
 
 const StyledAdminPortalBodyContainer = styled(Box) ({
-  width: '100%',
   height: 'calc(100vh - 73px)',
   marginTop: '73px',
   padding: '0px 48px',
@@ -36,17 +31,18 @@ const StyledSaveButton = styled(Box)<{disable: string}>(({disable}) => ({
   cursor: disable == 'true' ? 'not-allowed': 'pointer',
   height: '40px',
   marginTop: '46px',
-  backgroundColor: disable ? '#CAC9C9' :'#FFAA5D',
-  color: '#474747',
+  backgroundColor: disable == 'true' ? '#CAC9C9' :'#FFAA5D',
   border: '1px solid #474747',
   boxSizing: 'border-box',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   transitionDuration: '.5s',
+  color: disable == 'true' ? '#474747' : '#FFF !important',
 
   '& button': {
-    color: '#474747',
+    // color: '#474747',
+    color: disable == 'true' ? '#474747' : 'white !important',
     transitionDuration: '.5s',
     fontSize: '14px',
     cursor: disable == 'true' ? 'not-allowed': 'pointer',
