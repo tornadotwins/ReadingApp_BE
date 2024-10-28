@@ -2,7 +2,8 @@ import isMobile from '@/utils/is-mobile';
 
 import type { Notifications } from './types';
 
-const API_URL = 'http://localhost:5000';
+// const API_URL = 'http://localhost:5000';
+const API_URL = 'https://readingapp-d5944320053c.herokuapp.com';
 
 const title = 'React PWA';
 
