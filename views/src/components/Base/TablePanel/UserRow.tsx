@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Text from "../Text";
 import Checkbox from "../Checkbox";
@@ -20,6 +20,11 @@ import { RoleType } from '@/pages/types';
 const UserRow = (props: UserRowType) => {
   const [isAdmin, setIsAdmin] = useState(props.user.isAdmin);
   const [roles, setRoles] = useState<RoleType[]>(props.user.roles);
+
+  useEffect(() => {
+    setIsAdmin(props.user.isAdmin);
+    setRoles(props.user.roles);
+  }, [props.user])
 
   const RoleOptions = [
     { label: 'None', value: 'none' },

@@ -28,13 +28,12 @@ function DeleteConfirmDialog(props: DeleteConfirmDialogPropsType) {
     }
   }, [confirmText]);
 
-  const passwordRef = useRef<HTMLInputElement>(null);
-  const saveRef = useRef<HTMLButtonElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
 
-  const focusPassword = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const focusConfirmButton = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      passwordRef.current?.focus();
+      confirmRef.current?.click();
     }
   };
 
@@ -64,7 +63,7 @@ function DeleteConfirmDialog(props: DeleteConfirmDialogPropsType) {
         <StyledForm>
           <Input
             value={confirmText}
-            onKeyDown={focusPassword}
+            onKeyDown={focusConfirmButton}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmText(e.target.value)}
           />
         </StyledForm>
@@ -78,7 +77,7 @@ function DeleteConfirmDialog(props: DeleteConfirmDialogPropsType) {
             <Button
               label='Delete forever'
               onClick={handleDeleteConfirm}
-              reference={saveRef}
+              reference={confirmRef}
               disabled={isDisable}
             />
           </StyledDeleteButtonContainer>

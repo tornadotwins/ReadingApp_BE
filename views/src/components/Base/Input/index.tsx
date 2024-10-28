@@ -19,6 +19,7 @@ function Input(props: InputType) {
         <TextField
           required={props.required}
           type={props.type}
+          value={props.value}
           inputRef={props.reference}
           placeholder={props.placeholder}
           onKeyDown={handleKeyDown}

@@ -34,6 +34,7 @@ function AdminPortal(props: AdminPortalPropsType) {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [isChangedUsers, setIsChangedUsers] = useState(false);
+  const [personToEdit, setPersonToEdit] = useState<UserType>();
   const [personToDeleteId, setPersonToDeleteId] = useState<string>('');
 
   const [showEditPersonDlg, setShowEditPersonDlg] = useState(false);
@@ -94,7 +95,7 @@ function AdminPortal(props: AdminPortalPropsType) {
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
     navigate('/');
-  }
+  };
 
   // Save Person
   const handleSavePerson = (username: string, password: string, isAdmin: boolean) => {
@@ -133,7 +134,7 @@ function AdminPortal(props: AdminPortalPropsType) {
         });
       });
     setIsLoading(false);
-  }
+  };
 
   // Delete Person
   const handleDeletePerson = (id: string, confirmed: boolean = false) => {
@@ -142,16 +143,69 @@ function AdminPortal(props: AdminPortalPropsType) {
       // Store the ID of the person to be deleted
       setPersonToDeleteId(id); // Add this state variable
       return;
+    } else {
+      setIsLoading(true);
+      authService
+        .deleteUser(id)
+        .then(() => {
+          const updatedUsers = users.filter((user) => user._id !== id);
+          setUsers(updatedUsers);
+
+          toast.success(DELETE_PERSON_SUCCESS, {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            autoClose: 3000,
+          });
+        })
+        .catch((error) => {
+          toast.success(error, {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            autoClose: 3000,
+          });
+        });
     }
 
+    setShowDeleteConfirmDlg(false);
+    setIsLoading(false);
+  };
+
+  // Show dialog when user click "Edit" button
+  const handleEditPerson = (user: UserType) => {
+    setPersonToEdit(user);
+    setShowEditPersonDlg(true);
+  }
+
+  // Update user information
+  const handleUpdateUserInfo = (username: string, password: string, isAdmin: boolean) => {
+    if (!personToEdit)
+      return;
+
     setIsLoading(true);
+
+    const data = {
+      id: personToEdit._id,
+      username,
+      password,
+      isAdmin,
+      roles: personToEdit.roles,
+    };
+
     authService
-      .deleteUser(id)
-      .then(() => {
-        const updatedUsers = users.filter((user) => user._id !== id);
+      .updateUser(data)
+      .then((updatedUser: UserType) => {
+        const updatedUsers = users.map((user: UserType) => user._id == updatedUser._id ? updatedUser : user);
         setUsers(updatedUsers);
 
-        toast.success(DELETE_PERSON_SUCCESS, {
+        toast.success('User updated successfully', {
           position: 'top-right',
           draggable: true,
           theme: 'colored',
@@ -160,9 +214,12 @@ function AdminPortal(props: AdminPortalPropsType) {
           pauseOnHover: true,
           autoClose: 3000,
         });
+
+        setShowEditPersonDlg(false);
+        setPersonToEdit(undefined);
       })
       .catch((error) => {
-        toast.success(error, {
+        toast.error(error, {
           position: 'top-right',
           draggable: true,
           theme: 'colored',
@@ -173,13 +230,7 @@ function AdminPortal(props: AdminPortalPropsType) {
         });
       });
 
-    setShowDeleteConfirmDlg(false);
     setIsLoading(false);
-  }
-
-  // Edit Person
-  const handleEditPerson = () => {
-
   }
 
   return (
@@ -226,8 +277,17 @@ function AdminPortal(props: AdminPortalPropsType) {
 
         <PersonInfoDialog
           isOpen={showEditPersonDlg}
-          onSave={(username, password, isAdmin) => handleSavePerson(username, password, isAdmin)}
-          onCancel={() => setShowEditPersonDlg(false)}
+          user={personToEdit}
+          onSave={(username, password, isAdmin) => {
+            personToEdit ?
+              handleUpdateUserInfo(username, password, isAdmin) :
+              handleSavePerson(username, password, isAdmin)
+          }
+          }
+          onCancel={() => {
+            setShowEditPersonDlg(false);
+            setPersonToEdit(undefined);
+          }}
         />
 
         <DeleteDialog

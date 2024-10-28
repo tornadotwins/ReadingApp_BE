@@ -90,6 +90,27 @@ class AuthService {
     })
   }
 
+  updateUser = (data: UserRequestType): Promise<UserType> => {
+    return new Promise((resolve, reject) => {
+      const url = API_URL + '/admin/auth';
+      const token = this.getAccessToken();
+      token && this.setSession(token);
+
+      axios
+        .put(url, data)
+        .then((response) => {
+          if(response.data.user) {
+            resolve(response.data.user);
+          } else {
+            reject(response.data.error);
+          }
+        })
+        .catch((error) => {
+          reject(this.getErrorMessage(error));
+        })
+    })
+  }
+
   setSession = (accessToken: string) => {
     if (accessToken) {
       localStorage.setItem(ACCESS_TOKEN, accessToken);

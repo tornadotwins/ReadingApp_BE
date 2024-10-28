@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import Text from '../Text';
 import Checkbox from '../Checkbox';
@@ -20,6 +20,19 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (props.user) {
+      setUsername(props.user?.username || '');
+      setPassword(props.user?.password || '');
+      setIsAdmin(props.user?.isAdmin || false);
+    } else {
+      // Reset form when creating a new user
+      setUsername('');
+      setPassword('');
+      setIsAdmin(false);
+    }
+  }, [props.user, props.isOpen]);
 
   const passwordRef = useRef<HTMLInputElement>(null);
   const isAdminRef = useRef<HTMLInputElement>(null);
@@ -47,8 +60,18 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
   };
 
   const handleSave = () => {
+    // Add validation
+    if (!username.trim()) {
+      return; // Add appropriate error message
+    }
+
+    if (!props.user && !password.trim()) {
+      return; // Add appropriate error message for new users
+    }
+
     props.onSave(username, password, isAdmin);
   };
+
 
   const handleCancel = () => {
     // Reset form state
