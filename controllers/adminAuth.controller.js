@@ -14,7 +14,6 @@ exports.login = async (req, res) => {
   }
 
   const { username, password } = req.body;
-  console.log(username, password);
 
   // Check user is existing with username.
   const user = await AdminUser.findOneAndUpdate(
@@ -29,8 +28,6 @@ exports.login = async (req, res) => {
   }
 
   const cryptedPassword = encrypt(password);
-
-  console.log(user.password, cryptedPassword);
 
   if (user.password != cryptedPassword) {
     return res
@@ -217,7 +214,7 @@ exports.updateUsers = async (req, res) => {
 ////////////////////////////// Add Language /////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.addLanguage = async (req, res) => {
-  const language = req.body;
+  const { language } = req.body;
 
   if (!language) {
     return res
@@ -227,37 +224,56 @@ exports.addLanguage = async (req, res) => {
 
   const users = await AdminUser.find();
 
-  users.map((user) => {
-    user.roles.push({ language: language.language, role: 'none' });
-    user.save();
-    user.password = decrypt(user.password);
+  // Update each user's roles and save
+  await Promise.all(
+    users.map(async (user) => {
+      user.roles.push({ language, role: 'none' });
+      await user.save();
+    }),
+  );
+
+  // Prepare response data without altering saved passwords
+  const responseUsers = users.map((user) => {
+    return {
+      ...user.toObject(),
+      password: decrypt(user.password),
+    };
   });
 
-  return res.status(200).send({ users: users });
+  return res.status(200).send({ users: responseUsers });
 };
 
 /////////////////////////////////////////////////////////////////////////
 //////////////////////////// Delete Language ////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.deleteLanguage = async (req, res) => {
-  const { language } = req.body;
+  const { language } = req.params;
 
-  try {
-    await AdminUser.updateMany(
-      {},
-      {
-        $pull: {
-          roles: {
-            language: language,
-          },
-        },
-      },
-    );
-
-    return res.status(200).send({
-      message: 'The language has been deleted successfully',
-    });
-  } catch (error) {
-    console.error('Error deleting the language roles:', error);
+  if (!language) {
+    return res
+      .status(400)
+      .send({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
   }
+
+  const users = await AdminUser.find();
+
+  // Update roles for each user and save
+  await Promise.all(
+    users.map(async (user) => {
+      user.roles = user.roles.filter(
+        (role) => role.language !== language,
+      );
+      await user.save();
+    }),
+  );
+
+  // Prepare response data without modifying saved passwords
+  const responseUsers = users.map((user) => {
+    return {
+      ...user.toObject(),
+      password: decrypt(user.password),
+    };
+  });
+
+  return res.status(200).send({ users: responseUsers });
 };

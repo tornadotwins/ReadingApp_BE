@@ -39,6 +39,7 @@ function AdminPortal(props: AdminPortalPropsType) {
   const [personToEdit, setPersonToEdit] = useState<UserType>();
   const [personToDeleteId, setPersonToDeleteId] = useState<string>('');
   const [deletePerson, setDeletePerson] = useState(false);
+  const [languageToDelete, setLanguageToDelete] = useState('');
 
   const [showEditPersonDlg, setShowEditPersonDlg] = useState(false);
   const [showDeletePersonDlg, setShowDeletePersonDlg] = useState(false);
@@ -252,7 +253,6 @@ function AdminPortal(props: AdminPortalPropsType) {
     authService
       .addLanguage(language)
       .then((users: UserType[]) => {
-        console.log(users);
         setUsers(users);
         setTableHeaders([...tableHeaders, language]);
 
@@ -284,29 +284,18 @@ function AdminPortal(props: AdminPortalPropsType) {
   // Delete language
   const handleDeleteLanguage = (language: string, confirmed: boolean = false) => {
     if (!confirmed) {
+      setLanguageToDelete(language);
       setShowDeleteLanguageDlg(true);
-      return;
     } else {
       setIsLoading(true);
 
-      const updatedTableHeaders = tableHeaders.filter(header => header !== language);
+      const updatedTableHeaders = tableHeaders.filter(header => header !== languageToDelete);
       setTableHeaders(updatedTableHeaders);
 
-      // Update users by removing the language from their roles
-      const updatedUsers = users.map((user) => {
-        return {
-          ...user,
-          roles: user.roles.filter(role => role.language !== language)
-        };
-      });
-
-      // Update database (remove the language from their roles)
       authService
-        .updateUsers(updatedUsers)
+        .deleteLanguage(language)
         .then((users: UserType[]) => {
           setUsers(users);
-
-          // Show success message
           toast.success(`Language "${language}" deleted successfully`, {
             position: 'top-right',
             draggable: true,
@@ -318,7 +307,6 @@ function AdminPortal(props: AdminPortalPropsType) {
           });
         })
         .catch((error) => {
-          // Show success message
           toast.error(error, {
             position: 'top-right',
             draggable: true,
@@ -330,11 +318,10 @@ function AdminPortal(props: AdminPortalPropsType) {
           });
         });
 
-      setUsers(updatedUsers);
-
       setIsLoading(false);
       setShowDeleteConfirmDlg(false);
       setShowDeleteLanguageDlg(false);
+      setLanguageToDelete('');
     }
   };
 
@@ -449,9 +436,12 @@ function AdminPortal(props: AdminPortalPropsType) {
           onConfirm={() =>
             deletePerson ?
               handleDeletePerson(personToDeleteId, true) :
-              handleDeleteLanguage('miguel', true)
+              handleDeleteLanguage(languageToDelete, true)
           }
-          onCancel={() => setShowDeleteConfirmDlg(false)}
+          onCancel={() => {
+            setShowDeleteConfirmDlg(false);
+            setLanguageToDelete('');
+          }}
         />
 
         <LanguageDialog
@@ -461,23 +451,16 @@ function AdminPortal(props: AdminPortalPropsType) {
           onCancel={() => setShowLanguageDlg(false)}
         />
 
-        {/* <DeleteDialog
-          title={DELETE_LANGUAGE_TITLE}
-          content={DELETE_LANGUAGE_MESSAGE}
-          isOpen={showDeleteLanguageDlg}
-          onDelete={() => {
-            setShowDeleteLanguageDlg(false);
-            setShowDeleteConfirmDlg(true);
-          }}
-          onCancel={() => setShowDeleteLanguageDlg(false)}
-        /> */}
-
         <DeleteLanguageDialog
           title={DELETE_LANGUAGE_TITLE}
           content={DELETE_LANGUAGE_MESSAGE}
           isOpen={showDeleteLanguageDlg}
-          languages={tableHeaders}
-          onDelete={() => { }}
+          roles={users.length > 0 ? users[0].roles : []}
+          onDelete={(language) => {
+            setLanguageToDelete(language);
+            setShowDeleteLanguageDlg(false);
+            setShowDeleteConfirmDlg(true);
+          }}
           onCancel={() => setShowDeleteLanguageDlg(false)}
         />
       </StyledAdminPortalContainer>

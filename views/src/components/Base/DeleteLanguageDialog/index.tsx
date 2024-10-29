@@ -18,23 +18,34 @@ import {
   StyledDialogContent,
 } from './styles';
 import SelectBox from '../Select';
+import { RoleType } from '@/pages/types';
 
 function DeleteLanguageDialog(props: DeleteDialogPropsType) {
   const [options, setOptions] = useState<{ label: string, value: string }[]>([]);
   const [deleteLanguage, setDeleteLanguage] = useState<string>('');
 
   useEffect(() => {
-    props.languages.map((language: string) => {
-      setOptions([...options, { label: language, value: language }])
-    })
-  }, [props.languages]);
+    // Use a functional update to ensure options accumulate correctly
+    setOptions(() =>
+      props.roles.map((role: RoleType) => ({
+        label: role.language,
+        value: role.language,
+      }))
+    );
+
+    // Reset deleteLanguage when open dialog
+    if (props.isOpen && props.roles.length > 0) {
+      setDeleteLanguage(props.roles[0].language)
+    }
+  }, [props.roles, props.isOpen]);
 
   const handleDelete = () => {
-    props.onDelete();
+    deleteLanguage && props.onDelete(deleteLanguage);
   };
 
   const handleCancel = () => {
-    // Call the onCancel prop
+    setOptions([]);
+    setDeleteLanguage('');
     props.onCancel();
   };
 

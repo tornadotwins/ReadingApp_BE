@@ -22,6 +22,22 @@ const StyledDialogContent = styled(Box) ({
   padding: '17px',
   backgroundColor: '#155D74',
   boxSizing: 'border-box',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-around',
+
+  '& .MuiInputBase-root': {
+    backgroundColor: 'white',
+    border: '1px solid black',
+    
+    '& .MuiSelect-select': {
+      color: 'black'
+    }
+  },
+
+  '& .MuiMenuItem-root': {
+    backgroundColor: 'white'
+  }
 });
 
 const StyledContentMessageContainer = styled(Box) ({
@@ -35,6 +51,15 @@ const StyledLanguageSelectContainer = styled(Box) ({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
+
+  '& .MuiFormControl-root': {
+    width: '178px',
+    alignItems: 'self-end',
+
+    '& .MuiInputBase-root': {
+      width: '100%'
+    }
+  }
 });
 
 const StyledLabel = styled(Box) ({
@@ -56,7 +81,6 @@ const StyledButtonGroup = styled(Box) ({
   alignItems: 'center',
   width: '100%',
   float: 'right',
-  marginTop: '16px',
 
   '& > .MuiBox-root: last-child': {
     marginRight: '0px'

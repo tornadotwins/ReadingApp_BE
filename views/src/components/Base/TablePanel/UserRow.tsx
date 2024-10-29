@@ -200,7 +200,6 @@ const UserRow = (props: UserRowType) => {
   useEffect(() => {
     setIsAdmin(props.user.isAdmin);
     setRoles(props.user.roles);
-    console.log(props.user)
   }, [props.user]);
 
   useEffect(() => {

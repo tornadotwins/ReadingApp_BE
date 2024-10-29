@@ -1,9 +1,11 @@
+import { RoleType } from "@/pages/types";
+
 type DeleteDialogPropsType = {
   isOpen: boolean;
   title: string;
   content: string;
-  languages: string[];
-  onDelete: () => void;
+  roles: RoleType[];
+  onDelete: (language: string) => void;
   onCancel: () => void;
 }
 

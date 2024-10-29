@@ -8,7 +8,6 @@ class AuthService {
   login = (data: UserRequestType): Promise<UserType> => {
     return new Promise((resolve, reject) => {
       const url = API_URL + '/admin/auth/login';
-      console.log(url)
       axios
         .post(url, data)
         .then((response) => {
@@ -141,6 +140,27 @@ class AuthService {
 
       axios
         .put(url, {language})
+        .then((response) => {
+          if(response.data.users) {
+            resolve(response.data.users);
+          } else {
+            reject(response.data.error);
+          }
+        })
+        .catch((error) => {
+          reject(this.getErrorMessage(error));
+        })
+    })
+  }
+
+  deleteLanguage = (language: string): Promise<UserType[]> => {
+    return new Promise((resolve, reject) => {
+      const url = API_URL + `/admin/auth/language/${language}`;
+      const token = this.getAccessToken();
+      token && this.setSession(token);
+
+      axios
+        .delete(url)
         .then((response) => {
           if(response.data.users) {
             resolve(response.data.users);
