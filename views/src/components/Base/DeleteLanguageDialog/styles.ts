@@ -1,4 +1,4 @@
-import { Box, styled, Dialog, DialogTitle } from "@mui/material";
+import {Box, Dialog, DialogTitle, styled} from '@mui/material';
 
 const StyledDialog = styled(Dialog) ({
   borderRadius: '0px',
@@ -17,7 +17,8 @@ const StyledDialogTitle = styled (DialogTitle) ({
 });
 
 const StyledDialogContent = styled(Box) ({
-  width: '276px',
+  width: '284px',
+  height: '245px',
   padding: '17px',
   backgroundColor: '#155D74',
   boxSizing: 'border-box',
@@ -29,6 +30,16 @@ const StyledContentMessageContainer = styled(Box) ({
   justifyContent: 'center',
   alignItems: 'center',
 });
+
+const StyledLanguageSelectContainer = styled(Box) ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+});
+
+const StyledLabel = styled(Box) ({
+  
+})
 
 const StyledContentIcon = styled(Box)({
   display: 'flex',
@@ -104,7 +115,9 @@ export {
   StyledDialogContent,
   StyledContentMessageContainer,
   StyledContentIcon,
+  StyledLabel,
   StyledContentMessage,
+  StyledLanguageSelectContainer,
   StyledButtonGroup,
   StyledButtonContainer,
   StyledDeleteButtonContainer,

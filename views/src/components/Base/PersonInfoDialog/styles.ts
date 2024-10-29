@@ -64,7 +64,7 @@ const StyledCheckForm = styled(Box) ({
   paddingLeft: '8px',
 
   '& .MuiFormControlLabel-root': {
-    marginLeft: '20px',
+    marginLeft: '15px',
   },
 
   '& input': {

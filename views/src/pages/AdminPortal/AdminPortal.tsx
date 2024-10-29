@@ -30,6 +30,7 @@ import { ADD_PERSON_SUCCESS, DELETE_LANGUAGE_MESSAGE, DELETE_LANGUAGE_TITLE, DEL
 import DeleteDialog from '@/components/Base/DeleteDialog';
 import DeleteConfirmDialog from '@/components/Base/DeleteConfirmDialog';
 import LanguageDialog from '@/components/Base/LanguageDialog';
+import DeleteLanguageDialog from '@/components/Base/DeleteLanguageDialog';
 
 function AdminPortal(props: AdminPortalPropsType) {
   const [isLoading, setIsLoading] = useState(false);
@@ -460,7 +461,7 @@ function AdminPortal(props: AdminPortalPropsType) {
           onCancel={() => setShowLanguageDlg(false)}
         />
 
-        <DeleteDialog
+        {/* <DeleteDialog
           title={DELETE_LANGUAGE_TITLE}
           content={DELETE_LANGUAGE_MESSAGE}
           isOpen={showDeleteLanguageDlg}
@@ -468,6 +469,15 @@ function AdminPortal(props: AdminPortalPropsType) {
             setShowDeleteLanguageDlg(false);
             setShowDeleteConfirmDlg(true);
           }}
+          onCancel={() => setShowDeleteLanguageDlg(false)}
+        /> */}
+
+        <DeleteLanguageDialog
+          title={DELETE_LANGUAGE_TITLE}
+          content={DELETE_LANGUAGE_MESSAGE}
+          isOpen={showDeleteLanguageDlg}
+          languages={tableHeaders}
+          onDelete={() => { }}
           onCancel={() => setShowDeleteLanguageDlg(false)}
         />
       </StyledAdminPortalContainer>

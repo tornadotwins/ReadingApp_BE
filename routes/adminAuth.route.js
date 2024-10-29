@@ -5,7 +5,7 @@ const { checkToken } = require('../utils');
 const router = express.Router();
 
 router.post('/login', AdminAuthController.login);
-router.post('/save-user', checkToken, AdminAuthController.saveUser);
+router.post('/save-user', AdminAuthController.saveUser);
 router.get('/users', checkToken, AdminAuthController.getAllUsers);
 router.put('/', checkToken, AdminAuthController.updateUser);
 router.delete('/:id', checkToken, AdminAuthController.deleteUser);

@@ -17,7 +17,7 @@ function SelectBox(props: SelectBoxProps) {
       <InputLabel>{props.label}</InputLabel>
       <StyledSelect
         value={props.value}
-        IconComponent={() => <StyledExpandMore style={{ color: props.textColor }} />}
+        IconComponent={() => <StyledExpandMore style={{ color: props.textColor, cursor: 'pointer' }} />}
         MenuProps={MenuProps}
         disabled={props.disabled}
         sx={{ backgroundColor: props.backgroundColor, color: props.textColor }}

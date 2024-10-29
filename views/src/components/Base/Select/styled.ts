@@ -23,6 +23,10 @@ const StyledSelect = styled(MuiSelect)<{ style: any }>(({ style }) => ({
     backgroundColor: style.backgroundColor,
   },
 
+  '& .MuiSvgIcon-root': {
+    pointerEvents: 'none',
+  },
+
   '& .MuiSelect-icon': {
     color: 'black',
     top: '50%',
@@ -38,6 +42,10 @@ const StyledSelect = styled(MuiSelect)<{ style: any }>(({ style }) => ({
 const StyledExpandMore = styled(ExpandMore)<{ style: any }>(({ style }) => ({
   marginRight: '5px',
   color: style.color,
+  
+  '& .MuiSvgIcon-root': {
+    cursor: 'pointer',
+  }
 }));
 
 // Style for option in Selectbox
