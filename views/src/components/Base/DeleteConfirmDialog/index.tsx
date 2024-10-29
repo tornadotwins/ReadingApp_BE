@@ -38,6 +38,7 @@ function DeleteConfirmDialog(props: DeleteConfirmDialogPropsType) {
   };
 
   const handleDeleteConfirm = () => {
+    setConfirmText('');
     props.onConfirm();
   };
 

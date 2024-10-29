@@ -35,6 +35,14 @@ const StyledDialogTitle = styled (DialogTitle) ({
 const StyledDialogContent = styled(DialogContent) ({
   backgroundColor: '#155D74',
   padding: '12px',
+
+  '& >.MuiBox-root: nth-of-type(3)': {
+    '& >.MuiBox-root: nth-of-type(2)': {
+      '& >.MuiBox-root': {
+        marginLeft: '12px'
+      }
+    }
+  }
 });
 
 const StyledPersonInfoFormContainer = styled(Box) ({
@@ -62,10 +70,6 @@ const StyledCheckForm = styled(Box) ({
   alignItems: 'center',
   marginTop: '8px',
   paddingLeft: '8px',
-
-  '& .MuiFormControlLabel-root': {
-    marginLeft: '15px',
-  },
 
   '& input': {
     border: '1px solid blue'
