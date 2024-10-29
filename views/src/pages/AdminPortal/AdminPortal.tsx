@@ -250,8 +250,9 @@ function AdminPortal(props: AdminPortalPropsType) {
     setIsLoading(true);
 
     authService
-      .updateUsers(users)
+      .addLanguage(language)
       .then((users: UserType[]) => {
+        console.log(users);
         setUsers(users);
         setTableHeaders([...tableHeaders, language]);
 
@@ -339,7 +340,6 @@ function AdminPortal(props: AdminPortalPropsType) {
 
   // Save changes
   const handleSaveChanges = () => {
-    console.log(users)
     setIsLoading(true);
     setIsUsersChanged(true);
 

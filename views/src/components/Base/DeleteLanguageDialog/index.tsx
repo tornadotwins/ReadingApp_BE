@@ -24,7 +24,6 @@ function DeleteLanguageDialog(props: DeleteDialogPropsType) {
   const [deleteLanguage, setDeleteLanguage] = useState<string>('');
 
   useEffect(() => {
-    console.log(props.languages);
     props.languages.map((language: string) => {
       setOptions([...options, { label: language, value: language }])
     })

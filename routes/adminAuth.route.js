@@ -11,6 +11,7 @@ router.put('/', checkToken, AdminAuthController.updateUser);
 router.delete('/:id', checkToken, AdminAuthController.deleteUser);
 
 router.put('/users', checkToken, AdminAuthController.updateUsers);
+router.put('/language', checkToken, AdminAuthController.addLanguage);
 router.delete('/language', checkToken, AdminAuthController.deleteLanguage);
 
 module.exports = router;
