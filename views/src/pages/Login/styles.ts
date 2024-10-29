@@ -29,7 +29,7 @@ const StyledLoginContainer = styled(CenteredFlexBox)({
 });
 
 const StyledLoginBody = styled(Box) ({
-  height: '100%',
+  height: 'calc(100vh - 73px)',
   marginTop: '73px',
   display: 'flex',
   alignItems: 'center',
