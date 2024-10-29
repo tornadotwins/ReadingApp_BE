@@ -219,8 +219,6 @@ exports.updateUsers = async (req, res) => {
 exports.addLanguage = async (req, res) => {
   const language = req.body;
 
-  console.log(language)
-
   if (!language) {
     return res
       .status(400)
@@ -232,6 +230,7 @@ exports.addLanguage = async (req, res) => {
   users.map((user) => {
     user.roles.push({ language: language.language, role: 'none' });
     user.save();
+    user.password = decrypt(user.password);
   });
 
   return res.status(200).send({ users: users });
