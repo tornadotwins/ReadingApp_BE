@@ -1,8 +1,7 @@
 const AdminUser = require('../models/adminUser.model');
 const ERROR_MESSAGES = require('../config/error.message');
 const Config = require('../config');
-const crypto = require('crypto');
-const { generateToken } = require('../utils');
+const { generateToken, encrypt, decrypt } = require('../utils');
 
 /////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// Login /////////////////////////////////
@@ -28,14 +27,9 @@ exports.login = async (req, res) => {
       .send({ message: ERROR_MESSAGES.USERNAME_NOT_EXIST });
   }
 
-  const salt = user.password.split('$')[0];
-  const hash = user.password.split('$')[1];
-  const newHash = crypto
-    .createHmac('sha512', salt)
-    .update(password)
-    .digest('base64');
+  const cryptedPassword = encrypt(password);
 
-  if (hash !== newHash) {
+  if (user.password != cryptedPassword) {
     return res
       .status(400)
       .send({ message: ERROR_MESSAGES.PASSWORD_INCORRECT });
@@ -71,35 +65,30 @@ exports.saveUser = async (req, res) => {
       .send({ message: ERROR_MESSAGES.USERNAME_IN_USE });
   }
 
-  const salt = crypto.randomBytes(16).toString('base64');
-  const hash = crypto
-    .createHmac('sha512', salt)
-    .update(password)
-    .digest('base64');
-
-  console.log(password, hash);
+  const cryptedPassword = encrypt(password);
 
   const user = new AdminUser();
   user.username = username;
   user.isAdmin = isAdmin;
 
   const anyUser = await AdminUser.findOne();
-  const roles = anyUser.roles;
+  const roles = anyUser?.roles;
   let newUserRoles = [];
-  roles.map((role) =>
-    newUserRoles.push({ language: role.language, role: 'none' }),
-  );
+  roles &&
+    roles.map((role) =>
+      newUserRoles.push({ language: role.language, role: 'none' }),
+    );
 
   user.roles = newUserRoles;
 
-  user.password = salt + '$' + hash;
+  user.password = cryptedPassword;
   user.createdAt = Date.now();
   user.loginAt = Date.now();
   user.lastLoggedInAt = '';
 
   await user.save();
 
-  user.password = undefined;
+  user.password = password;
 
   return res.status(200).send({
     user,
@@ -111,6 +100,11 @@ exports.saveUser = async (req, res) => {
 /////////////////////////////////////////////////////////////////////////
 exports.getAllUsers = async (req, res) => {
   const users = await AdminUser.find();
+
+  users.forEach((user) => {
+    user.password = decrypt(user.password);
+  });
+
   return res.status(200).send({ users });
 };
 
@@ -125,11 +119,7 @@ exports.updateUser = async (req, res) => {
       .status(400)
       .send({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
 
-  const salt = crypto.randomBytes(16).toString('base64');
-  const hash = crypto
-    .createHmac('sha512', salt)
-    .update(newUser.password)
-    .digest('base64');
+  const encryptedPassword = encrypt(newUser.password);
 
   const userId = newUser.id;
 
@@ -143,10 +133,11 @@ exports.updateUser = async (req, res) => {
 
   existingUser.roles = newUser.roles;
   existingUser.username = newUser.username;
-  existingUser.password = salt + '$' + hash;
+  existingUser.password = encryptedPassword;
   existingUser.isAdmin = newUser.isAdmin;
 
   const updatedUser = await existingUser.save();
+  updatedUser.password = newUser.password;
 
   return res.status(200).send({ user: updatedUser });
 };
@@ -193,7 +184,7 @@ exports.updateUsers = async (req, res) => {
 
       const existingUser = await AdminUser.findById(userInfo._id);
       existingUser.username = userInfo.username;
-      existingUser.password = userInfo.password;
+      existingUser.password = encrypt(userInfo.password);
       existingUser.roles = userInfo.roles;
       existingUser.isAdmin = userInfo.isAdmin;
       existingUser.updatedAt = Date.now();
@@ -220,27 +211,69 @@ exports.updateUsers = async (req, res) => {
 };
 
 /////////////////////////////////////////////////////////////////////////
+////////////////////////////// Add Language /////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.addLanguage = async (req, res) => {
+  const { language } = req.body;
+
+  if (!language) {
+    return res
+      .status(400)
+      .send({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+  }
+
+  const users = await AdminUser.find();
+
+  // Update each user's roles and save
+  await Promise.all(
+    users.map(async (user) => {
+      user.roles.push({ language, role: 'none' });
+      await user.save();
+    }),
+  );
+
+  // Prepare response data without altering saved passwords
+  const responseUsers = users.map((user) => {
+    return {
+      ...user.toObject(),
+      password: decrypt(user.password),
+    };
+  });
+
+  return res.status(200).send({ users: responseUsers });
+};
+
+/////////////////////////////////////////////////////////////////////////
 //////////////////////////// Delete Language ////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.deleteLanguage = async (req, res) => {
-  const { language } = req.body;
+  const { language } = req.params;
 
-  try {
-    await AdminUser.updateMany(
-      {},
-      {
-        $pull: {
-          roles: {
-            language: language,
-          },
-        },
-      },
-    );
-
-    return res.status(200).send({
-      message: 'The language has been deleted successfully',
-    });
-  } catch (error) {
-    console.error('Error deleting the language roles:', error);
+  if (!language) {
+    return res
+      .status(400)
+      .send({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
   }
+
+  const users = await AdminUser.find();
+
+  // Update roles for each user and save
+  await Promise.all(
+    users.map(async (user) => {
+      user.roles = user.roles.filter(
+        (role) => role.language !== language,
+      );
+      await user.save();
+    }),
+  );
+
+  // Prepare response data without modifying saved passwords
+  const responseUsers = users.map((user) => {
+    return {
+      ...user.toObject(),
+      password: decrypt(user.password),
+    };
+  });
+
+  return res.status(200).send({ users: responseUsers });
 };

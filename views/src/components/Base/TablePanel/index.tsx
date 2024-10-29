@@ -14,7 +14,6 @@ import {
   StyledTableBody
 } from './styles';
 import { TablePanelType } from './types';
-
 import { UserType } from '@/pages/types';
 
 const TablePanel = (props: TablePanelType) => {

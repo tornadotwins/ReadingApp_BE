@@ -1,7 +1,7 @@
 import { styled, Box } from '@mui/material';
 
 const StyledCheckBoxContainer = styled(Box) ({
-
+  cursor: 'pointer'
 });
 
 const StyledCheckBoxLabel = styled(Box) ({

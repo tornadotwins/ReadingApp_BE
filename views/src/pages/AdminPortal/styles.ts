@@ -22,7 +22,6 @@ const StyledAdminPortalBodyContainer = styled(Box) ({
 
 const StyledTablePanelHeader = styled(Box) ({
   display: 'flex',
-  justifyContent: 'space-between',
   alignItems: 'center',
 });
 
@@ -31,6 +30,7 @@ const StyledSaveButton = styled(Box)<{disable: string}>(({disable}) => ({
   cursor: disable == 'true' ? 'not-allowed': 'pointer',
   height: '40px',
   marginTop: '46px',
+  marginLeft: '500px',
   backgroundColor: disable == 'true' ? '#CAC9C9' :'#FFAA5D',
   border: '1px solid #474747',
   boxSizing: 'border-box',

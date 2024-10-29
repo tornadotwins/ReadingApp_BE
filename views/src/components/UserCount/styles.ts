@@ -17,7 +17,8 @@ const StyledUserCount = styled(Box) ({
   justifyContent: 'center',
 
   '& .MuiBox-root': {
-    transform: 'translate(0, -15%)'
+    transform: 'translate(0, -15%)',
+    marginTop: '15px'
   }
 });
 
