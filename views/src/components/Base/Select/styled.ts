@@ -25,6 +25,8 @@ const StyledSelect = styled(MuiSelect)<{ style: any }>(({ style }) => ({
 
   '& .MuiSvgIcon-root': {
     pointerEvents: 'none',
+    position: 'absolute',
+    right: '0px',
   },
 
   '& .MuiSelect-icon': {
