@@ -131,6 +131,7 @@ function Translator() {
    * Save book by calling API
    */
   const saveBook = () => {
+    console.log(necessaryParseData)
     translatorService
       .saveBook(necessaryParseData)
       .then((result) => {
@@ -171,6 +172,7 @@ function Translator() {
    * Effect hook to extract table header and data when parsed data is changed (new file is selcted)
    */
   useEffect(() => {
+    setNecessaryParsedData([]);
     const firstData = parsedData[0];
 
     const languageLabel = languages.find(languageItem => languageItem.value == language)?.label
@@ -194,7 +196,7 @@ function Translator() {
         ...prevNecessaryParsedData,
         necessaryData
       ]);
-    })
+    });
   }, [parsedData]);
 
   return (
