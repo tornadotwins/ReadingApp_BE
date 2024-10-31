@@ -131,7 +131,6 @@ function Translator() {
    * Save book by calling API
    */
   const saveBook = () => {
-    console.log(necessaryParseData)
     translatorService
       .saveBook(necessaryParseData)
       .then((result) => {

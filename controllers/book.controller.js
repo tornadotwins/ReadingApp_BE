@@ -6,6 +6,13 @@ const Introduction = require('../models/introduction.model');
 const History = require('../models/history.model');
 const User = require('../models/user.model');
 const ERROR_MESSAGES = require('../config/error.message');
+const {
+  getLanguage,
+  getBookTitle,
+  getSubBookTitles,
+  getChapterInfos,
+  groupVersesByChapter,
+} = require('../utils');
 
 /////////////////////////////////////////////////////////////////////////
 ///////////////////////////// Get All books /////////////////////////////
@@ -653,8 +660,23 @@ exports.getIntroVerses = async (req, res) => {
 //////////////////////// Save book by picked file ///////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.saveBookByFile = (req, res) => {
-  const bookInfos = req.body;
-  console.log(bookInfos);
+  try {
+    const bookInfos = req.body;
+
+    const language = getLanguage(bookInfos[0]);
+    const bookTitle = getBookTitle(bookInfos[0], language);
+    const subBookTitles = getSubBookTitles(bookInfos, language);
+    const chapterInfos = getChapterInfos(bookInfos, language);
+    const verseInfos = groupVersesByChapter(bookInfos, language);
+
+    return res.status(200).json({
+      verseInfos,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      message: 'Failed to save book',
+    });
+  }
 };
 
 // Sort and Group by its library
