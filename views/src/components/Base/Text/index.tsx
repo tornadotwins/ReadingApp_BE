@@ -5,6 +5,7 @@ function Text({
   children,
   fontWeight = '400',
   fontSize = 16,
+  fontStyle = 'normal',
   fontFamily,
   lineHeight = 24,
   textAlign,
@@ -17,6 +18,7 @@ function Text({
       style={{
         fontWeight,
         fontSize,
+        fontStyle,
         fontFamily,
         lineHeight: lineHeight + 'px',
         textAlign,

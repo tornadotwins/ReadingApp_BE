@@ -1,52 +1,48 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Table,
+  TableCell,
   TableContainer,
   TableRow,
 } from '@mui/material';
 
 import Text from '../Text';
-import UserRow from './UserRow';
 
 import {
   StyledTableHead,
   StyledTableHeadCell,
   StyledTableBody
 } from './styles';
-import { TablePanelType } from './types';
-import { UserType } from '@/pages/types';
+import {
+  TableType,
+  TableRowType
+} from './types';
 
-const TablePanel = (props: TablePanelType) => {
+const TablePanel = (props: TableType) => {
   const [headers, setHeaders] = useState<string[]>([]);
-  const [users, setUsers] = useState<UserType[]>(props.users);
+  const [rows, setRows] = useState<TableRowType[]>([]);
 
   useEffect(() => {
     setHeaders(props.headers);
   }, [props.headers]);
 
   useEffect(() => {
-    setUsers(props.users);
-  }, [props.users]);
-
-  const handleUserChange = (updatedUser: UserType) => {
-    // Update the users state with the modified user data
-    const updatedUsers = users.map(user =>
-      user.username === updatedUser.username ? updatedUser : user
-    );
-    setUsers(updatedUsers);
-
-    // Optionally, you can also notify a parent component if needed
-    if (props.onUserChange) {
-      props.onUserChange(updatedUsers);
-    }
-  };
+    setRows(props.rows);
+  }, [props.rows]);
 
   const renderTableHeader = () => (
     <StyledTableHead>
       <TableRow>
         {headers.map((header: string, index: number) => (
           <StyledTableHeadCell key={index}>
-            <Text fontFamily='"Baloo Da 2"' fontWeight='700' fontSize={16} lineHeight={24} textAlign='center' color='#155D74'>
+            <Text
+              fontFamily='"Baloo Da 2"'
+              fontWeight='700'
+              fontSize={16}
+              lineHeight={24}
+              textAlign='center'
+              color='#155D74'
+            >
               {header}
             </Text>
           </StyledTableHeadCell>
@@ -57,15 +53,31 @@ const TablePanel = (props: TablePanelType) => {
 
   const renderTableBody = () => (
     <StyledTableBody>
-      {users.map((user: UserType, index: number) => (
-        <UserRow
-          key={index}
-          user={user}
-          headers={headers}
-          onEditUser={props.onEditUser}
-          onDeleteUser={props.onDeleteUser}
-          onUserChange={handleUserChange} // Pass the callback to handle changes
-        />
+      {rows.map((row: TableRowType, rowIndex: number) => (
+        <TableRow key={rowIndex}>
+          <TableCell>
+            <Text
+              fontFamily='"Baloo Da 2"'
+              fontWeight='400'
+              fontSize={14}
+              lineHeight={20}
+              textAlign='center'
+            >
+              {row.key}
+            </Text>
+          </TableCell>
+          <TableCell>
+            <Text
+              fontFamily='"Baloo Da 2"'
+              fontWeight='400'
+              fontSize={14}
+              lineHeight={20}
+              textAlign='center'
+            >
+              {row.value}
+            </Text>
+          </TableCell>
+        </TableRow>
       ))}
     </StyledTableBody>
   );

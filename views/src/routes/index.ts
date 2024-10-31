@@ -23,7 +23,7 @@ const routes: Routes = {
   },
   [Pages.Translator]: {
     component: asyncComponentLoader(() => import('@/pages/Translator')),
-    path: '/admin/tarnslator',
+    path: '/admin/translator',
     title: 'Translator Portal',
     icon: AddTaskIcon,
   },

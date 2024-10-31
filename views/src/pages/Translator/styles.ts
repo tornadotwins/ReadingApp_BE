@@ -22,6 +22,15 @@ const StyledTranslatorContainer = styled(CenteredFlexBox)({
   }
 });
 
+const StyledTranslatorPortalContainer = styled(Box) ({
+  width: '90%',
+  height: 'calc(100% - 73px)',
+  margin: 'auto',
+  marginTop: '73px',
+});
+
+
 export {
   StyledTranslatorContainer,
+  StyledTranslatorPortalContainer,
 }
