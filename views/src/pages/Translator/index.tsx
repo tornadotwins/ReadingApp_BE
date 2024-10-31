@@ -12,6 +12,8 @@ import { SelectBoxOption } from '@/components/Base/Select/types';
 import { HEADER_TRANSLATOR_PORTAL } from '@/config/messages';
 import useOrientation from '@/hooks/useOrientation';
 
+import translatorService from '../../../services/translator.services';
+
 import { AppStateType } from '@/reducers/types';
 import {
   StyledTranslatorContainer,
@@ -35,8 +37,9 @@ function Translator() {
   const [language, setLanguage] = useState(languages[0].value);
   const [file, setFile] = useState<File | null>(null);
   const [fileInput, setFileInput] = useState<ChangeEvent<HTMLInputElement>>();
-  const [parsedData, setParsedData] = useState<ParseDataType[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
+  const [parsedData, setParsedData] = useState<ParseDataType[]>([]);
+  const [necessaryParseData, setNecessaryParsedData] = useState<ParseDataType[]>([]);
 
   useEffect(() => {
     const file = fileInput?.target.files && fileInput?.target.files[0];
@@ -125,6 +128,20 @@ function Translator() {
   };
 
   /**
+   * Save book by calling API
+   */
+  const saveBook = () => {
+    translatorService
+      .saveBook(necessaryParseData)
+      .then((result) => {
+        console.log(result)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  /**
    * Effect hook to handle file parsing when a new file is selected
    * - Checks if a file exists
    * - Determines the file type by its extension
@@ -151,14 +168,33 @@ function Translator() {
   }, [file]);
 
   /**
-   * Effect hook to extract table header when parsed data is changed (new file is selcted)
+   * Effect hook to extract table header and data when parsed data is changed (new file is selcted)
    */
   useEffect(() => {
     const firstData = parsedData[0];
 
+    const languageLabel = languages.find(languageItem => languageItem.value == language)?.label
+
     firstData && Object.keys(firstData).forEach((key) => {
-      setHeaders(prevHeaders => [...prevHeaders, key]);
+      if (languageLabel && key.includes(languageLabel))
+        setHeaders(prevHeaders => [...prevHeaders, key]);
     });
+
+    // Set the necessary parsed data according to the selected language
+    parsedData.forEach((data: ParseDataType) => {
+      const necessaryData: ParseDataType = {};
+      Object.keys(data).forEach((key) => {
+        // If key contains selected language, it is necessary field to save in DB
+        if (key.includes(languageLabel as string)) {
+          necessaryData[key] = data[key];
+        }
+      });
+
+      setNecessaryParsedData(prevNecessaryParsedData => [
+        ...prevNecessaryParsedData,
+        necessaryData
+      ]);
+    })
   }, [parsedData]);
 
   return (
@@ -179,7 +215,7 @@ function Translator() {
             headers={headers}
             onChangeLanguage={(e) => setLanguage(e.target.value as string)}
             onChangeFile={(e: ChangeEvent<HTMLInputElement>) => setFileInput(e)}
-            onChangeUploader={() => { }}
+            onUpload={saveBook}
           />
         </StyledTranslatorPortalContainer>
       </StyledTranslatorContainer>

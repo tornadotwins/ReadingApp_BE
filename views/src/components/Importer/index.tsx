@@ -1,4 +1,8 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  useEffect,
+  useState
+} from "react";
 import {
   Button,
   FilePicker,
@@ -76,7 +80,7 @@ function Importer(props: ImporterPropsType) {
         <StyledImportButtonContainer>
           <Button
             label="Import (will overwrite)"
-            onClick={() => { console.log('clicked import button') }}
+            onClick={props.onUpload}
           />
         </StyledImportButtonContainer>
       </StyledFilePickerContainer>

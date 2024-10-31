@@ -649,6 +649,14 @@ exports.getIntroVerses = async (req, res) => {
   }
 };
 
+/////////////////////////////////////////////////////////////////////////
+//////////////////////// Save book by picked file ///////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.saveBookByFile = (req, res) => {
+  const bookInfos = req.body;
+  console.log(bookInfos);
+};
+
 // Sort and Group by its library
 const sortAndGroupLibraries = (libraries) => {
   // Group books by library

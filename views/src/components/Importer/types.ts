@@ -11,7 +11,7 @@ type ImporterPropsType = {
 
   onChangeLanguage: (event: React.ChangeEvent<{value: unknown}>) => void;
   onChangeFile: (event: ChangeEvent<HTMLInputElement>) => void;
-  // onChangeFile: (file: File) => void;
+  onUpload: () => void;
 };
 
 type ImporterLanguageType = {

@@ -11,8 +11,7 @@ type UploaderPropsType = {
 
   onChangeLanguage: (e: ChangeEvent<{value: unknown}>) => void;
   onChangeFile: (e: ChangeEvent<HTMLInputElement>) => void;
-  // onChangeFile: (e: File) => void;
-  onChangeUploader: () => void;
+  onUpload: () => void;
 }
 
 export type {
