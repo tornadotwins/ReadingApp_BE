@@ -36,6 +36,7 @@ function Translator() {
   const [file, setFile] = useState<File | null>(null);
   const [fileInput, setFileInput] = useState<ChangeEvent<HTMLInputElement>>();
   const [parsedData, setParsedData] = useState<ParseDataType[]>([]);
+  const [headers, setHeaders] = useState<string[]>([]);
 
   useEffect(() => {
     const file = fileInput?.target.files && fileInput?.target.files[0];
@@ -65,7 +66,6 @@ function Translator() {
             }
 
             const jsonData = results.data as ParseDataType[];
-            console.log(jsonData);
             setParsedData(jsonData);
           },
           header: true, // This automatically converts to array of objects using headers
@@ -110,7 +110,6 @@ function Translator() {
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet) as ParseDataType[];
-        console.log(jsonData)
 
         setParsedData(jsonData);
       };
@@ -150,6 +149,18 @@ function Translator() {
     }
   }, [file]);
 
+  /**
+   * Effect hook to extract table header when parsed data is changed (new file is selcted)
+   */
+  useEffect(() => {
+    const firstData = parsedData[0];
+
+    firstData && Object.keys(firstData).forEach((key) => {
+      console.log(key)
+      setHeaders(prevHeaders => [...prevHeaders, key]);
+    });
+  }, [parsedData]);
+
   return (
     <>
       <Meta title={HEADER_TRANSLATOR_PORTAL} />
@@ -164,6 +175,8 @@ function Translator() {
             language={language}
             languages={languages}
             file={file}
+            parsedData={parsedData}
+            headers={headers}
             onChangeLanguage={(e) => setLanguage(e.target.value as string)}
             onChangeFile={(e: ChangeEvent<HTMLInputElement>) => setFileInput(e)}
             onChangeUploader={() => { }}

@@ -22,6 +22,7 @@ import {
 } from "./types";
 
 function Importer(props: ImporterPropsType) {
+  console.log(props.headers);
   return (
     <StyledImporterContainer>
       <StyledLanguageDropdownContainer>
@@ -53,7 +54,6 @@ function Importer(props: ImporterPropsType) {
         <StyledFilePicker>
           <FilePicker
             onChange={(e: ChangeEvent<HTMLInputElement>) => props.onChangeFile(e)}
-          // onChange={(e: File) => props.onChangeFile(e)}
           />
         </StyledFilePicker>
 
@@ -66,6 +66,7 @@ function Importer(props: ImporterPropsType) {
       </StyledFilePickerContainer>
 
       <StyledTableContainer>
+
       </StyledTableContainer>
     </StyledImporterContainer>
   )

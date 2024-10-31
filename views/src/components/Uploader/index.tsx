@@ -11,8 +11,10 @@ function Uploader(props: UploaderPropsType) {
         language={props.language}
         languages={props.languages}
         file={props.file}
+        headers={props.headers}
+        parsedData={props.parsedData}
+
         onChangeLanguage={(e) => props.onChangeLanguage(e)}
-        // onChangeFile={(e) => props.onChangeFile(e)}
         onChangeFile={(e) => props.onChangeFile(e)}
       />
     </StyledUploaderContainer>
