@@ -1,8 +1,9 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import {
   Button,
   FilePicker,
   SelectBox,
+  TablePanel,
   Text
 } from "../Base";
 
@@ -18,11 +19,26 @@ import {
   StyledTableContainer,
 } from "./styles";
 import {
-  ImporterPropsType
+  ImporterPropsType,
 } from "./types";
+import { TableRowType } from "../Base/TablePanel/types";
+import { ParseDataType } from "@/pages/Translator/types";
 
 function Importer(props: ImporterPropsType) {
-  console.log(props.headers);
+  const [tableData, setTableData] = useState<TableRowType[]>([]);
+
+  useEffect(() => {
+    const newTableData: TableRowType[] = props.parsedData.map((data: ParseDataType) => {
+      const rowData: TableRowType = {};
+      Object.keys(data).forEach((key) => {
+        rowData[key] = data[key];
+      });
+      return rowData;
+    });
+
+    setTableData(newTableData);
+  }, [props.parsedData]);
+
   return (
     <StyledImporterContainer>
       <StyledLanguageDropdownContainer>
@@ -66,7 +82,10 @@ function Importer(props: ImporterPropsType) {
       </StyledFilePickerContainer>
 
       <StyledTableContainer>
-
+        <TablePanel
+          headers={props.headers}
+          rows={tableData}
+        />
       </StyledTableContainer>
     </StyledImporterContainer>
   )

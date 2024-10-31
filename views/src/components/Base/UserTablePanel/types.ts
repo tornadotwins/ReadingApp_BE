@@ -1,6 +1,6 @@
 import { UserType } from "@/pages/types";
 
-type TablePanelType = {
+type UserTablePanelType = {
   headers: string[];
   users: UserType[];
   onEditUser?: (user: UserType) => void;
@@ -21,6 +21,6 @@ type UserRowType = {
 };
 
 export type {
-  TablePanelType,
+  UserTablePanelType,
   UserRowType,
 };

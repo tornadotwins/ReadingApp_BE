@@ -10,6 +10,7 @@ const StyledHeaderContainer = styled(Box) ({
   padding: '0',
 
   position: 'fixed',
+  zIndex: '100',
   top: '0',
   
   display: 'flex',

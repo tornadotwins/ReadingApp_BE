@@ -132,6 +132,7 @@ function Translator() {
    * - Shows error for unsupported file types
   */
   useEffect(() => {
+    setHeaders([]);
     // If no file is selected, exit early
     if (!file) return;
 
@@ -156,7 +157,6 @@ function Translator() {
     const firstData = parsedData[0];
 
     firstData && Object.keys(firstData).forEach((key) => {
-      console.log(key)
       setHeaders(prevHeaders => [...prevHeaders, key]);
     });
   }, [parsedData]);
