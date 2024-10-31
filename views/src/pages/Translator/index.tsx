@@ -8,6 +8,7 @@ import 'material-react-toastify/dist/ReactToastify.css';
 import Header from '@/components/Header';
 import Meta from '@/components/Meta';
 import Uploader from '@/components/Uploader';
+import { SelectBoxOption } from '@/components/Base/Select/types';
 import { HEADER_TRANSLATOR_PORTAL } from '@/config/messages';
 import useOrientation from '@/hooks/useOrientation';
 
@@ -17,7 +18,6 @@ import {
   StyledTranslatorPortalContainer,
 } from './styles';
 import { ParseDataType } from './types';
-import { SelectBoxOption } from '@/components/Base/Select/types';
 
 function Translator() {
   const isPortrait = useOrientation();
@@ -42,65 +42,111 @@ function Translator() {
     file && setFile(file);
   }, [fileInput]);
 
+  /**
+   * Parse picked CSV file to JSON format
+   * @param file File picked from file input
+   */
   const handleCSVParse = (file: File) => {
-    Papa.parse(file, {
-      complete: (results: any) => {
-        const headers = results.data[0] as string[];
-
-        const parsedRows = results.data.slice(1).map((row: any) => {
-          const obj: any = {};
-          headers.forEach((header, index) => {
-            obj[header] = row[index];
-          });
-          return obj;
-        });
-
-        setParsedData(parsedRows);
-      },
-      header: true,
-      skipEmptyLines: true
-    });
-  };
-
-  const handleExcelParse = async (arrayBuffer: ArrayBuffer) => {
     try {
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-      console.log({ worksheet });
-      const jsonData = XLSX.utils.sheet_to_json(worksheet) as ParseDataType[];
+      const reader = new FileReader();
 
-      setParsedData(jsonData);
-      console.log('');
+      reader.onload = (e) => {
+        const csvData = e.target?.result;
+        if (!csvData) {
+          console.error('Failed to read file');
+          return;
+        }
+
+        Papa.parse(csvData as string, {
+          complete: (results) => {
+            if (results.errors.length > 0) {
+              console.error('CSV parsing errors:', results.errors);
+              return;
+            }
+
+            const jsonData = results.data as ParseDataType[];
+            console.log(jsonData);
+            setParsedData(jsonData);
+          },
+          header: true, // This automatically converts to array of objects using headers
+          skipEmptyLines: true,
+          transformHeader: (header) => {
+            // Transform header names
+            return header.trim();
+          },
+          transform: (value) => {
+            // Transform cell values
+            return value.trim();
+          }
+        });
+      };
+
+      reader.onerror = (error) => {
+        console.error('Error reading file:', error);
+      };
+
+      reader.readAsText(file); // Use readAsText for CSV files
     } catch (err) {
-      console.log('Error parsing Excel file');
-      console.error(err);
+      console.error('Error parsing CSV file:', err);
     }
   };
 
-  useEffect(() => {
-    if (!file) {
-      return;
-    }
+  /**
+   * Parse picked file to JSON format
+   * @param file Filed picked from file input
+   */
+  const handleExcelParse = async (file: File) => {
+    try {
+      const reader = new FileReader();
 
-    const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = e.target?.result;
+        if (!data) {
+          console.error('Failed to read file');
+          return;
+        }
+
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet) as ParseDataType[];
+        console.log(jsonData)
+
+        setParsedData(jsonData);
+      };
+
+      reader.onerror = (error) => {
+        console.error('Error reading file:', error);
+      };
+
+      reader.readAsArrayBuffer(file);
+    } catch (err) {
+      console.error('Error parsing Excel file:', err);
+    }
+  };
+
+  /**
+   * Effect hook to handle file parsing when a new file is selected
+   * - Checks if a file exists
+   * - Determines the file type by its extension
+   * - Calls appropriate parser (CSV or Excel)
+   * - Shows error for unsupported file types
+  */
+  useEffect(() => {
+    // If no file is selected, exit early
+    if (!file) return;
+
+    // Extract the file extension from the filename
     const fileName = file.name;
     const fileExtension = fileName.substr(fileName.lastIndexOf('.') + 1).toLowerCase();
-    console.log(fileExtension)
-    reader.onload = (event) => {
-      console.log('event: ', event)
-      if (!event.target?.result)
-        return;
-      if (fileExtension == 'csv') {
-        console.log('=========== CSV Parse ============')
 
-        handleCSVParse(file);
-      } else {
-        console.log('=========== Excel Parse ============')
-        console.log(event.target.result as ArrayBuffer)
-
-        handleExcelParse(event.target.result as ArrayBuffer);
-      }
+    // Parse the file based on its extension (CSV or Excel)
+    if (fileExtension === 'csv') {
+      handleCSVParse(file);
+    } else if (['xlsx', 'xls'].includes(fileExtension)) {
+      handleExcelParse(file);
+    } else {
+      console.error('Unsupported file format');
     }
   }, [file]);
 
