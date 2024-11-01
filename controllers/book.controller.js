@@ -725,6 +725,8 @@ const getSavedSubBookInfos = async (
   bookId,
   subBookTitles,
 ) => {
+  console.log(languageCode, bookId, subBookTitles);
+
   let savedSubBooks = [];
   // Check if the sub book already exists in DB
   const existingSubBooks = await SubBook.findOne({ book: bookId });
@@ -734,9 +736,9 @@ const getSavedSubBookInfos = async (
     await SubBook.deleteMany({ book: bookId });
   }
 
-  for (let index = 1; index <= subBookTitles.length; index++) {
+  for (let index = 0; index < subBookTitles.length; index++) {
     const subBookObj = new SubBook({
-      number: index,
+      number: index + 1,
       book: bookId,
       title: {
         [languageCode]: subBookTitles[index],
