@@ -662,18 +662,16 @@ exports.getIntroVerses = async (req, res) => {
 /////////////////////////////////////////////////////////////////////////
 exports.saveBookByFile = async (req, res) => {
   try {
-    const bookInfos = req.body;
+    const { bookInfos, bookTitle } = req.body;
 
     // Get information for the books (language, book title, sub book titles, chapters information, verses information)
     const language = getLanguage(bookInfos[0]);
     const languageCode = getLanguageCode(language);
-    const bookTitle = getBookTitle(bookInfos[0], language);
     const subBookTitles = getSubBookTitles(bookInfos, language);
     const chapterInfos = getChapterInfos(bookInfos, language);
     const verseInfos = groupVersesByChapter(bookInfos, language);
 
-    const bookId = getSavedBookId(languageCode, bookTitle);
-    console.log(bookId);
+    const bookId = await getSavedBookId(languageCode, bookTitle);
     const subBookInfos = getSavedSubBookInfos(
       languageCode,
       bookId,
@@ -696,15 +694,10 @@ const getSavedBookId = async (languageCode, title) => {
     if (!languageCode || !title) {
       throw new Error('Language code and title are required');
     }
-
-    console.log('===========before foundBook=============');
-    console.log({ [`title.${languageCode}`]: title });
-
-    // Check if the book already exists in db
+    // Check if the book already exists in db (English book title is received from front-end)
     const foundBook = await Book.findOne({
-      [`title.${languageCode}`]: title,
+      'title.en': title,
     });
-    console.log('===========after foundBook=============');
 
     if (foundBook) {
       return foundBook._id;
@@ -717,9 +710,6 @@ const getSavedBookId = async (languageCode, title) => {
       },
       coverImage: '', // Optional or provide a default value if needed
     });
-
-    console.log('=============');
-    console.log(bookObj);
 
     const createdBook = await bookObj.save();
     return createdBook._id;

@@ -224,7 +224,38 @@ function Translator() {
     const missedFields = necessaryHeaders.filter((necessaryHeader) => !headers.includes(necessaryHeader));
 
     setMissingFields(missedFields);
-  }, [headers, languageLabel])
+  }, [headers, languageLabel]);
+
+  /*const groupVersesByChapter = (verses: ParseDataType[]) => {
+    // Group verses by Book, SubBook, and Chapter
+    const chapterGroups = verses.reduce((acc: ChapterGroups, verse: ParseDataType) => {
+      const chapterKey = `${verse.Book_English}-${verse.SubBook_English}-${verse.Chapter_English}`;
+
+      if (!acc[chapterKey]) {
+        acc[chapterKey] = {
+          book: verse.Book_English,
+          subBook: verse.SubBook_English,
+          chapter: verse.Chapter_English,
+          verses: []
+        };
+      }
+
+      // Add both English and Arabic verses
+      acc[chapterKey].verses.push({
+        verseNumber: verse.Verse_Number_English,
+        english: verse.Verse_English,
+        arabic: verse.Verse_Arabic
+      });
+
+      return acc;
+    }, {});
+
+    // Convert to array and sort verses within each chapter
+    return Object.values(chapterGroups).map(chapter => ({
+      ...chapter,
+      verses: chapter.verses.sort((a, b) => a.verseNumber - b.verseNumber)
+    }));
+  };*/
 
   return (
     <>
