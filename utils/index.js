@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const ERROR_MESSAGES = require('../config/error.message');
 const CryptoJS = require('crypto-js');
+const { LANGUAGE_CODE, LANGUAGE_CODE_TABLES } = require('../config');
 
 /////////////////////////////////////////////////////////////////////////
 ////////// Generate Token by payload data and expiresIn  ////////////////
@@ -185,4 +186,15 @@ exports.groupVersesByChapter = (bookInfos, language) => {
     // Then sort by chapter number
     return a.chapterNumber - b.chapterNumber;
   });
+};
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////// Get language code  //////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.getLanguageCode = (language) => {
+  const languageTable = LANGUAGE_CODE_TABLES.find(
+    (languageCodeTable) => languageCodeTable.language == language,
+  );
+
+  return languageTable.code;
 };

@@ -21,6 +21,7 @@ import {
   StyledFilePicker,
   StyledImportButtonContainer,
   StyledTableContainer,
+  StyledMissingFieldErrorContainer,
 } from "./styles";
 import {
   ImporterPropsType,
@@ -62,7 +63,7 @@ function Importer(props: ImporterPropsType) {
 
       <StyledConfirmTextContainer>
         <Text color="#555" fontStyle="italic">
-          Make sure these columns exist: Book_English, SubBook_English, Chapter_English, Verse_Number_English, Verse_English
+          {`Make sure these columns exist: Book_${props.languageLabel as string}, SubBook_${props.languageLabel as string}, Chapter_${props.languageLabel as string}, Verse_Number_${props.languageLabel as string}, Verse_${props.languageLabel as string}`}
         </Text>
       </StyledConfirmTextContainer>
 
@@ -76,6 +77,18 @@ function Importer(props: ImporterPropsType) {
             onChange={(e: ChangeEvent<HTMLInputElement>) => props.onChangeFile(e)}
           />
         </StyledFilePicker>
+
+        {props.parsedData.length > 0 && props.missedFields.length > 0 && (
+          <StyledMissingFieldErrorContainer>
+            <Text color="red">Missing columns: </Text>
+
+            {props.missedFields.map((missedField: string, index: number) =>
+              <Text key={index} color="red">
+                {missedField}
+              </Text>
+            )}
+          </StyledMissingFieldErrorContainer>
+        )}
 
         <StyledImportButtonContainer>
           <Button

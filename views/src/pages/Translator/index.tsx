@@ -35,11 +35,13 @@ function Translator() {
   ];
 
   const [language, setLanguage] = useState(languages[0].value);
+  const [languageLabel, setLanguageLabel] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [fileInput, setFileInput] = useState<ChangeEvent<HTMLInputElement>>();
   const [headers, setHeaders] = useState<string[]>([]);
   const [parsedData, setParsedData] = useState<ParseDataType[]>([]);
   const [necessaryParseData, setNecessaryParsedData] = useState<ParseDataType[]>([]);
+  const [missingFields, setMissingFields] = useState<string[]>([]);
 
   useEffect(() => {
     const file = fileInput?.target.files && fileInput?.target.files[0];
@@ -165,7 +167,7 @@ function Translator() {
     } else {
       console.error('Unsupported file format');
     }
-  }, [file]);
+  }, [file, language]);
 
   /**
    * Effect hook to extract table header and data when parsed data is changed (new file is selcted)
@@ -174,7 +176,7 @@ function Translator() {
     setNecessaryParsedData([]);
     const firstData = parsedData[0];
 
-    const languageLabel = languages.find(languageItem => languageItem.value == language)?.label
+    const languageLabel = languages.find(languageItem => languageItem.value == language)?.label;
 
     firstData && Object.keys(firstData).forEach((key) => {
       if (languageLabel && key.includes(languageLabel))
@@ -196,7 +198,33 @@ function Translator() {
         necessaryData
       ]);
     });
-  }, [parsedData]);
+  }, [parsedData, language]);
+
+  /**
+   * Effect hook to get language label when language(language code) is changed
+   */
+  useEffect(() => {
+    setHeaders([]);
+    const languageLabel = languages.find(languageItem => languageItem.value == language)?.label;
+    languageLabel && setLanguageLabel(languageLabel);
+  }, [language]);
+
+  /**
+   * Effect hook to get missed fields when language or selected file is changed
+   */
+  useEffect(() => {
+    const necessaryHeaders = [
+      `Book_${languageLabel}`,
+      `SubBook_${languageLabel}`,
+      `Chapter_${languageLabel}`,
+      `Verse_Number_${languageLabel}`,
+      `Verse_${languageLabel}`
+    ];
+
+    const missedFields = necessaryHeaders.filter((necessaryHeader) => !headers.includes(necessaryHeader));
+
+    setMissingFields(missedFields);
+  }, [headers, languageLabel])
 
   return (
     <>
@@ -210,10 +238,13 @@ function Translator() {
         <StyledTranslatorPortalContainer>
           <Uploader
             language={language}
+            languageLabel={languageLabel}
             languages={languages}
             file={file}
             parsedData={parsedData}
             headers={headers}
+            missedFields={missingFields}
+
             onChangeLanguage={(e) => setLanguage(e.target.value as string)}
             onChangeFile={(e: ChangeEvent<HTMLInputElement>) => setFileInput(e)}
             onUpload={saveBook}

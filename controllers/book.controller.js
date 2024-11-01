@@ -12,6 +12,7 @@ const {
   getSubBookTitles,
   getChapterInfos,
   groupVersesByChapter,
+  getLanguageCode,
 } = require('../utils');
 
 /////////////////////////////////////////////////////////////////////////
@@ -659,23 +660,153 @@ exports.getIntroVerses = async (req, res) => {
 /////////////////////////////////////////////////////////////////////////
 //////////////////////// Save book by picked file ///////////////////////
 /////////////////////////////////////////////////////////////////////////
-exports.saveBookByFile = (req, res) => {
+exports.saveBookByFile = async (req, res) => {
   try {
     const bookInfos = req.body;
 
+    // Get information for the books (language, book title, sub book titles, chapters information, verses information)
     const language = getLanguage(bookInfos[0]);
+    const languageCode = getLanguageCode(language);
     const bookTitle = getBookTitle(bookInfos[0], language);
     const subBookTitles = getSubBookTitles(bookInfos, language);
     const chapterInfos = getChapterInfos(bookInfos, language);
     const verseInfos = groupVersesByChapter(bookInfos, language);
 
-    return res.status(200).json({
-      verseInfos,
-    });
+    const bookId = getSavedBookId(languageCode, bookTitle);
+    console.log(bookId);
+    const subBookInfos = getSavedSubBookInfos(
+      languageCode,
+      bookId,
+      subBookTitles,
+    );
+
+    return res.status(200).json({ subBookInfos });
   } catch (error) {
     return res.status(400).json({
       message: 'Failed to save book',
+      error: error,
     });
+  }
+};
+
+// Check if the book already exists in DB. If it doesn't exist, save it
+const getSavedBookId = async (languageCode, title) => {
+  try {
+    // Input validation
+    if (!languageCode || !title) {
+      throw new Error('Language code and title are required');
+    }
+
+    console.log('===========before foundBook=============');
+    console.log({ [`title.${languageCode}`]: title });
+
+    // Check if the book already exists in db
+    const foundBook = await Book.findOne({
+      [`title.${languageCode}`]: title,
+    });
+    console.log('===========after foundBook=============');
+
+    if (foundBook) {
+      return foundBook._id;
+    }
+
+    // Create new book if it doesn't exist
+    const bookObj = new Book({
+      title: {
+        [languageCode]: title,
+      },
+      coverImage: '', // Optional or provide a default value if needed
+    });
+
+    console.log('=============');
+    console.log(bookObj);
+
+    const createdBook = await bookObj.save();
+    return createdBook._id;
+  } catch (error) {
+    console.error('Error in getSavedBookId:', error);
+    throw error; // Re-throw to handle it in the calling function
+  }
+};
+
+// Check if the sub book already exists in DB. If it doesn't exist, save it to DB
+const getSavedSubBookInfos = async (
+  languageCode,
+  bookId,
+  subBookTitles,
+) => {
+  let savedSubBooks = [];
+  // Check if the sub book already exists in DB
+  const existingSubBooks = await SubBook.findOne({ book: bookId });
+
+  // Remove all existing Sub books
+  if (existingSubBooks) {
+    await SubBook.deleteMany({ book: bookId });
+  }
+
+  for (let index = 1; index <= subBookTitles.length; index++) {
+    const subBookObj = new SubBook({
+      number: index,
+      book: bookId,
+      title: {
+        [languageCode]: subBookTitles[index],
+      },
+    });
+
+    const savedSubBookObj = await subBookObj.save();
+    savedSubBooks.push(savedSubBookObj);
+  }
+
+  return savedSubBooks;
+};
+
+const getSavedChapterInfos = async (
+  languageCode,
+  chapterInfos,
+  subBookInfos,
+) => {
+  try {
+    let savedChapters = [];
+    const subBookMap = new Map();
+
+    // Create a map of subBook titles to their IDs for easy lookup
+    subBookInfos.forEach((subBook) => {
+      subBookMap.set(subBook.title[languageCode], subBook._id);
+    });
+
+    // Get all subBook IDs
+    const subBookIds = subBookInfos.map((subBook) => subBook._id);
+
+    // Delete all existing chapters for these subBooks
+    await Chapter.deleteMany({ subBook: { $in: subBookIds } });
+
+    // Create chapter information
+    for (const chapterInfo of chapterInfos) {
+      const subBookId = subBookMap.get(chapterInfo.subBookTitle);
+
+      if (!subBookId) {
+        console.error(
+          `SubBook not found for title: ${chapterInfo.subBookTitle}`,
+        );
+        continue;
+      }
+
+      const chapterObj = new Chapter({
+        number: chapterInfo.chapterNumber,
+        subBook: subBookId,
+        title: {
+          [languageCode]: `Chapter ${chapterInfo.chapterNumber}`,
+        },
+      });
+
+      const savedChapter = await chapterObj.save();
+      savedChapters.push(savedChapter);
+    }
+
+    return savedChapters;
+  } catch (error) {
+    console.error('Error in getSavedChapterInfos:', error);
+    throw error;
   }
 };
 
