@@ -650,7 +650,7 @@ exports.getIntroVerses = async (req, res) => {
     // Return the verses
     return res.status(200).json(filteredVerses);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res
       .status(500)
       .json({ message: ERROR_MESSAGES.SERVER_ERROR });
@@ -672,13 +672,18 @@ exports.saveBookByFile = async (req, res) => {
     const verseInfos = groupVersesByChapter(bookInfos, language);
 
     const bookId = await getSavedBookId(languageCode, bookTitle);
-    const subBookInfos = getSavedSubBookInfos(
+    const subBookInfos = await getSavedSubBookInfos(
       languageCode,
       bookId,
       subBookTitles,
     );
+    const savedChapterInfos = getSavedChapterInfos(
+      languageCode,
+      chapterInfos,
+      subBookInfos,
+    );
 
-    return res.status(200).json({ subBookInfos });
+    return res.status(200).json({ savedChapterInfos });
   } catch (error) {
     return res.status(400).json({
       message: 'Failed to save book',
@@ -725,8 +730,6 @@ const getSavedSubBookInfos = async (
   bookId,
   subBookTitles,
 ) => {
-  console.log(languageCode, bookId, subBookTitles);
-
   let savedSubBooks = [];
   // Check if the sub book already exists in DB
   const existingSubBooks = await SubBook.findOne({ book: bookId });
@@ -770,7 +773,7 @@ const getSavedChapterInfos = async (
     const subBookIds = subBookInfos.map((subBook) => subBook._id);
 
     // Delete all existing chapters for these subBooks
-    await Chapter.deleteMany({ subBook: { $in: subBookIds } });
+    await Chapter.deleteMany({ subBook: subBookIds });
 
     // Create chapter information
     for (const chapterInfo of chapterInfos) {
@@ -784,11 +787,8 @@ const getSavedChapterInfos = async (
       }
 
       const chapterObj = new Chapter({
-        number: chapterInfo.chapterNumber,
+        chapterNumber: chapterInfo.chapterNumber,
         subBook: subBookId,
-        title: {
-          [languageCode]: `Chapter ${chapterInfo.chapterNumber}`,
-        },
       });
 
       const savedChapter = await chapterObj.save();
@@ -846,7 +846,7 @@ exports.createSubBook = async (req, res) => {
       message: ERROR_MESSAGES.BOOKMARK_ADDED,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res
       .status(500)
       .json({ message: ERROR_MESSAGES.SERVER_ERROR });
@@ -871,7 +871,7 @@ exports.createChapter = async (req, res) => {
       message: ERROR_MESSAGES.BOOKMARK_ADDED,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res
       .status(500)
       .json({ message: ERROR_MESSAGES.SERVER_ERROR });
@@ -899,7 +899,7 @@ exports.createVerse = async (req, res) => {
       message: ERROR_MESSAGES.BOOKMARK_ADDED,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res
       .status(500)
       .json({ message: ERROR_MESSAGES.SERVER_ERROR });
