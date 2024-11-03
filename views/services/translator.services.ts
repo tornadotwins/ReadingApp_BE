@@ -1,14 +1,15 @@
 import axios from 'axios';
 
 import {API_URL} from '../config'
-import { ParseDataType } from '@/pages/Translator/types';
+import { TranslatorRequestType } from './types';
 
 class TranslatorService {
-  saveBook = (data: ParseDataType[]) => {
+  saveBook = (data: TranslatorRequestType) => {
+    console.log(data)
     return new Promise((resolve, reject) => {
       const url = API_URL + '/books/saveBookByFile';
       axios
-        .post(url, data)
+        .post(url, {data})
         .then((result) => {
           resolve(result.data)
         })

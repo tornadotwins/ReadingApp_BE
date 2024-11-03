@@ -662,7 +662,7 @@ exports.getIntroVerses = async (req, res) => {
 /////////////////////////////////////////////////////////////////////////
 exports.saveBookByFile = async (req, res) => {
   try {
-    const { bookInfos, bookTitle } = req.body;
+    const { bookInfos, bookTitle } = req.body.data;
 
     // Get information for the books (language, book title, sub book titles, chapters information, verses information)
     const language = getLanguage(bookInfos[0]);
@@ -689,12 +689,12 @@ exports.saveBookByFile = async (req, res) => {
       language,
     );
 
-    const savedVerseInfos = await getSavedVerseInfos(
-      languageCode,
-      verseInfos,
-    );
+    // const savedVerseInfos = await getSavedVerseInfos(
+    //   languageCode,
+    //   verseInfos,
+    // );
 
-    return res.status(200).json({ savedVerseInfos });
+    return res.status(200).json({ savedChapterInfos });
   } catch (error) {
     return res.status(400).json({
       message: 'Failed to save book',
@@ -744,40 +744,74 @@ const getSavedSubBookInfos = async (
   let savedSubBooks = [];
 
   // Check if sub books exist for this book
-  const existingSubBooks = await SubBook.find({ book: bookId });
+  const existingSubBooks = await SubBook.find({ book: bookId }).sort(
+    'number',
+  );
 
   if (existingSubBooks && existingSubBooks.length > 0) {
-    // Get all subbook IDs
-    const subBookIds = existingSubBooks.map((subBook) => subBook._id);
+    // Check if any existing sub book has the current language code
+    const hasLanguageCode = existingSubBooks.some(
+      (subBook) => subBook.title && subBook.title[languageCode],
+    );
 
-    // Find all chapters related to these subbooks
-    const relatedChapters = await Chapter.find({
-      subBook: { $in: subBookIds },
-    });
-    const chapterIds = relatedChapters.map((chapter) => chapter._id);
+    if (hasLanguageCode) {
+      // If language code exists, only update the titles for that language
+      if (subBookTitles.length !== existingSubBooks.length) {
+        throw new Error(
+          `Number of provided titles (${subBookTitles.length}) does not match number of existing sub books (${existingSubBooks.length})`,
+        );
+      }
 
-    // Delete all related verses first (to maintain referential integrity)
-    await Verse.deleteMany({ chapter: { $in: chapterIds } });
+      const updatePromises = existingSubBooks.map(
+        async (existingSubBook, index) => {
+          // Only update the specific language code title
+          await SubBook.updateOne(
+            { _id: existingSubBook._id },
+            {
+              $set: {
+                [`title.${languageCode}`]: subBookTitles[index],
+              },
+            },
+          );
+          return SubBook.findById(existingSubBook._id);
+        },
+      );
 
-    // Delete all related chapters
-    await Chapter.deleteMany({ subBook: { $in: subBookIds } });
+      savedSubBooks = await Promise.all(updatePromises);
+    } else {
+      // If language code doesn't exist, add new translations to existing sub books
+      if (subBookTitles.length !== existingSubBooks.length) {
+        throw new Error(
+          `Number of provided titles (${subBookTitles.length}) does not match number of existing sub books (${existingSubBooks.length})`,
+        );
+      }
 
-    // Finally delete the sub books
-    await SubBook.deleteMany({ book: bookId });
-  }
+      const updatePromises = existingSubBooks.map(
+        async (existingSubBook, index) => {
+          existingSubBook.title = {
+            ...existingSubBook.title,
+            [languageCode]: subBookTitles[index],
+          };
+          return existingSubBook.save();
+        },
+      );
 
-  // Create new sub books
-  for (let index = 0; index < subBookTitles.length; index++) {
-    const subBookObj = new SubBook({
-      number: index + 1,
-      book: bookId,
-      title: {
-        [languageCode]: subBookTitles[index],
-      },
-    });
+      savedSubBooks = await Promise.all(updatePromises);
+    }
+  } else {
+    // If no sub books exist, create new ones
+    for (let index = 0; index < subBookTitles.length; index++) {
+      const subBookObj = new SubBook({
+        number: index + 1,
+        book: bookId,
+        title: {
+          [languageCode]: subBookTitles[index],
+        },
+      });
 
-    const savedSubBookObj = await subBookObj.save();
-    savedSubBooks.push(savedSubBookObj);
+      const savedSubBookObj = await subBookObj.save();
+      savedSubBooks.push(savedSubBookObj);
+    }
   }
 
   return savedSubBooks;
@@ -801,25 +835,19 @@ const getSavedChapterInfos = async (
     // Get all subBook IDs
     const subBookIds = subBookInfos.map((subBook) => subBook._id);
 
-    // Find existing chapters first to get their IDs
+    // Find existing chapters
     const existingChapters = await Chapter.find({
       subBook: { $in: subBookIds },
     });
 
-    if (existingChapters.length > 0) {
-      // Get all chapter IDs
-      const chapterIds = existingChapters.map(
-        (chapter) => chapter._id,
-      );
+    // Create a map of existing chapters for quick lookup
+    const existingChapterMap = new Map();
+    existingChapters.forEach((chapter) => {
+      const key = `${chapter.subBook}_${chapter.chapterNumber}`;
+      existingChapterMap.set(key, chapter);
+    });
 
-      // Delete all verses related to these chapters first
-      await Verse.deleteMany({ chapter: { $in: chapterIds } });
-
-      // Then delete the chapters
-      await Chapter.deleteMany({ subBook: { $in: subBookIds } });
-    }
-
-    // Create new chapter information
+    // Create new chapter information only if needed
     for (const chapterInfo of chapterInfos) {
       const subBookId = subBookMap.get(chapterInfo.subBookTitle);
 
@@ -830,16 +858,35 @@ const getSavedChapterInfos = async (
         continue;
       }
 
-      const chapterObj = new Chapter({
-        chapterNumber: chapterInfo.chapterNumber,
-        subBook: subBookId,
-        isTranslated: {
-          [languageCode]: true,
-        },
-      });
+      const existingChapterKey = `${subBookId}_${chapterInfo.chapterNumber}`;
+      const existingChapter = existingChapterMap.get(
+        existingChapterKey,
+      );
 
-      const savedChapter = await chapterObj.save();
-      savedChapters.push(savedChapter);
+      if (existingChapter) {
+        // If chapter exists but language translation doesn't exist
+        if (!existingChapter.isTranslated[languageCode]) {
+          // existingChapter.isTranslated[languageCode] = true;
+          existingChapter.isTranslated = {
+            ...existingChapter.isTranslated,
+            [languageCode]: true,
+          };
+          const updatedChapter = await existingChapter.save();
+          savedChapters.push(updatedChapter);
+        }
+      } else {
+        // Create new chapter if it doesn't exist
+        const chapterObj = new Chapter({
+          chapterNumber: chapterInfo.chapterNumber,
+          subBook: subBookId,
+          isTranslated: {
+            [languageCode]: true,
+          },
+        });
+
+        const savedChapter = await chapterObj.save();
+        savedChapters.push(savedChapter);
+      }
     }
 
     return savedChapters;

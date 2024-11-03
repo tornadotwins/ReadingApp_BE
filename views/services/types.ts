@@ -1,3 +1,5 @@
+import { ParseDataType } from "@/pages/Translator/types";
+
 type UserRequestType = {
   id?: string;
   username: string;
@@ -5,6 +7,12 @@ type UserRequestType = {
   isAdmin?: boolean;
 }
 
+type TranslatorRequestType = {
+  bookInfos: ParseDataType[],
+  bookTitle: string,
+}
+
 export type {
   UserRequestType,
+  TranslatorRequestType,
 }

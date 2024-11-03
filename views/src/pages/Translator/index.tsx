@@ -20,6 +20,7 @@ import {
   StyledTranslatorPortalContainer,
 } from './styles';
 import { ParseDataType } from './types';
+import { toast, Bounce } from 'material-react-toastify';
 
 function Translator() {
   const isPortrait = useOrientation();
@@ -134,12 +135,30 @@ function Translator() {
    */
   const saveBook = () => {
     translatorService
-      .saveBook(necessaryParseData)
-      .then((result) => {
-        console.log(result)
+      .saveBook({ bookInfos: necessaryParseData, bookTitle: 'Injil' })
+      .then(() => {
+        toast.success('Saved successfully!', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
       })
       .catch((error) => {
-        console.log(error);
+        toast.success(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
       });
   }
 
