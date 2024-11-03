@@ -689,15 +689,12 @@ exports.saveBookByFile = async (req, res) => {
       language,
     );
 
-    return res.status(200).json(verseInfos);
-
     const savedVerseInfos = await getSavedVerseInfos(
       languageCode,
       verseInfos,
-      savedChapterInfos,
     );
 
-    return res.status(200).json({ savedChapterInfos });
+    return res.status(200).json({ savedVerseInfos });
   } catch (error) {
     return res.status(400).json({
       message: 'Failed to save book',
@@ -745,14 +742,31 @@ const getSavedSubBookInfos = async (
   subBookTitles,
 ) => {
   let savedSubBooks = [];
-  // Check if the sub book already exists in DB
-  const existingSubBooks = await SubBook.findOne({ book: bookId });
 
-  // Remove all existing Sub books
-  if (existingSubBooks) {
+  // Check if sub books exist for this book
+  const existingSubBooks = await SubBook.find({ book: bookId });
+
+  if (existingSubBooks && existingSubBooks.length > 0) {
+    // Get all subbook IDs
+    const subBookIds = existingSubBooks.map((subBook) => subBook._id);
+
+    // Find all chapters related to these subbooks
+    const relatedChapters = await Chapter.find({
+      subBook: { $in: subBookIds },
+    });
+    const chapterIds = relatedChapters.map((chapter) => chapter._id);
+
+    // Delete all related verses first (to maintain referential integrity)
+    await Verse.deleteMany({ chapter: { $in: chapterIds } });
+
+    // Delete all related chapters
+    await Chapter.deleteMany({ subBook: { $in: subBookIds } });
+
+    // Finally delete the sub books
     await SubBook.deleteMany({ book: bookId });
   }
 
+  // Create new sub books
   for (let index = 0; index < subBookTitles.length; index++) {
     const subBookObj = new SubBook({
       number: index + 1,
@@ -787,10 +801,25 @@ const getSavedChapterInfos = async (
     // Get all subBook IDs
     const subBookIds = subBookInfos.map((subBook) => subBook._id);
 
-    // Delete all existing chapters for these subBooks
-    await Chapter.deleteMany({ subBook: subBookIds });
+    // Find existing chapters first to get their IDs
+    const existingChapters = await Chapter.find({
+      subBook: { $in: subBookIds },
+    });
 
-    // Create chapter information
+    if (existingChapters.length > 0) {
+      // Get all chapter IDs
+      const chapterIds = existingChapters.map(
+        (chapter) => chapter._id,
+      );
+
+      // Delete all verses related to these chapters first
+      await Verse.deleteMany({ chapter: { $in: chapterIds } });
+
+      // Then delete the chapters
+      await Chapter.deleteMany({ subBook: { $in: subBookIds } });
+    }
+
+    // Create new chapter information
     for (const chapterInfo of chapterInfos) {
       const subBookId = subBookMap.get(chapterInfo.subBookTitle);
 
@@ -804,6 +833,9 @@ const getSavedChapterInfos = async (
       const chapterObj = new Chapter({
         chapterNumber: chapterInfo.chapterNumber,
         subBook: subBookId,
+        isTranslated: {
+          [languageCode]: true,
+        },
       });
 
       const savedChapter = await chapterObj.save();
@@ -818,16 +850,31 @@ const getSavedChapterInfos = async (
 };
 
 // Check if the verses already exists in DB. If it doesn't exist, save it to DB
-const getSavedVerseInfos = async (
-  languageCode,
-  verseInfos,
-  chapterInfos,
-) => {
-  // console.log({
-  //   languageCode,
-  //   verseInfos,
-  //   chapterInfos,
-  // });
+const getSavedVerseInfos = async (languageCode, verseInfos) => {
+  let savedVerseInfos = [];
+  verseInfos.forEach((verseInfo) => {
+    verseInfo.verses.forEach(async (verse) => {
+      const verseObj = new Verse({
+        chapter: verseInfo.chapterId,
+        text: {
+          [languageCode]: verse.verseText,
+        },
+        number: verse.verseNumber,
+        audioStart: {
+          [languageCode]: '',
+        },
+        header: {
+          [languageCode]: '',
+        },
+        reference: [],
+      });
+
+      const savedVerse = await verseObj.save();
+      savedVerseInfos.push(savedVerse);
+    });
+  });
+
+  return savedVerseInfos;
 };
 
 // Sort and Group by its library
