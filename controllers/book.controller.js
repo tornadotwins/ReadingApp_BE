@@ -669,7 +669,6 @@ exports.saveBookByFile = async (req, res) => {
     const languageCode = getLanguageCode(language);
     const subBookTitles = getSubBookTitles(bookInfos, language);
     const chapterInfos = getChapterInfos(bookInfos, language);
-    const verseInfos = groupVersesByChapter(bookInfos, language);
 
     const bookId = await getSavedBookId(languageCode, bookTitle);
     const subBookInfos = await getSavedSubBookInfos(
@@ -677,10 +676,25 @@ exports.saveBookByFile = async (req, res) => {
       bookId,
       subBookTitles,
     );
-    const savedChapterInfos = getSavedChapterInfos(
+    const savedChapterInfos = await getSavedChapterInfos(
       languageCode,
       chapterInfos,
       subBookInfos,
+    );
+
+    const verseInfos = groupVersesByChapter(
+      bookInfos,
+      subBookInfos,
+      savedChapterInfos,
+      language,
+    );
+
+    return res.status(200).json(verseInfos);
+
+    const savedVerseInfos = await getSavedVerseInfos(
+      languageCode,
+      verseInfos,
+      savedChapterInfos,
     );
 
     return res.status(200).json({ savedChapterInfos });
@@ -755,6 +769,7 @@ const getSavedSubBookInfos = async (
   return savedSubBooks;
 };
 
+// Check if the chapter already exists in DB. If it doesn't exist, save it to DB
 const getSavedChapterInfos = async (
   languageCode,
   chapterInfos,
@@ -800,6 +815,19 @@ const getSavedChapterInfos = async (
     console.error('Error in getSavedChapterInfos:', error);
     throw error;
   }
+};
+
+// Check if the verses already exists in DB. If it doesn't exist, save it to DB
+const getSavedVerseInfos = async (
+  languageCode,
+  verseInfos,
+  chapterInfos,
+) => {
+  // console.log({
+  //   languageCode,
+  //   verseInfos,
+  //   chapterInfos,
+  // });
 };
 
 // Sort and Group by its library

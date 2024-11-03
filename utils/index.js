@@ -148,17 +148,41 @@ exports.getChapterInfos = (bookInfos, language) => {
 /////////////////////////////////////////////////////////////////////////
 ////////////////////////////// Get verses  //////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-exports.groupVersesByChapter = (bookInfos, language) => {
+exports.groupVersesByChapter = (
+  bookInfos,
+  subBookInfos,
+  chapterInfos,
+  language,
+) => {
   // First create a map to store grouped data
   const groupedData = new Map();
 
+  const languageCode = module.exports.getLanguageCode(language);
+
   bookInfos.forEach((bookInfo) => {
+    // Get Sub Book ID
     const subBook = bookInfo[`SubBook_${language}`];
+    const subBookInfo = subBookInfos.find(
+      (subBookInfo) => subBookInfo.title?.[languageCode] == subBook,
+    );
+    const subBookId = subBookInfo._id;
+
+    // Get Chapter ID
     const strChapterNumber = bookInfo[`Chapter_${language}`];
     const chapterNumber = parseInt(
       strChapterNumber.split(' ')[1],
       10,
     );
+
+    // Find the chapter info that matches both subBookId and chapterNumber
+    const chapterInfo = chapterInfos.find(
+      (chapter) =>
+        chapter.subBook.toString() === subBookId.toString() &&
+        chapter.chapterNumber === chapterNumber,
+    );
+
+    // Get the chapter ID
+    const chapterId = chapterInfo._id;
 
     // Create unique key for subBook + chapter combination
     const key = `${subBook}-${chapterNumber}`;
@@ -166,6 +190,8 @@ exports.groupVersesByChapter = (bookInfos, language) => {
     if (!groupedData.has(key)) {
       groupedData.set(key, {
         subBookTitle: subBook,
+        subBookId: subBookId,
+        chapterId: chapterId,
         chapterNumber: chapterNumber,
         verses: [],
       });
