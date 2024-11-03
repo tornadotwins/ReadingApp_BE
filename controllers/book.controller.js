@@ -689,10 +689,10 @@ exports.saveBookByFile = async (req, res) => {
       language,
     );
 
-    // const savedVerseInfos = await getSavedVerseInfos(
-    //   languageCode,
-    //   verseInfos,
-    // );
+    const savedVerseInfos = await getSavedVerseInfos(
+      languageCode,
+      verseInfos,
+    );
 
     return res.status(200).json({ savedChapterInfos });
   } catch (error) {
@@ -897,7 +897,7 @@ const getSavedChapterInfos = async (
 };
 
 // Check if the verses already exists in DB. If it doesn't exist, save it to DB
-const getSavedVerseInfos = async (languageCode, verseInfos) => {
+/*const getSavedVerseInfos = async (languageCode, verseInfos) => {
   let savedVerseInfos = [];
   verseInfos.forEach((verseInfo) => {
     verseInfo.verses.forEach(async (verse) => {
@@ -920,6 +920,61 @@ const getSavedVerseInfos = async (languageCode, verseInfos) => {
       savedVerseInfos.push(savedVerse);
     });
   });
+
+  return savedVerseInfos;
+};*/
+
+const getSavedVerseInfos = async (languageCode, verseInfos) => {
+  let savedVerseInfos = [];
+
+  // Use for...of to properly handle async operations
+  for (const verseInfo of verseInfos) {
+    for (const verse of verseInfo.verses) {
+      // First check if verse exists with the chapter and number
+      const existingVerse = await Verse.findOne({
+        chapter: verseInfo.chapterId,
+        number: verse.verseNumber,
+      });
+
+      if (existingVerse) {
+        // If verse exists, check if language fields exist
+        if (!existingVerse.text[languageCode]) {
+          existingVerse.text[languageCode] = verse.verseText;
+        }
+        if (!existingVerse.audioStart[languageCode]) {
+          existingVerse.audioStart[languageCode] = '';
+        }
+        if (!existingVerse.header[languageCode]) {
+          existingVerse.header[languageCode] = '';
+        }
+
+        // Save only if modifications were made
+        if (existingVerse.isModified()) {
+          const savedVerse = await existingVerse.save();
+          savedVerseInfos.push(savedVerse);
+        }
+      } else {
+        // If verse doesn't exist, create new one
+        const verseObj = new Verse({
+          chapter: verseInfo.chapterId,
+          text: {
+            [languageCode]: verse.verseText,
+          },
+          number: verse.verseNumber,
+          audioStart: {
+            [languageCode]: '',
+          },
+          header: {
+            [languageCode]: '',
+          },
+          reference: [],
+        });
+
+        const savedVerse = await verseObj.save();
+        savedVerseInfos.push(savedVerse);
+      }
+    }
+  }
 
   return savedVerseInfos;
 };
