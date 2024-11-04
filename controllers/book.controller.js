@@ -661,7 +661,7 @@ exports.getIntroVerses = async (req, res) => {
 /////////////////////////////////////////////////////////////////////////
 exports.saveBookByFile = async (req, res) => {
   try {
-    const { bookInfos, bookTitle, language } = req.body.data;
+    const { bookInfos, bookTitle, language } = req.body;
 
     // Get information for the books (language, book title, sub book titles, chapters information, verses information)
     const languageCode = getLanguageCode(language);
@@ -688,6 +688,7 @@ exports.saveBookByFile = async (req, res) => {
       bookInfos,
       savedChapterInfo,
       language,
+      subBookTitle,
     );
 
     return res.status(200).json(savedVerseInfo);
@@ -747,14 +748,25 @@ const saveSubBook = async (
       (existingSubBook) => existingSubBook.title.en == enSubBookTitle,
     )
   ) {
-    const subBookObj = new SubBook({
-      number: existingSubBooks.length + 1,
-      title: {
-        en: enSubBookTitle,
-      },
-      book: bookId,
-      noChapter: false,
-    });
+    const subBookObj =
+      languageCode == 'en'
+        ? new SubBook({
+            number: existingSubBooks.length + 1,
+            title: {
+              en: enSubBookTitle,
+            },
+            book: bookId,
+            noChapter: false,
+          })
+        : new SubBook({
+            number: existingSubBooks.length + 1,
+            title: {
+              en: enSubBookTitle,
+              [languageCode]: subBookTitle,
+            },
+            book: bookId,
+            noChapter: false,
+          });
 
     const newSubBook = subBookObj.save();
     return newSubBook;
@@ -766,7 +778,7 @@ const saveSubBook = async (
 
     currentSubBook.title[languageCode] = subBookTitle;
 
-    const updated = await SubBook.updateOne(
+    await SubBook.updateOne(
       { _id: currentSubBook._id },
       {
         $set: {
@@ -810,11 +822,13 @@ const saveChapter = async (
 
     return newChapters;
   } else {
+    let updatedChapters = [];
+
     // If chapters already exist, update their `isTranslated` field
     await Promise.all(
-      chapterNumbers.map(async (chapterInfo) => {
+      chapterNumbers.map(async (chapterNumber) => {
         const existingChapter = existingChapters.find(
-          (chapter) => chapter.chapterNumber === chapterInfo,
+          (chapter) => chapter.chapterNumber === chapterNumber,
         );
 
         if (existingChapter) {
@@ -822,15 +836,54 @@ const saveChapter = async (
           existingChapter.isTranslated[languageCode] = true;
           existingChapter.updatedAt = Date.now(); // Update the `updatedAt` field
 
-          await existingChapter.save();
+          await Chapter.updateOne(
+            { _id: existingChapter._id },
+            {
+              $set: {
+                [`isTranslated.${languageCode}`]: true,
+              },
+            },
+          );
+
+          const updatedChapter = await Chapter.findById(
+            existingChapter._id,
+          );
+          updatedChapters.push(updatedChapter);
         }
       }),
     );
-    return existingChapters;
+    return updatedChapters;
   }
 };
 
-const saveVerse = async (bookInfos, savedChaptersInfo, language) => {
+// const saveVerse = async (
+//   bookInfos,
+//   savedChaptersInfo,
+//   language,
+//   subBookTitle,
+// ) => {
+//   let result = [];
+
+//   const languageCode = getLanguageCode(language);
+
+//   bookInfos.forEach((bookInfo) => {
+//     const verseInfo = savedChaptersInfo.map(
+//       (savedChapterInfo) =>
+//         savedChapterInfo.chapterNumber ==
+//           bookInfo['Chapter_Number'] &&
+//         bookInfo[`SubBook_${language}`] == subBookTitle,
+//     );
+
+//     console.log(verseInfo);
+//   });
+// };
+
+const saveVerse = async (
+  bookInfos,
+  savedChaptersInfo,
+  language,
+  subBookTitle,
+) => {
   let result = [];
 
   const languageCode = getLanguageCode(language);
@@ -838,12 +891,6 @@ const saveVerse = async (bookInfos, savedChaptersInfo, language) => {
   savedChaptersInfo.forEach(async (savedChapterInfo) => {
     const chapterId = savedChapterInfo._id;
     const chapterNumber = savedChapterInfo.chapterNumber;
-
-    // Get sub book title
-    const subBookTitle = await getSubBookTitleFromChapterId(
-      chapterId,
-      languageCode,
-    );
 
     // find verse text and verse number from bookInfo
     const verseInfos = bookInfos.filter(
@@ -874,7 +921,7 @@ const saveVerse = async (bookInfos, savedChaptersInfo, language) => {
           header: {
             [languageCode]: '',
           },
-          reference: {},
+          reference: [],
         });
 
         const savedVerse = await verseObj.save();
@@ -884,7 +931,16 @@ const saveVerse = async (bookInfos, savedChaptersInfo, language) => {
         existingVerse.text[languageCode] = verseText;
         existingVerse.updatedAt = Date.now();
 
-        const updatedVerse = await existingVerse.save();
+        await Verse.updateOne(
+          { _id: existingVerse._id },
+          {
+            $set: {
+              [`text.${languageCode}`]: verseText,
+            },
+          },
+        );
+
+        const updatedVerse = await Verse.findById(existingVerse._id);
 
         result.push(updatedVerse);
       }

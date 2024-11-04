@@ -10,6 +10,7 @@ type UserRequestType = {
 type TranslatorRequestType = {
   bookInfos: ParseDataType[],
   bookTitle: string,
+  language: string,
 }
 
 export type {

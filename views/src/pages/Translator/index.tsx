@@ -135,7 +135,7 @@ function Translator() {
    */
   const saveBook = () => {
     translatorService
-      .saveBook({ bookInfos: necessaryParseData, bookTitle: 'Injil' })
+      .saveBook({ bookInfos: necessaryParseData, bookTitle: 'Injil', language: languageLabel })
       .then(() => {
         toast.success('Saved successfully!', {
           position: 'top-right',
@@ -197,20 +197,26 @@ function Translator() {
 
     const languageLabel = languages.find(languageItem => languageItem.value == language)?.label;
 
+    setHeaders(prevHeaders => [...prevHeaders, 'SubBook_English']);
     firstData && Object.keys(firstData).forEach((key) => {
       if (languageLabel && key.includes(languageLabel))
         setHeaders(prevHeaders => [...prevHeaders, key]);
     });
 
+    setHeaders(prevHeaders => [...prevHeaders, 'Chapter_Number', 'Verse_Number']);
+
     // Set the necessary parsed data according to the selected language
     parsedData.forEach((data: ParseDataType) => {
       const necessaryData: ParseDataType = {};
+      necessaryData['SubBook_English'] = data['SubBook_English'];
       Object.keys(data).forEach((key) => {
         // If key contains selected language, it is necessary field to save in DB
         if (key.includes(languageLabel as string)) {
           necessaryData[key] = data[key];
         }
       });
+      necessaryData['Chapter_Number'] = data['Chapter_Number'];
+      necessaryData['Verse_Number'] = data['Verse_Number'];
 
       setNecessaryParsedData(prevNecessaryParsedData => [
         ...prevNecessaryParsedData,
@@ -233,10 +239,10 @@ function Translator() {
    */
   useEffect(() => {
     const necessaryHeaders = [
-      `Book_${languageLabel}`,
+      'SubBook_English',
       `SubBook_${languageLabel}`,
-      `Chapter_${languageLabel}`,
-      `Verse_Number_${languageLabel}`,
+      `Chapter_Number`,
+      `Verse_Number`,
       `Verse_${languageLabel}`
     ];
 

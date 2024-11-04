@@ -63,7 +63,7 @@ function Importer(props: ImporterPropsType) {
 
       <StyledConfirmTextContainer>
         <Text color="#555" fontStyle="italic">
-          {`Make sure these columns exist: Book_${props.languageLabel as string}, SubBook_${props.languageLabel as string}, Chapter_${props.languageLabel as string}, Verse_Number_${props.languageLabel as string}, Verse_${props.languageLabel as string}`}
+          {`Make sure these columns exist: Book_${props.languageLabel as string}, SubBook_${props.languageLabel as string}, Chapter_Number, Verse_Number, Verse_${props.languageLabel as string}`}
         </Text>
       </StyledConfirmTextContainer>
 
