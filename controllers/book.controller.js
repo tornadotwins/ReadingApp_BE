@@ -8,9 +8,8 @@ const User = require('../models/user.model');
 const ERROR_MESSAGES = require('../config/error.message');
 const {
   getLanguage,
-  getBookTitle,
   getSubBookTitles,
-  getChapterInfos,
+  getChapterNumbers,
   groupVersesByChapter,
   getLanguageCode,
 } = require('../utils');
@@ -662,39 +661,36 @@ exports.getIntroVerses = async (req, res) => {
 /////////////////////////////////////////////////////////////////////////
 exports.saveBookByFile = async (req, res) => {
   try {
-    const { bookInfos, bookTitle } = req.body.data;
+    const { bookInfos, bookTitle, language } = req.body.data;
 
     // Get information for the books (language, book title, sub book titles, chapters information, verses information)
-    const language = getLanguage(bookInfos[0]);
     const languageCode = getLanguageCode(language);
-    const subBookTitles = getSubBookTitles(bookInfos, language);
-    const chapterInfos = getChapterInfos(bookInfos, language);
+    const subBookTitle = bookInfos[0]?.[`SubBook_${language}`];
+    const enSubBookTitle = bookInfos[0]?.['SubBook_English'];
+
+    const chapterNumbers = getChapterNumbers(bookInfos);
 
     const bookId = await getSavedBookId(languageCode, bookTitle);
-    const subBookInfos = await getSavedSubBookInfos(
-      languageCode,
+    const savedSubBookInfo = await saveSubBook(
       bookId,
-      subBookTitles,
-    );
-    const savedChapterInfos = await getSavedChapterInfos(
       languageCode,
-      chapterInfos,
-      subBookInfos,
+      subBookTitle,
+      enSubBookTitle,
     );
 
-    const verseInfos = groupVersesByChapter(
+    const savedChapterInfo = await saveChapter(
+      languageCode,
+      savedSubBookInfo._id,
+      chapterNumbers,
+    );
+
+    const savedVerseInfo = await saveVerse(
       bookInfos,
-      subBookInfos,
-      savedChapterInfos,
+      savedChapterInfo,
       language,
     );
 
-    const savedVerseInfos = await getSavedVerseInfos(
-      languageCode,
-      verseInfos,
-    );
-
-    return res.status(200).json({ savedChapterInfos });
+    return res.status(200).json(savedVerseInfo);
   } catch (error) {
     return res.status(400).json({
       message: 'Failed to save book',
@@ -735,6 +731,193 @@ const getSavedBookId = async (languageCode, title) => {
   }
 };
 
+const saveSubBook = async (
+  bookId,
+  languageCode,
+  subBookTitle,
+  enSubBookTitle,
+) => {
+  // Check if the sub book already exists in db (compare with enSubBook)
+  const existingSubBooks = await SubBook.find({ book: bookId });
+
+  // If subBook doesn't exist, create a new sub book
+  if (
+    !(existingSubBooks.length > 0) ||
+    !existingSubBooks.some(
+      (existingSubBook) => existingSubBook.title.en == enSubBookTitle,
+    )
+  ) {
+    const subBookObj = new SubBook({
+      number: existingSubBooks.length + 1,
+      title: {
+        en: enSubBookTitle,
+      },
+      book: bookId,
+      noChapter: false,
+    });
+
+    const newSubBook = subBookObj.save();
+    return newSubBook;
+  } else {
+    // update the current sub book
+    const currentSubBook = existingSubBooks.find(
+      (existingSubBook) => existingSubBook.title.en == enSubBookTitle,
+    );
+
+    currentSubBook.title[languageCode] = subBookTitle;
+
+    const updated = await SubBook.updateOne(
+      { _id: currentSubBook._id },
+      {
+        $set: {
+          [`title.${languageCode}`]: subBookTitle,
+        },
+      },
+    );
+
+    return await SubBook.findById({ _id: currentSubBook._id });
+  }
+};
+
+const saveChapter = async (
+  languageCode,
+  subBookId,
+  chapterNumbers,
+) => {
+  // Check if the chapter already exists in database
+  const existingChapters = await Chapter.find({
+    subBook: subBookId,
+  });
+
+  // If chapter doesn't exist, create a new one
+  if (!existingChapters.length > 0) {
+    const newChapters = await Promise.all(
+      chapterNumbers.map(async (chapterInfo) => {
+        const saveChapterObj = new Chapter({
+          chapterNumber: chapterInfo,
+          subBook: subBookId,
+          audio: {
+            [languageCode]: '', // Initialize with an empty string or the desired value
+          },
+          isTranslated: {
+            [languageCode]: true,
+          },
+        });
+
+        return await saveChapterObj.save();
+      }),
+    );
+
+    return newChapters;
+  } else {
+    // If chapters already exist, update their `isTranslated` field
+    await Promise.all(
+      chapterNumbers.map(async (chapterInfo) => {
+        const existingChapter = existingChapters.find(
+          (chapter) => chapter.chapterNumber === chapterInfo,
+        );
+
+        if (existingChapter) {
+          // Update the `isTranslated` field if it exists
+          existingChapter.isTranslated[languageCode] = true;
+          existingChapter.updatedAt = Date.now(); // Update the `updatedAt` field
+
+          await existingChapter.save();
+        }
+      }),
+    );
+    return existingChapters;
+  }
+};
+
+const saveVerse = async (bookInfos, savedChaptersInfo, language) => {
+  let result = [];
+
+  const languageCode = getLanguageCode(language);
+
+  savedChaptersInfo.forEach(async (savedChapterInfo) => {
+    const chapterId = savedChapterInfo._id;
+    const chapterNumber = savedChapterInfo.chapterNumber;
+
+    // Get sub book title
+    const subBookTitle = await getSubBookTitleFromChapterId(
+      chapterId,
+      languageCode,
+    );
+
+    // find verse text and verse number from bookInfo
+    const verseInfos = bookInfos.filter(
+      (bookInfo) =>
+        bookInfo['Chapter_Number'] == chapterNumber &&
+        bookInfo[`SubBook_${language}`] == subBookTitle,
+    );
+
+    verseInfos.forEach(async (verseInfo) => {
+      const verseText = verseInfo[`Verse_${language}`];
+      const verseNumber = verseInfo['Verse_Number'];
+      const existingVerse = await Verse.findOne({
+        chapter: chapterId,
+        number: verseNumber,
+      });
+
+      if (!existingVerse) {
+        // If verse doesn't exist in database, create it to database
+        const verseObj = new Verse({
+          chapter: chapterId,
+          text: {
+            [languageCode]: verseText,
+          },
+          number: verseNumber,
+          audioStart: {
+            [languageCode]: '',
+          },
+          header: {
+            [languageCode]: '',
+          },
+          reference: {},
+        });
+
+        const savedVerse = await verseObj.save();
+
+        result.push(savedVerse);
+      } else {
+        existingVerse.text[languageCode] = verseText;
+        existingVerse.updatedAt = Date.now();
+
+        const updatedVerse = await existingVerse.save();
+
+        result.push(updatedVerse);
+      }
+    });
+  });
+
+  return result;
+};
+
+const getSubBookTitleFromChapterId = async (
+  chapterId,
+  languageCode,
+) => {
+  try {
+    // Find the chapter by its ID and populate the subBook field if necessary
+    const chapter = await Chapter.findById(chapterId).populate(
+      'subBook',
+    );
+
+    if (!chapter) {
+      throw new Error('Chapter not found');
+    }
+
+    // Return the subBook ID
+    return chapter.subBook.title[languageCode];
+  } catch (error) {
+    console.error('Error getting subBook ID:', error);
+    throw error;
+  }
+};
+
+/*
+// ==================================== Not Using ==================================== //
 // Check if the sub book already exists in DB. If it doesn't exist, save it to DB
 const getSavedSubBookInfos = async (
   languageCode,
@@ -896,34 +1079,6 @@ const getSavedChapterInfos = async (
   }
 };
 
-// Check if the verses already exists in DB. If it doesn't exist, save it to DB
-/*const getSavedVerseInfos = async (languageCode, verseInfos) => {
-  let savedVerseInfos = [];
-  verseInfos.forEach((verseInfo) => {
-    verseInfo.verses.forEach(async (verse) => {
-      const verseObj = new Verse({
-        chapter: verseInfo.chapterId,
-        text: {
-          [languageCode]: verse.verseText,
-        },
-        number: verse.verseNumber,
-        audioStart: {
-          [languageCode]: '',
-        },
-        header: {
-          [languageCode]: '',
-        },
-        reference: [],
-      });
-
-      const savedVerse = await verseObj.save();
-      savedVerseInfos.push(savedVerse);
-    });
-  });
-
-  return savedVerseInfos;
-};*/
-
 const getSavedVerseInfos = async (languageCode, verseInfos) => {
   let savedVerseInfos = [];
 
@@ -978,6 +1133,8 @@ const getSavedVerseInfos = async (languageCode, verseInfos) => {
 
   return savedVerseInfos;
 };
+// ==================================== Not Using ==================================== //
+*/
 
 // Sort and Group by its library
 const sortAndGroupLibraries = (libraries) => {

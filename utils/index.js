@@ -114,35 +114,25 @@ exports.getSubBookTitles = (bookInfos, language) => {
 /////////////////////////////////////////////////////////////////////////
 ///////////////////////////// Get chapters  /////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-exports.getChapterInfos = (bookInfos, language) => {
-  let chapterInfos = [];
+exports.getChapterNumbers = (bookInfos) => {
+  let chapterNumbers = [];
 
   bookInfos.forEach((bookInfo) => {
-    const strChapterNumber = bookInfo[`Chapter_${language}`];
-    const chapterNumber = parseInt(
-      strChapterNumber.split(' ')[1],
-      10,
-    );
-
-    const currentSubBookTitle = bookInfo[`SubBook_${language}`];
+    const strChapterNumber = bookInfo['Chapter_Number'];
+    const chapterNumber = parseInt(strChapterNumber, 10);
 
     // Check if chapter already exists using some() method
-    const chapterExists = chapterInfos.some(
-      (chapter) =>
-        chapter.subBookTitle === currentSubBookTitle &&
-        chapter.chapterNumber === chapterNumber,
+    const chapterExists = chapterNumbers.some(
+      (chapter) => chapter == chapterNumber,
     );
 
     // Only push if chapter doesn't exist
     if (!chapterExists) {
-      chapterInfos.push({
-        subBookTitle: currentSubBookTitle,
-        chapterNumber: chapterNumber,
-      });
+      chapterNumbers.push(chapterNumber);
     }
   });
 
-  return chapterInfos;
+  return chapterNumbers;
 };
 
 /////////////////////////////////////////////////////////////////////////
