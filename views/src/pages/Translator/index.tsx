@@ -135,7 +135,7 @@ function Translator() {
    */
   const saveBook = () => {
     translatorService
-      .saveBook({ bookInfos: necessaryParseData, bookTitle: 'Injil', language: languageLabel })
+      .saveBook({ bookInfos: necessaryParseData, bookTitle: 'Qur\'an', language: languageLabel })
       .then(() => {
         toast.success('Saved successfully!', {
           position: 'top-right',
@@ -199,6 +199,8 @@ function Translator() {
 
     setHeaders(prevHeaders => [...prevHeaders, 'SubBook_English']);
     firstData && Object.keys(firstData).forEach((key) => {
+      if (key == 'SubBook_Transliteration')
+        setHeaders(prevHeaders => [...prevHeaders, key]);
       if (languageLabel && key.includes(languageLabel))
         setHeaders(prevHeaders => [...prevHeaders, key]);
     });
@@ -211,9 +213,12 @@ function Translator() {
       necessaryData['SubBook_English'] = data['SubBook_English'];
       Object.keys(data).forEach((key) => {
         // If key contains selected language, it is necessary field to save in DB
-        if (key.includes(languageLabel as string)) {
+        if (key.includes(languageLabel as string))
           necessaryData[key] = data[key];
-        }
+
+        // If key is "SubBook_Transliteration" and the language is English, it is necessary field to save in DB
+        if (key == 'SubBook_Transliteration' && languageLabel == 'English')
+          necessaryData[key] = data[key];
       });
       necessaryData['Chapter_Number'] = data['Chapter_Number'];
       necessaryData['Verse_Number'] = data['Verse_Number'];

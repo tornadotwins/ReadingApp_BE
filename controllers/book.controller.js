@@ -667,15 +667,19 @@ exports.saveBookByFile = async (req, res) => {
     const languageCode = getLanguageCode(language);
     const subBookTitle = bookInfos[0]?.[`SubBook_${language}`];
     const enSubBookTitle = bookInfos[0]?.['SubBook_English'];
+    const subBookTransliteration =
+      bookInfos[0]?.['SubBook_Transliteration'];
 
     const chapterNumbers = getChapterNumbers(bookInfos);
 
     const bookId = await getSavedBookId(languageCode, bookTitle);
     const savedSubBookInfo = await saveSubBook(
       bookId,
+      bookTitle,
       languageCode,
       subBookTitle,
       enSubBookTitle,
+      subBookTransliteration,
     );
 
     const savedChapterInfo = await saveChapter(
@@ -709,7 +713,9 @@ const getSavedBookId = async (languageCode, title) => {
     }
     // Check if the book already exists in db (English book title is received from front-end)
     const foundBook = await Book.findOne({
-      'title.en': title,
+      'title.en': {
+        $regex: new RegExp(`^${title.replace(/'/g, "[’']")}$`),
+      },
     });
 
     if (foundBook) {
@@ -719,8 +725,9 @@ const getSavedBookId = async (languageCode, title) => {
     // Create new book if it doesn't exist
     const bookObj = new Book({
       title: {
-        [languageCode]: title,
+        en: title,
       },
+      library: '66cbe68db07590b6dcd5f13a',
       coverImage: '', // Optional or provide a default value if needed
     });
 
@@ -734,9 +741,11 @@ const getSavedBookId = async (languageCode, title) => {
 
 const saveSubBook = async (
   bookId,
+  bookTitle,
   languageCode,
   subBookTitle,
   enSubBookTitle,
+  subBookTransliteration = '',
 ) => {
   // Check if the sub book already exists in db (compare with enSubBook)
   const existingSubBooks = await SubBook.find({ book: bookId });
@@ -754,18 +763,26 @@ const saveSubBook = async (
             number: existingSubBooks.length + 1,
             title: {
               en: enSubBookTitle,
+              transliteration: subBookTransliteration,
             },
             book: bookId,
-            noChapter: false,
+            noChapter:
+              bookTitle == "Qur'an" || bookTitle == 'Zabra'
+                ? true
+                : false,
           })
         : new SubBook({
             number: existingSubBooks.length + 1,
             title: {
               en: enSubBookTitle,
+              transliteration: subBookTransliteration,
               [languageCode]: subBookTitle,
             },
             book: bookId,
-            noChapter: false,
+            noChapter:
+              bookTitle == "Qur'an" || bookTitle == 'Zabra'
+                ? true
+                : false,
           });
 
     const newSubBook = subBookObj.save();
@@ -856,28 +873,6 @@ const saveChapter = async (
   }
 };
 
-// const saveVerse = async (
-//   bookInfos,
-//   savedChaptersInfo,
-//   language,
-//   subBookTitle,
-// ) => {
-//   let result = [];
-
-//   const languageCode = getLanguageCode(language);
-
-//   bookInfos.forEach((bookInfo) => {
-//     const verseInfo = savedChaptersInfo.map(
-//       (savedChapterInfo) =>
-//         savedChapterInfo.chapterNumber ==
-//           bookInfo['Chapter_Number'] &&
-//         bookInfo[`SubBook_${language}`] == subBookTitle,
-//     );
-
-//     console.log(verseInfo);
-//   });
-// };
-
 const saveVerse = async (
   bookInfos,
   savedChaptersInfo,
@@ -949,248 +944,6 @@ const saveVerse = async (
 
   return result;
 };
-
-const getSubBookTitleFromChapterId = async (
-  chapterId,
-  languageCode,
-) => {
-  try {
-    // Find the chapter by its ID and populate the subBook field if necessary
-    const chapter = await Chapter.findById(chapterId).populate(
-      'subBook',
-    );
-
-    if (!chapter) {
-      throw new Error('Chapter not found');
-    }
-
-    // Return the subBook ID
-    return chapter.subBook.title[languageCode];
-  } catch (error) {
-    console.error('Error getting subBook ID:', error);
-    throw error;
-  }
-};
-
-/*
-// ==================================== Not Using ==================================== //
-// Check if the sub book already exists in DB. If it doesn't exist, save it to DB
-const getSavedSubBookInfos = async (
-  languageCode,
-  bookId,
-  subBookTitles,
-) => {
-  let savedSubBooks = [];
-
-  // Check if sub books exist for this book
-  const existingSubBooks = await SubBook.find({ book: bookId }).sort(
-    'number',
-  );
-
-  if (existingSubBooks && existingSubBooks.length > 0) {
-    // Check if any existing sub book has the current language code
-    const hasLanguageCode = existingSubBooks.some(
-      (subBook) => subBook.title && subBook.title[languageCode],
-    );
-
-    if (hasLanguageCode) {
-      // If language code exists, only update the titles for that language
-      if (subBookTitles.length !== existingSubBooks.length) {
-        throw new Error(
-          `Number of provided titles (${subBookTitles.length}) does not match number of existing sub books (${existingSubBooks.length})`,
-        );
-      }
-
-      const updatePromises = existingSubBooks.map(
-        async (existingSubBook, index) => {
-          // Only update the specific language code title
-          await SubBook.updateOne(
-            { _id: existingSubBook._id },
-            {
-              $set: {
-                [`title.${languageCode}`]: subBookTitles[index],
-              },
-            },
-          );
-          return SubBook.findById(existingSubBook._id);
-        },
-      );
-
-      savedSubBooks = await Promise.all(updatePromises);
-    } else {
-      // If language code doesn't exist, add new translations to existing sub books
-      if (subBookTitles.length !== existingSubBooks.length) {
-        throw new Error(
-          `Number of provided titles (${subBookTitles.length}) does not match number of existing sub books (${existingSubBooks.length})`,
-        );
-      }
-
-      const updatePromises = existingSubBooks.map(
-        async (existingSubBook, index) => {
-          existingSubBook.title = {
-            ...existingSubBook.title,
-            [languageCode]: subBookTitles[index],
-          };
-          return existingSubBook.save();
-        },
-      );
-
-      savedSubBooks = await Promise.all(updatePromises);
-    }
-  } else {
-    // If no sub books exist, create new ones
-    for (let index = 0; index < subBookTitles.length; index++) {
-      const subBookObj = new SubBook({
-        number: index + 1,
-        book: bookId,
-        title: {
-          [languageCode]: subBookTitles[index],
-        },
-      });
-
-      const savedSubBookObj = await subBookObj.save();
-      savedSubBooks.push(savedSubBookObj);
-    }
-  }
-
-  return savedSubBooks;
-};
-
-// Check if the chapter already exists in DB. If it doesn't exist, save it to DB
-const getSavedChapterInfos = async (
-  languageCode,
-  chapterInfos,
-  subBookInfos,
-) => {
-  try {
-    let savedChapters = [];
-    const subBookMap = new Map();
-
-    // Create a map of subBook titles to their IDs for easy lookup
-    subBookInfos.forEach((subBook) => {
-      subBookMap.set(subBook.title[languageCode], subBook._id);
-    });
-
-    // Get all subBook IDs
-    const subBookIds = subBookInfos.map((subBook) => subBook._id);
-
-    // Find existing chapters
-    const existingChapters = await Chapter.find({
-      subBook: { $in: subBookIds },
-    });
-
-    // Create a map of existing chapters for quick lookup
-    const existingChapterMap = new Map();
-    existingChapters.forEach((chapter) => {
-      const key = `${chapter.subBook}_${chapter.chapterNumber}`;
-      existingChapterMap.set(key, chapter);
-    });
-
-    // Create new chapter information only if needed
-    for (const chapterInfo of chapterInfos) {
-      const subBookId = subBookMap.get(chapterInfo.subBookTitle);
-
-      if (!subBookId) {
-        console.error(
-          `SubBook not found for title: ${chapterInfo.subBookTitle}`,
-        );
-        continue;
-      }
-
-      const existingChapterKey = `${subBookId}_${chapterInfo.chapterNumber}`;
-      const existingChapter = existingChapterMap.get(
-        existingChapterKey,
-      );
-
-      if (existingChapter) {
-        // If chapter exists but language translation doesn't exist
-        if (!existingChapter.isTranslated[languageCode]) {
-          // existingChapter.isTranslated[languageCode] = true;
-          existingChapter.isTranslated = {
-            ...existingChapter.isTranslated,
-            [languageCode]: true,
-          };
-          const updatedChapter = await existingChapter.save();
-          savedChapters.push(updatedChapter);
-        }
-      } else {
-        // Create new chapter if it doesn't exist
-        const chapterObj = new Chapter({
-          chapterNumber: chapterInfo.chapterNumber,
-          subBook: subBookId,
-          isTranslated: {
-            [languageCode]: true,
-          },
-        });
-
-        const savedChapter = await chapterObj.save();
-        savedChapters.push(savedChapter);
-      }
-    }
-
-    return savedChapters;
-  } catch (error) {
-    console.error('Error in getSavedChapterInfos:', error);
-    throw error;
-  }
-};
-
-const getSavedVerseInfos = async (languageCode, verseInfos) => {
-  let savedVerseInfos = [];
-
-  // Use for...of to properly handle async operations
-  for (const verseInfo of verseInfos) {
-    for (const verse of verseInfo.verses) {
-      // First check if verse exists with the chapter and number
-      const existingVerse = await Verse.findOne({
-        chapter: verseInfo.chapterId,
-        number: verse.verseNumber,
-      });
-
-      if (existingVerse) {
-        // If verse exists, check if language fields exist
-        if (!existingVerse.text[languageCode]) {
-          existingVerse.text[languageCode] = verse.verseText;
-        }
-        if (!existingVerse.audioStart[languageCode]) {
-          existingVerse.audioStart[languageCode] = '';
-        }
-        if (!existingVerse.header[languageCode]) {
-          existingVerse.header[languageCode] = '';
-        }
-
-        // Save only if modifications were made
-        if (existingVerse.isModified()) {
-          const savedVerse = await existingVerse.save();
-          savedVerseInfos.push(savedVerse);
-        }
-      } else {
-        // If verse doesn't exist, create new one
-        const verseObj = new Verse({
-          chapter: verseInfo.chapterId,
-          text: {
-            [languageCode]: verse.verseText,
-          },
-          number: verse.verseNumber,
-          audioStart: {
-            [languageCode]: '',
-          },
-          header: {
-            [languageCode]: '',
-          },
-          reference: [],
-        });
-
-        const savedVerse = await verseObj.save();
-        savedVerseInfos.push(savedVerse);
-      }
-    }
-  }
-
-  return savedVerseInfos;
-};
-// ==================================== Not Using ==================================== //
-*/
 
 // Sort and Group by its library
 const sortAndGroupLibraries = (libraries) => {
