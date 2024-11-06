@@ -25,4 +25,6 @@ router.post('/createVerse', BookController.createVerse);
 
 router.get('/:chapterId/intro', BookController.getIntroVerses);
 
+router.post('/saveBookByFile', BookController.saveBookByFile);
+
 module.exports = router;

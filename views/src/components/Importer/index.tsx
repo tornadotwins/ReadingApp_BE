@@ -1,8 +1,13 @@
-import { ChangeEvent } from "react";
+import {
+  ChangeEvent,
+  useEffect,
+  useState
+} from "react";
 import {
   Button,
   FilePicker,
   SelectBox,
+  TablePanel,
   Text
 } from "../Base";
 
@@ -16,13 +21,29 @@ import {
   StyledFilePicker,
   StyledImportButtonContainer,
   StyledTableContainer,
+  StyledMissingFieldErrorContainer,
 } from "./styles";
 import {
-  ImporterPropsType
+  ImporterPropsType,
 } from "./types";
+import { TableRowType } from "../Base/TablePanel/types";
+import { ParseDataType } from "@/pages/Translator/types";
 
 function Importer(props: ImporterPropsType) {
-  console.log(props.headers);
+  const [tableData, setTableData] = useState<TableRowType[]>([]);
+
+  useEffect(() => {
+    const newTableData: TableRowType[] = props.parsedData.map((data: ParseDataType) => {
+      const rowData: TableRowType = {};
+      Object.keys(data).forEach((key) => {
+        rowData[key] = data[key];
+      });
+      return rowData;
+    });
+
+    setTableData(newTableData);
+  }, [props.parsedData]);
+
   return (
     <StyledImporterContainer>
       <StyledLanguageDropdownContainer>
@@ -42,7 +63,7 @@ function Importer(props: ImporterPropsType) {
 
       <StyledConfirmTextContainer>
         <Text color="#555" fontStyle="italic">
-          Make sure these columns exist: Book_English, SubBook_English, Chapter_English, Verse_Number_English, Verse_English
+          {`Make sure these columns exist: Book_${props.languageLabel as string}, SubBook_${props.languageLabel as string}, Chapter_Number, Verse_Number, Verse_${props.languageLabel as string}`}
         </Text>
       </StyledConfirmTextContainer>
 
@@ -57,16 +78,31 @@ function Importer(props: ImporterPropsType) {
           />
         </StyledFilePicker>
 
+        {props.parsedData.length > 0 && props.missedFields.length > 0 && (
+          <StyledMissingFieldErrorContainer>
+            <Text color="red">Missing columns: </Text>
+
+            {props.missedFields.map((missedField: string, index: number) =>
+              <Text key={index} color="red">
+                {missedField}
+              </Text>
+            )}
+          </StyledMissingFieldErrorContainer>
+        )}
+
         <StyledImportButtonContainer>
           <Button
             label="Import (will overwrite)"
-            onClick={() => { console.log('clicked import button') }}
+            onClick={props.onUpload}
           />
         </StyledImportButtonContainer>
       </StyledFilePickerContainer>
 
       <StyledTableContainer>
-
+        <TablePanel
+          headers={props.headers}
+          rows={tableData}
+        />
       </StyledTableContainer>
     </StyledImporterContainer>
   )

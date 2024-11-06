@@ -13,10 +13,10 @@ import {
   StyledTableHeadCell,
   StyledTableBody
 } from './styles';
-import { TablePanelType } from './types';
+import { UserTablePanelType } from './types';
 import { UserType } from '@/pages/types';
 
-const TablePanel = (props: TablePanelType) => {
+const UserTablePanel = (props: UserTablePanelType) => {
   const [headers, setHeaders] = useState<string[]>([]);
   const [users, setUsers] = useState<UserType[]>(props.users);
 
@@ -80,4 +80,4 @@ const TablePanel = (props: TablePanelType) => {
   );
 };
 
-export default TablePanel;
+export default UserTablePanel;

@@ -13,7 +13,8 @@ import PageContainer from './PageContainer';
 import PaginationButtons from './PaginationButtons';
 import Radios from './Radio';
 import SelectBox from './Select';
-import TablePanel from './UserTablePanel';
+import UserTablePanel from './UserTablePanel';
+import TablePanel from './TablePanel';
 import Text from './Text';
 import Navbar from './Navbar';
 import CustomToast from './CustomToast';
@@ -34,6 +35,7 @@ export {
   PaginationButtons,
   Radios,
   SelectBox,
+  UserTablePanel,
   TablePanel,
   Text,
   Navbar,

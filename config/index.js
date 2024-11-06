@@ -11,7 +11,7 @@ module.exports = {
     DARK: 'Dark',
     BLACK_AND_WHITE: 'BlackAndWhite',
     SAPPHIRE: 'Sapphire',
-    EASY_OCEAN: 'EasyOcean'
+    EASY_OCEAN: 'EasyOcean',
   },
   AYA_NUMBER_FORMAT: {
     BEFORE: 'before',
@@ -43,4 +43,15 @@ module.exports = {
     TRANSLATION: 'en',
     OTHER: 'other',
   },
+
+  LANGUAGE_CODE_TABLES: [
+    {
+      language: 'English',
+      code: 'en',
+    },
+    {
+      language: 'Arabic',
+      code: 'ar',
+    },
+  ],
 };

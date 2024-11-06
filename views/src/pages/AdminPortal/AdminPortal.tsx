@@ -20,7 +20,7 @@ import {
   StyledAdminText,
 } from './styles';
 import PersonInfoDialog from '@/components/Base/PersonInfoDialog';
-import { LoadingOverlay, Text, TablePanel } from '@/components/Base';
+import { LoadingOverlay, Text, UserTablePanel } from '@/components/Base';
 import { ACCESS_TOKEN } from '@/config';
 import authService from '../../../services/auth.services';
 import { AdminPortalPropsType } from './types';
@@ -374,13 +374,12 @@ function AdminPortal(props: AdminPortalPropsType) {
           </StyledTablePanelHeader>
 
           <StyledTablePanelContainer>
-            <TablePanel
+            <UserTablePanel
               headers={tableHeaders}
               users={users}
               onEditUser={handleEditPerson}
               onDeleteUser={handleDeletePerson}
               onUserChange={(updatedUsers: UserType[]) => {
-                // handleSaveChanges(updatedUsers);
                 setIsUsersChanged(true);
                 setUsers(updatedUsers);
               }}

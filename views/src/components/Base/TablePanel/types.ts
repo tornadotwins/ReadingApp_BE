@@ -1,6 +1,5 @@
 type TableRowType = {
-  key: string;
-  value: string;
+  [key: string]: string;
 };
 
 type TableType = {

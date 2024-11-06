@@ -11,7 +11,7 @@ const StyledLanguageDropdownContainer = styled(Box) ({
 });
 
 const StyledLabel = styled(Box) ({
-  margin: '50px 0px 10px 0px',
+  margin: '20px 0px 10px 0px',
 });
 
 const StyledLanguageDropdown = styled(Box) ({
@@ -59,6 +59,17 @@ const StyledImportButtonContainer = styled(Box) ({
   }
 });
 
+const StyledMissingFieldErrorContainer = styled(Box) ({
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  marginTop: '15px',
+  
+  '& .MuiBox-root': {
+    marginRight: '10px'
+  }
+})
+
 const StyledTableContainer = styled(Box) ({
   width: '100%',
 })
@@ -72,5 +83,6 @@ export {
   StyledFilePickerContainer,
   StyledFilePicker,
   StyledImportButtonContainer,
+  StyledMissingFieldErrorContainer,
   StyledTableContainer,
 }

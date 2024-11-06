@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Table,
   TableCell,
@@ -55,28 +55,20 @@ const TablePanel = (props: TableType) => {
     <StyledTableBody>
       {rows.map((row: TableRowType, rowIndex: number) => (
         <TableRow key={rowIndex}>
-          <TableCell>
-            <Text
-              fontFamily='"Baloo Da 2"'
-              fontWeight='400'
-              fontSize={14}
-              lineHeight={20}
-              textAlign='center'
-            >
-              {row.key}
-            </Text>
-          </TableCell>
-          <TableCell>
-            <Text
-              fontFamily='"Baloo Da 2"'
-              fontWeight='400'
-              fontSize={14}
-              lineHeight={20}
-              textAlign='center'
-            >
-              {row.value}
-            </Text>
-          </TableCell>
+          {headers.map((header: string, cellIndex: number) => (
+            <TableCell key={`${rowIndex}-${cellIndex}`}>
+              <Text
+                fontFamily='"Baloo Da 2"'
+                fontWeight='400'
+                fontSize={14}
+                lineHeight={20}
+                textAlign='center'
+                color='black'
+              >
+                {row[header]}
+              </Text>
+            </TableCell>
+          ))}
         </TableRow>
       ))}
     </StyledTableBody>

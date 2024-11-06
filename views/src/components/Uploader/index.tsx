@@ -9,13 +9,16 @@ function Uploader(props: UploaderPropsType) {
     <StyledUploaderContainer>
       <Importer
         language={props.language}
+        languageLabel={props.languageLabel}
         languages={props.languages}
         file={props.file}
         headers={props.headers}
         parsedData={props.parsedData}
+        missedFields={props.missedFields}
 
         onChangeLanguage={(e) => props.onChangeLanguage(e)}
         onChangeFile={(e) => props.onChangeFile(e)}
+        onUpload={props.onUpload}
       />
     </StyledUploaderContainer>
   )
