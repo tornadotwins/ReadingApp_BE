@@ -135,7 +135,7 @@ function Translator() {
    */
   const saveBook = () => {
     translatorService
-      .saveBook({ bookInfos: necessaryParseData, bookTitle: 'Qur\'an', language: languageLabel })
+      .saveBook({ bookInfos: necessaryParseData, bookTitle: 'Tawrat', language: languageLabel })
       .then(() => {
         toast.success('Saved successfully!', {
           position: 'top-right',

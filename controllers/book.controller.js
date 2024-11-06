@@ -767,7 +767,7 @@ const saveSubBook = async (
             },
             book: bookId,
             noChapter:
-              bookTitle == "Qur'an" || bookTitle == 'Zabra'
+              bookTitle == "Qur'an" || bookTitle == 'Zabur'
                 ? true
                 : false,
           })
