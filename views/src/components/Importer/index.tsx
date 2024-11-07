@@ -63,7 +63,7 @@ function Importer(props: ImporterPropsType) {
 
       <StyledConfirmTextContainer>
         <Text color="#555" fontStyle="italic">
-          {`Make sure these columns exist: Book_${props.languageLabel as string}, SubBook_${props.languageLabel as string}, Chapter_Number, Verse_Number, Verse_${props.languageLabel as string}`}
+          Make sure the excel file is formatted correctly. Injil and Tawrat files have a different structure than Zabur and Quran files. See help doc for info.
         </Text>
       </StyledConfirmTextContainer>
 

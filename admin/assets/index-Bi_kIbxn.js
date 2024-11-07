@@ -1,1 +1,0 @@
-import{b as u,j as n,_ as a,a as o}from"./createTheme-Lrk4C8F8.js";const l=["value"],s=o.createContext();function c(t){let{value:e}=t,r=u(t,l);return n.jsx(s.Provider,a({value:e??!0},r))}const i=()=>{const t=o.useContext(s);return t??!1};export{c as R,i as u};
