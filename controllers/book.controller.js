@@ -114,7 +114,7 @@ exports.getVerses = async (req, res) => {
         .status(404)
         .json({ message: ERROR_MESSAGES.VERSE_NOT_FOUND });
     }
-    
+
     // Filter Verses
     let filteredVerses = {
       subBookId: verses[0].chapter.subBook,
@@ -675,6 +675,17 @@ exports.saveBookByFile = async (req, res) => {
     const chapterNumbers = getChapterNumbers(bookInfos);
 
     const bookId = await getSavedBookId(languageCode, bookTitle);
+
+    const existingSubBook = await SubBook.findOne({
+      book: bookId,
+      [`title.${languageCode}`]: subBookTitle,
+    });
+
+    if (existingSubBook) {
+      // Delete verses for this language in the existing sub book
+      await deleteVersesByLanguage(existingSubBook._id, languageCode);
+    }
+
     const savedSubBookInfo = await saveSubBook(
       bookId,
       bookTitle,
@@ -945,6 +956,31 @@ const saveVerse = async (
   });
 
   return result;
+};
+
+// Function to delete all verses for a specific language in a given subBook
+const deleteVersesByLanguage = async (subBookId, languageCode) => {
+  try {
+    // Find all chapters in the subBook
+    const chapters = await Chapter.find({ subBook: subBookId });
+
+    // Iterate over chapters to delete verses in the specified language
+    for (const chapter of chapters) {
+      await Verse.updateMany(
+        { chapter: chapter._id },
+        { $unset: { [`text.${languageCode}`]: '' } },
+      );
+    }
+
+    console.log(
+      `Verses in language '${languageCode}' deleted for subBook: ${subBookId}`,
+    );
+  } catch (error) {
+    console.error(
+      `Error deleting verses for language '${languageCode}':`,
+      error,
+    );
+  }
 };
 
 // Sort and Group by its library
