@@ -114,8 +114,7 @@ exports.getVerses = async (req, res) => {
         .status(404)
         .json({ message: ERROR_MESSAGES.VERSE_NOT_FOUND });
     }
-
-    console.log(verses);
+    
     // Filter Verses
     let filteredVerses = {
       subBookId: verses[0].chapter.subBook,
