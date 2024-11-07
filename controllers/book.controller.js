@@ -105,7 +105,9 @@ exports.getVerses = async (req, res) => {
   try {
     const verses = await Verse.find({
       chapter: chapterId,
-    }).populate('chapter');
+    })
+      .sort({ number: 1 })
+      .populate('chapter');
 
     if (!verses.length) {
       return res
@@ -113,6 +115,7 @@ exports.getVerses = async (req, res) => {
         .json({ message: ERROR_MESSAGES.VERSE_NOT_FOUND });
     }
 
+    console.log(verses);
     // Filter Verses
     let filteredVerses = {
       subBookId: verses[0].chapter.subBook,
