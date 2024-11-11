@@ -14,7 +14,6 @@ function Uploader(props: UploaderPropsType) {
         file={props.file}
         headers={props.headers}
         parsedData={props.parsedData}
-        missedFields={props.missedFields}
         error={props.error}
 
         onChangeLanguage={(e) => props.onChangeLanguage(e)}

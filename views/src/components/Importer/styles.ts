@@ -41,7 +41,7 @@ const StyledFilePicker = styled(Box) ({
   width: '100%',
 });
 
-const StyledImportButtonContainer = styled(Box) ({
+const StyledImportButtonContainer = styled(Box) <{disablebtn: string}> (({disablebtn}) => ({
   width: '30%',
   minWidth: '120px',
   maxWidth: '300px',
@@ -52,12 +52,14 @@ const StyledImportButtonContainer = styled(Box) ({
   '& .MuiButtonBase-root': {
     backgroundColor: '#155D74',
     width: '100%',
+    opacity: disablebtn == 'true' ? '.5' : '1',
+    cursor: disablebtn ==  'true' ? 'not-allowed' : 'pointer',
 
     '& .MuiBox-root': {
       color: 'white !important'
     }
   }
-});
+}));
 
 const StyledMissingFieldErrorContainer = styled(Box) ({
   width: '100%',

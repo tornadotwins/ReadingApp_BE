@@ -35,6 +35,8 @@ function Translator() {
     }
   ];
 
+  const book = 'Qur\'an';
+
   const [language, setLanguage] = useState(languages[0].value);
   const [languageLabel, setLanguageLabel] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -42,7 +44,6 @@ function Translator() {
   const [headers, setHeaders] = useState<string[]>([]);
   const [parsedData, setParsedData] = useState<ParseDataType[]>([]);
   const [necessaryParseData, setNecessaryParsedData] = useState<ParseDataType[]>([]);
-  const [missingFields, setMissingFields] = useState<string[]>([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -136,7 +137,7 @@ function Translator() {
    */
   const saveBook = () => {
     translatorService
-      .saveBook({ bookInfos: necessaryParseData, bookTitle: 'Zabur', language: languageLabel })
+      .saveBook({ bookInfos: necessaryParseData, bookTitle: book, language: languageLabel })
       .then(() => {
         toast.success('Saved successfully!', {
           position: 'top-right',
@@ -264,6 +265,7 @@ function Translator() {
     setError(errorMsg);
     // End checking necessary fields
 
+    // If no file selected
     if (parsedData.length == 0) {
       errorMsg = "Please select the file to upload."
       setError(errorMsg)
@@ -287,7 +289,6 @@ function Translator() {
             file={file}
             parsedData={parsedData}
             headers={headers}
-            missedFields={missingFields}
             error={error}
 
             onChangeLanguage={(e) => setLanguage(e.target.value as string)}

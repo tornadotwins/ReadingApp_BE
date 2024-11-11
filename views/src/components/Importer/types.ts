@@ -9,7 +9,6 @@ type ImporterPropsType = {
   file: File | null;
   headers: string[],
   parsedData: ParseDataType[];
-  missedFields: string[];
   error: string;
 
   onChangeLanguage: (event: React.ChangeEvent<{value: unknown}>) => void;

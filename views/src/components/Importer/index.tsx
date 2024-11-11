@@ -78,24 +78,13 @@ function Importer(props: ImporterPropsType) {
           />
         </StyledFilePicker>
 
-        {/* {props.parsedData.length > 0 && props.missedFields.length > 0 && (
-          <StyledMissingFieldErrorContainer>
-            <Text color="red">Missing columns: </Text>
-
-            {props.missedFields.map((missedField: string, index: number) =>
-              <Text key={index} color="red">
-                {missedField}
-              </Text>
-            )}
-          </StyledMissingFieldErrorContainer>
-        )} */}
         {props.error && (
           <StyledMissingFieldErrorContainer>
             <Text color="red">{props.error}</Text>
           </StyledMissingFieldErrorContainer>
         )}
 
-        <StyledImportButtonContainer>
+        <StyledImportButtonContainer disablebtn={props.error ? 'true' : 'false'}>
           <Button
             label="Import (will overwrite)"
             disabled={props.error ? true : false}
