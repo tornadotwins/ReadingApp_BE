@@ -43,6 +43,7 @@ function Translator() {
   const [parsedData, setParsedData] = useState<ParseDataType[]>([]);
   const [necessaryParseData, setNecessaryParsedData] = useState<ParseDataType[]>([]);
   const [missingFields, setMissingFields] = useState<string[]>([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const file = fileInput?.target.files && fileInput?.target.files[0];
@@ -240,21 +241,34 @@ function Translator() {
   }, [language]);
 
   /**
-   * Effect hook to get missed fields when language or selected file is changed
-   */
+   * Effect hook for error handling
+  */
   useEffect(() => {
-    const necessaryHeaders = [
+    // check necessary fields
+    const necessaryHeaders: string[] = [
       'SubBook_English',
       `SubBook_${languageLabel}`,
       `Chapter_Number`,
       `Verse_Number`,
       `Verse_${languageLabel}`
-    ];
+    ].filter((item, index, array) => item && array.indexOf(item) === index);
 
     const missedFields = necessaryHeaders.filter((necessaryHeader) => !headers.includes(necessaryHeader));
 
-    setMissingFields(missedFields);
-  }, [headers, languageLabel]);
+    let errorMsg = '';
+    missedFields.forEach((missedField: string) => errorMsg += `${missedField}, `);
+
+    if (errorMsg)
+      errorMsg = `You missed the ${missedFields.length >= 2 ? 'fields' : 'field'}: ` + errorMsg;
+
+    setError(errorMsg);
+    // End checking necessary fields
+
+    if (parsedData.length == 0) {
+      errorMsg = "Please select the file to upload."
+      setError(errorMsg)
+    }
+  }, [headers, languageLabel, parsedData]);
 
   return (
     <>
@@ -274,6 +288,7 @@ function Translator() {
             parsedData={parsedData}
             headers={headers}
             missedFields={missingFields}
+            error={error}
 
             onChangeLanguage={(e) => setLanguage(e.target.value as string)}
             onChangeFile={(e: ChangeEvent<HTMLInputElement>) => setFileInput(e)}

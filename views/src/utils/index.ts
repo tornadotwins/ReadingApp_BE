@@ -9,3 +9,16 @@ export const convertNumber2Date = (timestamp: number) => {
   // Format the date as "year.month.day"
   return `${month}/${day}/${year}`;
 }
+
+export const findDuplicatedString = (arr: string[]) => {
+  console.log({arr})
+  const res = [];
+    for (let i = 0; i < arr.length; i++) {
+        for (let j = i + 1; j < arr.length; j++) {
+            if (arr[i] === arr[j]) {
+                res.push(arr[i]);
+            }
+        }
+    }
+    return res;
+}

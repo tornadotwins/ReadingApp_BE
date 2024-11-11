@@ -10,6 +10,7 @@ type UploaderPropsType = {
   headers: string[],
   parsedData: ParseDataType[],
   missedFields: string[],
+  error: string,
 
   onChangeLanguage: (e: ChangeEvent<{value: unknown}>) => void;
   onChangeFile: (e: ChangeEvent<HTMLInputElement>) => void;
