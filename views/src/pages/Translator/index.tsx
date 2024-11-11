@@ -36,6 +36,7 @@ function Translator() {
   ];
 
   const book = 'Qur\'an';
+  // const book = "Injil"
 
   const [language, setLanguage] = useState(languages[0].value);
   const [languageLabel, setLanguageLabel] = useState('');
@@ -199,7 +200,8 @@ function Translator() {
 
     const languageLabel = languages.find(languageItem => languageItem.value == language)?.label;
 
-    setHeaders(prevHeaders => [...prevHeaders, 'SubBook_English']);
+    if (languageLabel != 'English')
+      setHeaders(prevHeaders => [...prevHeaders, 'SubBook_English']);
     firstData && Object.keys(firstData).forEach((key) => {
       if (key == 'SubBook_Transliteration')
         setHeaders(prevHeaders => [...prevHeaders, key]);
@@ -262,6 +264,15 @@ function Translator() {
     if (errorMsg)
       errorMsg = `You missed the ${missedFields.length >= 2 ? 'fields' : 'field'}: ` + errorMsg;
     // End checking necessary fields
+
+    // Check if the file contains only 1 sub book
+    if (parsedData.length > 1) {
+      const firstSubBookName = parsedData[0][`SubBook_${languageLabel}`];
+      const differentSubBooks = parsedData.find((data) => data[`SubBook_${languageLabel}`] != firstSubBookName);
+      if (differentSubBooks)
+        errorMsg = 'A file must have only 1 sub book.';
+      setError(errorMsg);
+    }
 
     // Check the file structure according to book
     const hasTransliteration = headers.includes('SubBook_Transliteration');

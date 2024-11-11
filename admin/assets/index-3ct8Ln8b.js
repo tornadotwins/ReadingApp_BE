@@ -1,0 +1,1 @@
+import{j as r}from"./createTheme-CRnXmvKE.js";import{M as e}from"./Meta-BbeIEAe3.js";import{J as t,T as a}from"./App-Bx8y6esV.js";import"./index-DQReN9hz.js";import"./index.esm-BOcK2KJS.js";function p(){return r.jsxs(r.Fragment,{children:[r.jsx(e,{title:"page 3"}),r.jsx(t,{children:r.jsx(a,{variant:"h3",children:"Page 3"})})]})}export{p as default};
