@@ -247,7 +247,7 @@ function Translator() {
    * Effect hook for error handling
   */
   useEffect(() => {
-    // check necessary fields
+
     const necessaryHeaders: string[] = [
       'SubBook_English',
       `SubBook_${languageLabel}`,
@@ -256,51 +256,57 @@ function Translator() {
       `Verse_${languageLabel}`
     ].filter((item, index, array) => item && array.indexOf(item) === index);
 
-    const missedFields = necessaryHeaders.filter((necessaryHeader) => !headers.includes(necessaryHeader));
-
     let errorMsg = '';
-    missedFields.forEach((missedField: string) => errorMsg += `${missedField}, `);
 
-    if (errorMsg)
-      errorMsg = `You missed the ${missedFields.length >= 2 ? 'fields' : 'field'}: ` + errorMsg;
-    // End checking necessary fields
-
-    // Check if the file contains only 1 sub book
     if (parsedData.length > 1) {
+      const fileHeaders = Object.keys(parsedData[0]);
+
+      // check necessary fields
+      const missedFields = necessaryHeaders.filter((necessaryHeader) => !fileHeaders.includes(necessaryHeader));
+      missedFields.forEach((missedField: string) => errorMsg += `${missedField}, `);
+
+      if (errorMsg)
+        errorMsg = `You missed the ${missedFields.length >= 2 ? 'fields' : 'field'}: ` + errorMsg;
+      // End checking necessary fields
+
+      // Check if the file contains only 1 sub book
       const firstSubBookName = parsedData[0][`SubBook_${languageLabel}`];
       const differentSubBooks = parsedData.find((data) => data[`SubBook_${languageLabel}`] != firstSubBookName);
       if (differentSubBooks)
         errorMsg = 'A file must have only 1 sub book.';
-      setError(errorMsg);
-    }
 
-    // Check the file structure according to book
-    const hasTransliteration = headers.includes('SubBook_Transliteration');
-    //In Qur'an or Zabur, all chapter numbers should be 1, not the others
-    if (book == 'Qur\'an' || book == 'Zabur') {
-      // Check if the file has SubBook_Transliteration field
-      if (!hasTransliteration)
-        errorMsg = 'SubBook_Transliteration field is required.';
-      setError(errorMsg);
+      const firstSubBookTransliteration = parsedData[0]['SubBook_Transliteration'];
+      const differentSubBookTransliterations = parsedData.find((data) => data['SubBook_Transliteration'] != firstSubBookTransliteration);
+      if (differentSubBookTransliterations)
+        errorMsg = 'A file must have only 1 transliteration for a sub book.'
 
-      // Check Chapter_Number fields
-      const isInValidChapterNumber = parsedData.some((data) => data.Chapter_Number != '1');
-      if (isInValidChapterNumber)
-        errorMsg = 'All chapter numbers should be "1" in Qur\'an and Zabur.'
-      setError(errorMsg)
-    } else {
-      // Check if the file has SubBook_Transliteration field
-      if (hasTransliteration)
-        errorMsg = 'SubBook_Transliteration field is not required.';
+      // Check the file structure according to book
+      const hasTransliteration = headers.includes('SubBook_Transliteration');
+      //In Qur'an or Zabur, all chapter numbers should be 1, not the others
+      if (book == 'Qur\'an' || book == 'Zabur') {
+        // Check if the file has SubBook_Transliteration field
+        if (!hasTransliteration)
+          errorMsg = 'SubBook_Transliteration field is required.';
 
-      setError(errorMsg);
-    }
-    // End checking the file structure according to book
+        // Check Chapter_Number fields
+        const isInValidChapterNumber = parsedData.some((data) => data.Chapter_Number != '1');
+        if (isInValidChapterNumber)
+          errorMsg = 'All chapter numbers should be "1" in Qur\'an and Zabur.'
+        setError(errorMsg);
+      } else {
+        // Check if the file has SubBook_Transliteration field
+        if (hasTransliteration)
+          errorMsg = 'SubBook_Transliteration field is not required.';
 
-    // If no file selected
-    if (parsedData.length == 0) {
-      errorMsg = "Please select the file to upload."
-      setError(errorMsg)
+        setError(errorMsg);
+      }
+      // End checking the file structure according to book
+
+      // If no file selected
+      if (parsedData.length == 0) {
+        errorMsg = "Please select the file to upload."
+        setError(errorMsg)
+      }
     }
   }, [headers, languageLabel, parsedData]);
 
