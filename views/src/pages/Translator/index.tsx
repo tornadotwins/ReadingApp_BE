@@ -261,9 +261,30 @@ function Translator() {
 
     if (errorMsg)
       errorMsg = `You missed the ${missedFields.length >= 2 ? 'fields' : 'field'}: ` + errorMsg;
-
-    setError(errorMsg);
     // End checking necessary fields
+
+    // Check the file structure according to book
+    const hasTransliteration = headers.includes('SubBook_Transliteration');
+    //In Qur'an or Zabur, all chapter numbers should be 1, not the others
+    if (book == 'Qur\'an' || book == 'Zabur') {
+      // Check if the file has SubBook_Transliteration field
+      if (!hasTransliteration)
+        errorMsg = 'SubBook_Transliteration field is required.';
+      setError(errorMsg);
+
+      // Check Chapter_Number fields
+      const isInValidChapterNumber = parsedData.some((data) => data.Chapter_Number != '1');
+      if (isInValidChapterNumber)
+        errorMsg = 'All chapter numbers should be "1" in Qur\'an and Zabur.'
+      setError(errorMsg)
+    } else {
+      // Check if the file has SubBook_Transliteration field
+      if (hasTransliteration)
+        errorMsg = 'SubBook_Transliteration field is not required.';
+
+      setError(errorMsg);
+    }
+    // End checking the file structure according to book
 
     // If no file selected
     if (parsedData.length == 0) {
