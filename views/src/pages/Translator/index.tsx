@@ -35,8 +35,8 @@ function Translator() {
     }
   ];
 
-  const book = 'Qur\'an';
-  // const book = "Injil"
+  // const book = 'Qur\'an';
+  const book = "Injil"
 
   const [language, setLanguage] = useState(languages[0].value);
   const [languageLabel, setLanguageLabel] = useState('');
@@ -283,7 +283,7 @@ function Translator() {
       // Check the file structure according to book
       const hasTransliteration = headers.includes('SubBook_Transliteration');
       //In Qur'an or Zabur, all chapter numbers should be 1, not the others
-      if (book == 'Qur\'an' || book == 'Zabur') {
+      /*if (book == 'Qur\'an' || book == 'Zabur') {
         // Check if the file has SubBook_Transliteration field
         if (!hasTransliteration)
           errorMsg = 'SubBook_Transliteration field is required.';
@@ -293,7 +293,7 @@ function Translator() {
         if (isInValidChapterNumber)
           errorMsg = 'All chapter numbers should be "1" in Qur\'an and Zabur.'
         setError(errorMsg);
-      } else {
+      } else {*/
         // Check if the file has SubBook_Transliteration field
         if (hasTransliteration)
           errorMsg = 'SubBook_Transliteration field is not required.';
@@ -307,7 +307,7 @@ function Translator() {
         errorMsg = "Please select the file to upload."
         setError(errorMsg)
       }
-    }
+    // }
   }, [headers, languageLabel, parsedData]);
 
   return (
