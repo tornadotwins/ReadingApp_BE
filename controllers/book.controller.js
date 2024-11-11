@@ -6,20 +6,16 @@ const Introduction = require('../models/introduction.model');
 const History = require('../models/history.model');
 const User = require('../models/user.model');
 const ERROR_MESSAGES = require('../config/error.message');
-const {
-  getLanguage,
-  getSubBookTitles,
-  getChapterNumbers,
-  groupVersesByChapter,
-  getLanguageCode,
-} = require('../utils');
+const { getChapterNumbers, getLanguageCode } = require('../utils');
 
 /////////////////////////////////////////////////////////////////////////
 ///////////////////////////// Get All books /////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.getLibraries = async (req, res) => {
   try {
-    const libraries = await Book.find().populate('library');
+    const libraries = await Book.find()
+      .populate('library')
+      .sort({ order: 1 });
 
     if (libraries.length > 0) {
       const sortedLibraries = sortAndGroupLibraries(libraries);
@@ -742,6 +738,14 @@ const getSavedBookId = async (languageCode, title) => {
       },
       library: '66cbe68db07590b6dcd5f13a',
       coverImage: '', // Optional or provide a default value if needed
+      order:
+        title == "Qur'an"
+          ? 1
+          : title == 'Injil'
+          ? 2
+          : title == 'Zabur'
+          ? 3
+          : 4,
     });
 
     const createdBook = await bookObj.save();
