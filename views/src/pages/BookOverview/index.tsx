@@ -17,6 +17,7 @@ import {
 import useOrientation from "@/hooks/useOrientation";
 import ChapterTextOverview from "@/components/ChapterTextOverview";
 import { getLanguageFromLanguageCode } from "@/utils";
+import { TRANSLATION_STATUS_COMPLETE, TRANSLATION_STATUS_NONE, TRANSLATION_STATUS_PUBLISH } from "@/config";
 
 const BookOverview = () => {
   const [selectedBook, setSelectedBook] = useState('Qur\'an');
@@ -56,12 +57,98 @@ const BookOverview = () => {
     },
   ];
 
-
   const languages = [
     { value: 'en', label: 'English' },
     { value: 'ar', label: 'Arabic' },
     { value: 'id', label: 'Indonesian' },
   ];
+
+  const chapters = [
+    {
+      chapterNumber: 0,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 1,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 2,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 3,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 4,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 5,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 6,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 7,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 8,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 9,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 10,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 11,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 12,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 13,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 14,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 15,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 16,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 17,
+      status: TRANSLATION_STATUS_PUBLISH,
+    },
+    {
+      chapterNumber: 18,
+      status: TRANSLATION_STATUS_COMPLETE,
+    },
+    {
+      chapterNumber: 19,
+      status: TRANSLATION_STATUS_NONE,
+    },
+    {
+      chapterNumber: 20,
+      status: TRANSLATION_STATUS_NONE,
+    },
+  ]
 
   const isPortrait = useOrientation();
 
@@ -99,7 +186,7 @@ const BookOverview = () => {
           />
         </StyledLanguageContainer>
 
-        <ChapterTextOverview bookTitle={selectedBook} language={getLanguageFromLanguageCode(currentLanguage, languages)} />
+        <ChapterTextOverview bookTitle={selectedBook} language={getLanguageFromLanguageCode(currentLanguage, languages)} chapters={chapters} />
       </StyledBookOverviewContainer>
     </StyledContainer>
   )

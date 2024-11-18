@@ -1,5 +1,6 @@
 import Images from "@/config/images";
 import { Text } from "../Base";
+import QuranChapters from "../QuranChapters";
 import { StyledContainer, StyledOverviewTitleContainer, StyledOverviewTitleIcon } from "./styles";
 import { ChapterTextOverviewPropsType } from "./types";
 
@@ -13,6 +14,8 @@ const ChapterTextOverview = (props: ChapterTextOverviewPropsType) => {
           {`${props.bookTitle} text - ${props.language} - chapters:`}
         </Text>
       </StyledOverviewTitleContainer>
+
+      <QuranChapters chapters={props.chapters} />
     </StyledContainer>
   )
 }

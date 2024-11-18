@@ -2,37 +2,34 @@ import { TRANSLATION_STATUS_NONE } from "@/config";
 import ChapterSquare from "../ChapterSquare";
 
 import { StyledIntroContainer, StyledQuranContainer, StyledChapterContainer } from "./styles";
-import { QuranChaptersPropsType } from './types';
+import { QuranChaptersPropsType, QuranChapterType } from './types';
 
 const QuranChapters = (props: QuranChaptersPropsType) => {
   return (
     <StyledQuranContainer>
       <StyledIntroContainer>
-        <StyledIntroContainer>
-          <ChapterSquare
-            chapterNumber={0}
-            translationStatus={TRANSLATION_STATUS_NONE}
-            onClick={() => { }}
-          />
-        </StyledIntroContainer>
-
-        <StyledChapterContainer>
-          {
-            Array.from({ length: props.chapters }).map((_, index) => (
-              <ChapterSquare
-                key={index + 1}
-                chapterNumber={index + 1}
-                translationStatus={TRANSLATION_STATUS_NONE}
-                onClick={() => {
-                  console.log(`Chapter ${index + 1} clicked`);
-                }}
-              />
-            ))
+        <ChapterSquare
+          chapterNumber={0}
+          translationStatus={TRANSLATION_STATUS_NONE}
+          onClick={() => console.log("Intro Chapter clicked")
           }
-        </StyledChapterContainer>
+        />
       </StyledIntroContainer>
+
+      <StyledChapterContainer>
+        {props.chapters.map((chapter: QuranChapterType, index: number) => (
+          <ChapterSquare
+            key={index}
+            chapterNumber={chapter.chapterNumber}
+            translationStatus={chapter.status}
+            onClick={() => {
+              console.log(`Chapter ${index} clicked`);
+            }}
+          />
+        ))}
+      </StyledChapterContainer>
     </StyledQuranContainer>
   );
-}
+};
 
 export default QuranChapters;

@@ -13,6 +13,8 @@ const StyledChapterSquare = styled(Box) <{status: string}> (({status}) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+  border: '1px solid #155D74',
+  cursor: 'pointer',
 
   backgroundColor: status == TRANSLATION_STATUS_PUBLISH ? 
                     '#FFAA5D' : 

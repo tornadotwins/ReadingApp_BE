@@ -8,7 +8,7 @@ const BookSelector = (props: BookSelectorPropsType) => {
     <StyledBookSelectorContainer>
       {
         props.books.map((book: BookSelectType, index: number) =>
-          <StyledBookSelector key={index} onClick={book.onClick} isSelected={book.bookTitle == props.selectedBook}>
+          <StyledBookSelector key={index} onClick={book.onClick} isselected={book.bookTitle == props.selectedBook ? 'true' : 'false'}>
             <Text fontFamily="'Baloo Da 2'" fontWeight="500" fontSize={16} lineHeight={24}>
               {book.bookTitle}
             </Text>
