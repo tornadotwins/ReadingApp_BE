@@ -1,3 +1,5 @@
+import { LanguageType } from "@/pages/types";
+
 export const convertNumber2Date = (timestamp: number) => {
   const date = new Date(timestamp);
   
@@ -11,7 +13,6 @@ export const convertNumber2Date = (timestamp: number) => {
 }
 
 export const findDuplicatedString = (arr: string[]) => {
-  console.log({arr})
   const res = [];
     for (let i = 0; i < arr.length; i++) {
         for (let j = i + 1; j < arr.length; j++) {
@@ -21,4 +22,10 @@ export const findDuplicatedString = (arr: string[]) => {
         }
     }
     return res;
+}
+
+export const getLanguageFromLanguageCode = (languageCode: string, languages: LanguageType[]) => {
+  const languageObj = languages.find(language => language.value == languageCode);
+
+  return languageObj?.label || 'English';
 }

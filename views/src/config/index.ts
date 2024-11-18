@@ -57,6 +57,15 @@ const giphy404 = 'https://giphy.com/embed/xTiN0L7EW5trfOvEk0';
 
 const ACCESS_TOKEN = "token";
 
+const BOOK_QURAN = 'Qur\'an';
+const BOOK_INJIL = 'Injil';
+const BOOK_ZABUR = 'Zabur';
+const BOOK_TAWRAT = 'Tawrat';
+
+const TRANSLATION_STATUS_COMPLETE = 'Completed';
+const TRANSLATION_STATUS_PUBLISH = 'Published';
+const TRANSLATION_STATUS_NONE = 'None';
+
 const DEFAULT_TEXT_SIZE = 14;
 const THEME = {
   DEFAULT: 'Default',
@@ -124,6 +133,15 @@ export {
   giphy404,
 
   ACCESS_TOKEN,
+
+  BOOK_QURAN,
+  BOOK_INJIL,
+  BOOK_ZABUR,
+  BOOK_TAWRAT,
+
+  TRANSLATION_STATUS_COMPLETE,
+  TRANSLATION_STATUS_NONE,
+  TRANSLATION_STATUS_PUBLISH,
 
   DEFAULT_TEXT_SIZE,
   THEME,

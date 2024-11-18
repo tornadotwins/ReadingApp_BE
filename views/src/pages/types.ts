@@ -12,7 +12,13 @@ type UserType = {
   lastLoggedInAt: number;
 };
 
+type LanguageType = {
+  value: string;
+  label: string;
+}
+
 export type {
   RoleType,
   UserType,
+  LanguageType,
 };

@@ -7,6 +7,7 @@ enum Pages {
   Welcome,
   AdminPortal,
   Translator,
+  BookOverview,
   Page2,
   Page3,
   Page4,
