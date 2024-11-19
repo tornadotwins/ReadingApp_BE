@@ -1,6 +1,10 @@
-type TranslatorPortalPropsType = {
+import { Dispatch } from "redux";
+import { UserType } from "../types";
+
+type TranslatorPropsType = {
   title: string;
-  
+  currentUser: UserType;
+  dispatch: Dispatch;
 }
 
 type ParseDataType = {
@@ -15,7 +19,7 @@ type ChapterType = {
 }
 
 export type {
-  TranslatorPortalPropsType,
+  TranslatorPropsType,
   ParseDataType,
   ChapterType
 }

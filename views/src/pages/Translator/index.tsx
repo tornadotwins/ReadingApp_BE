@@ -4,26 +4,30 @@ import { Dispatch } from 'redux';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import 'material-react-toastify/dist/ReactToastify.css';
+import { toast, Bounce } from 'material-react-toastify';
+import { AppStateType } from '@/reducers/types';
+import { useNavigate } from 'react-router-dom';
 
 import Header from '@/components/Header';
 import Meta from '@/components/Meta';
 import Uploader from '@/components/Uploader';
 import { SelectBoxOption } from '@/components/Base/Select/types';
 import { HEADER_TRANSLATOR_PORTAL } from '@/config/messages';
+import { ACCESS_TOKEN } from '@/config';
 import useOrientation from '@/hooks/useOrientation';
 
 import translatorService from '../../../services/translator.services';
 
-import { AppStateType } from '@/reducers/types';
 import {
   StyledTranslatorContainer,
   StyledTranslatorPortalContainer,
 } from './styles';
-import { ParseDataType } from './types';
-import { toast, Bounce } from 'material-react-toastify';
+import { ParseDataType, TranslatorPropsType } from './types';
+import actionTypes from '@/actions/actionTypes';
 
-function Translator() {
+function Translator(props: TranslatorPropsType) {
   const isPortrait = useOrientation();
+  const navigate = useNavigate();
   const languages: SelectBoxOption[] = [
     {
       label: 'English',
@@ -294,29 +298,45 @@ function Translator() {
           errorMsg = 'All chapter numbers should be "1" in Qur\'an and Zabur.'
         setError(errorMsg);
       } else {*/
-        // Check if the file has SubBook_Transliteration field
-        if (hasTransliteration)
-          errorMsg = 'SubBook_Transliteration field is not required.';
+      // Check if the file has SubBook_Transliteration field
+      if (hasTransliteration)
+        errorMsg = 'SubBook_Transliteration field is not required.';
 
-        setError(errorMsg);
-      }
-      // End checking the file structure according to book
+      setError(errorMsg);
+    }
+    // End checking the file structure according to book
 
-      // If no file selected
-      if (parsedData.length == 0) {
-        errorMsg = "Please select the file to upload."
-        setError(errorMsg)
-      }
+    // If no file selected
+    if (parsedData.length == 0) {
+      errorMsg = "Please select the file to upload."
+      setError(errorMsg)
+    }
     // }
   }, [headers, languageLabel, parsedData]);
+
+  // Navigate to Login page
+  const onLogout = () => {
+    localStorage.removeItem(ACCESS_TOKEN);
+
+    props.dispatch({
+      type: actionTypes.SET_CURRENT_USER,
+      payload: {
+        user: null,
+      },
+    });
+
+    navigate('/admin');
+  };
 
   return (
     <>
       <Meta title={HEADER_TRANSLATOR_PORTAL} />
       <StyledTranslatorContainer flexDirection={isPortrait ? 'column' : 'row'}>
         <Header
-          header='Translator portal'
-          isLoggedIn={false}
+          isAdmin={!!props.currentUser.isAdmin}
+          username={props.currentUser.username}
+          isLoggedIn
+          onLogOut={onLogout}
         />
 
         <StyledTranslatorPortalContainer>

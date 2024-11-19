@@ -2,27 +2,21 @@ import Text from '../Text';
 import { StyledButton } from './styled';
 import { ButtonProps } from './types';
 
-function Button({
-  label,
-  disabled = false,
-  style,
-  reference,
-  onClick,
-}: ButtonProps) {
-
+function Button(props: ButtonProps) {
   return (
     <StyledButton
-      style={style}
-      disabled={disabled}
-      ref={reference}
+      style={props.style}
+      disabled={props.disabled}
+      startIcon={props.icon}
+      ref={props.reference}
       onClick={() => {
-        if (!disabled) {
-          onClick();
+        if (!props.disabled) {
+          props.onClick();
         }
       }}
     >
       <Text fontFamily='"Baloo Da 2"' fontWeight='500' fontSize={16} lineHeight={24} color='#474747'>
-        {label}
+        {props.label}
       </Text>
     </StyledButton>
   );

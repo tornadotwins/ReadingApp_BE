@@ -1,4 +1,4 @@
-import React from "react";
+import { useNavigate } from 'react-router-dom';
 
 import { HeaderType } from "./types";
 import {
@@ -10,9 +10,26 @@ import {
 import { Button, Text } from "../Base";
 
 function Header(props: HeaderType) {
+  const navigate = useNavigate();
+
   return (
     <StyledHeaderContainer>
       <StyledHeaderTitle>
+        {
+          props.isAdmin &&
+          <Text
+            fontFamily="Buenard"
+            fontWeight="700"
+            fontSize={36}
+            lineHeight={47}
+            textAlign="center"
+            color="white"
+            hasUnderline={props.isAdminPage}
+            onClick={() => navigate('/admin/admin-portal')}
+          >
+            {'Admin Portal'}
+          </Text>
+        }
         <Text
           fontFamily="Buenard"
           fontWeight="700"
@@ -20,8 +37,10 @@ function Header(props: HeaderType) {
           lineHeight={47}
           textAlign="center"
           color="white"
+          hasUnderline={!props.isAdminPage}
+          onClick={() => navigate('/admin/bookoverview')}
         >
-          {props.header}
+          {'Translation Portal'}
         </Text>
       </StyledHeaderTitle>
 

@@ -1,7 +1,9 @@
 type HeaderType = {
-  header: string;
+  header?: string;
   isLoggedIn: boolean;
   username?: string;
+  isAdmin?: boolean;
+  isAdminPage?: boolean;
 
   onLogOut?: () => void;
 }

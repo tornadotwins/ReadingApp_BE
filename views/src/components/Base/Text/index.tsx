@@ -11,6 +11,7 @@ function Text({
   textAlign,
   color,
   hasUnderline,
+  onClick,
 }: TextProps) {
 
   return (
@@ -25,6 +26,7 @@ function Text({
         color,
         textDecoration: hasUnderline ? 'underline' : 'none'
       }}
+      onClick={onClick}
     >
       {children}
     </StyledTextContainer>

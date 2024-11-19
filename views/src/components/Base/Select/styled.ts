@@ -60,6 +60,8 @@ const StyledMenuItem = styled(MuiMenuItem)<{dividelinecolor: string}>(({ selecte
   '&:hover': {
     backgroundColor: '#E0E0E0',
   },
+  
+  fontFamily: '"Baloo Da 2"',
 }));
 
 // Custom styles for the Paper component

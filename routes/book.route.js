@@ -27,4 +27,6 @@ router.get('/:chapterId/intro', BookController.getIntroVerses);
 
 router.post('/saveBookByFile', BookController.saveBookByFile);
 
+router.get('/:bookTitle/bookInfoByTitle', BookController.getBookInfomationByTitle)
+
 module.exports = router;
