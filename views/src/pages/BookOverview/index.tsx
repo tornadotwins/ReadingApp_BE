@@ -250,6 +250,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
               language={getLanguageFromLanguageCode(currentLanguage)}
               languageCode={currentLanguage}
               bookInfo={bookInfo}
+              isQuranOrZabur={selectedBook == BOOK_QURAN || selectedBook == BOOK_ZABUR}
             />
           )}
 

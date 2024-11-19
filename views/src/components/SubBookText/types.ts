@@ -1,8 +1,10 @@
-import { SubBookInfoType } from "@/pages/BookOverview/types"
+import { BookType, SubBookInfoType } from "@/pages/BookOverview/types"
 
 type SubBookTextPropsType = {
-  subBook: SubBookInfoType,
+  subBook?: SubBookInfoType,
+  book?: BookType,
   languageCode: string,
+  isQuranOrZabur?: boolean,
 }
 
 export type {

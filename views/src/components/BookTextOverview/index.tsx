@@ -9,7 +9,7 @@ import Images from "@/config/images";
 
 const BookTextOverview = (props: ChapterTextOverviewPropsType) => {
   return (
-    <StyledContainer>
+    <StyledContainer isquranorzabur={props.isQuranOrZabur ? 'true' : 'false'}>
       <StyledOverviewTitleContainer>
         <StyledOverviewTitleIcon src={Images.icon_book} />
 
@@ -19,13 +19,23 @@ const BookTextOverview = (props: ChapterTextOverviewPropsType) => {
       </StyledOverviewTitleContainer>
 
       {
-        props.bookInfo.subBooks.map((subBook: SubBookInfoType, index: number) =>
+        !props.isQuranOrZabur && props.bookInfo.subBooks.map((subBook: SubBookInfoType, index: number) =>
           <SubBookText
             key={index}
             subBook={subBook}
             languageCode={props.languageCode}
+            isQuranOrZabur={props.isQuranOrZabur}
           />
         )
+      }
+
+      {
+        props.isQuranOrZabur &&
+        <SubBookText
+          book={props.bookInfo}
+          languageCode={props.languageCode}
+          isQuranOrZabur={props.isQuranOrZabur}
+        />
       }
     </StyledContainer>
   )
