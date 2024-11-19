@@ -1,4 +1,4 @@
-import { LanguageType } from "@/pages/types";
+import { LANGUAGE_CODE_TABLE } from "@/config";
 
 export const convertNumber2Date = (timestamp: number) => {
   const date = new Date(timestamp);
@@ -24,8 +24,14 @@ export const findDuplicatedString = (arr: string[]) => {
     return res;
 }
 
-export const getLanguageFromLanguageCode = (languageCode: string, languages: LanguageType[]) => {
-  const languageObj = languages.find(language => language.value == languageCode);
+export const getLanguageFromLanguageCode = (languageCode: string) => {
+  const languageObj = LANGUAGE_CODE_TABLE.find((languageObj) => languageObj.code == languageCode);
 
-  return languageObj?.label || 'English';
+  return languageObj?.language || 'English';
+}
+
+export const getLanguageCodeFromLanguage = (language: string) => {
+  const languageObj = LANGUAGE_CODE_TABLE.find((languageObj) => languageObj.language == language);
+
+  return languageObj?.code || 'en';
 }

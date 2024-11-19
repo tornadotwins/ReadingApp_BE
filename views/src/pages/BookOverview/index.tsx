@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { connect } from "react-redux";
 import { Dispatch } from 'redux';
 import { AppStateType } from '@/reducers/types';
@@ -14,14 +15,23 @@ import {
   StyledLanguageContainer,
   StyledBookSelectorContainer
 } from "./styles";
+import { BookOverviewPropsType } from "./types";
+import { ACCESS_TOKEN } from "@/config";
+import actionTypes from "@/actions/actionTypes";
 import useOrientation from "@/hooks/useOrientation";
 import ChapterTextOverview from "@/components/ChapterTextOverview";
 import { getLanguageFromLanguageCode } from "@/utils";
-import { TRANSLATION_STATUS_COMPLETE, TRANSLATION_STATUS_NONE, TRANSLATION_STATUS_PUBLISH } from "@/config";
+import {
+  TRANSLATION_STATUS_COMPLETE,
+  TRANSLATION_STATUS_NONE,
+  TRANSLATION_STATUS_PUBLISH
+} from "@/config";
 
-const BookOverview = () => {
+const BookOverview = (props: BookOverviewPropsType) => {
   const [selectedBook, setSelectedBook] = useState('Qur\'an');
   const [currentLanguage, setCurrentLanguage] = useState('id');
+
+  const navigate = useNavigate();
 
   const toolsProps = [
     {
@@ -32,7 +42,7 @@ const BookOverview = () => {
       toolName: 'Arabic',
       onClick: () => { },
     }
-  ]
+  ];
 
   const bookSelectors = [
     {
@@ -157,9 +167,23 @@ const BookOverview = () => {
     setCurrentLanguage(value);
   };
 
+  // Navigate to Login page
+  const onLogout = () => {
+    localStorage.removeItem(ACCESS_TOKEN);
+
+    props.dispatch({
+      type: actionTypes.SET_CURRENT_USER,
+      payload: {
+        user: null,
+      },
+    });
+
+    navigate('/admin');
+  };
+
   return (
     <StyledContainer flexDirection={isPortrait ? 'column' : 'row'}>
-      <Header header="Translation Portal" isLoggedIn={true} />
+      <Header isLoggedIn={true} username={props.currentUser.username} isAdmin={props.currentUser.isAdmin} onLogOut={onLogout} />
 
       <StyledBookOverviewContainer>
         <Tools tools={toolsProps} />
@@ -186,7 +210,7 @@ const BookOverview = () => {
           />
         </StyledLanguageContainer>
 
-        <ChapterTextOverview bookTitle={selectedBook} language={getLanguageFromLanguageCode(currentLanguage, languages)} chapters={chapters} />
+        <ChapterTextOverview bookTitle={selectedBook} language={getLanguageFromLanguageCode(currentLanguage)} chapters={chapters} />
       </StyledBookOverviewContainer>
     </StyledContainer>
   )

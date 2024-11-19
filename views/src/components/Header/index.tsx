@@ -38,7 +38,7 @@ function Header(props: HeaderType) {
           textAlign="center"
           color="white"
           hasUnderline={!props.isAdminPage}
-          onClick={() => navigate('/admin/translator')}
+          onClick={() => navigate('/admin/bookoverview')}
         >
           {'Translation Portal'}
         </Text>
