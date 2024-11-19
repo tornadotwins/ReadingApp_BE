@@ -35,6 +35,7 @@ import {
 } from "@/utils";
 
 import bookService from '../../../services/book.services';
+import BookAudioOverview from "@/components/BookAudioOverview";
 
 const BookOverview = (props: BookOverviewPropsType) => {
   const [selectedBook, setSelectedBook] = useState(BOOK_QURAN);
@@ -203,6 +204,16 @@ const BookOverview = (props: BookOverviewPropsType) => {
 
           {bookInfo && (
             <BookTextOverview
+              bookTitle={selectedBook}
+              language={getLanguageFromLanguageCode(currentLanguage)}
+              languageCode={currentLanguage}
+              bookInfo={bookInfo}
+            />
+
+          )}
+
+          {bookInfo && (
+            <BookAudioOverview
               bookTitle={selectedBook}
               language={getLanguageFromLanguageCode(currentLanguage)}
               languageCode={currentLanguage}

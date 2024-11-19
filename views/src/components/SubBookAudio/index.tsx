@@ -1,6 +1,6 @@
 import { TRANSLATION_STATUS_NONE } from "@/config";
 import { Text } from "../Base";
-import ChapterSquare from "../ChapterSquare";
+import ChapterAudioSquare from "../ChapterAudioSquare";
 import {
   StyledSubBookContainer,
   StyledSubBookContentContainer,
@@ -8,10 +8,10 @@ import {
   StyledSubBookIntroChapterContainer,
   StyledSubBookChapterGroupContainer,
 } from "./styles";
-import { SubBookPropsType } from "./types";
+import { SubBookAudioPropsType } from "./types";
 import { ChapterInfoType } from "@/pages/BookOverview/types";
 
-function SubBook(props: SubBookPropsType) {
+function SubBookAudio(props: SubBookAudioPropsType) {
   return (
     <StyledSubBookContainer>
       <StyledSubBookTitleContainer>
@@ -24,10 +24,10 @@ function SubBook(props: SubBookPropsType) {
         <StyledSubBookIntroChapterContainer>
           {
             !!props.subBook.noChapter && props.subBook.chapterInfos[0].chapterNumber == 0 &&
-            <ChapterSquare
+            <ChapterAudioSquare
               chapterNumber={0}
               onClick={() => { }}
-              translationStatus={TRANSLATION_STATUS_NONE}
+              audioStatus={TRANSLATION_STATUS_NONE}
             />
           }
         </StyledSubBookIntroChapterContainer>
@@ -35,10 +35,10 @@ function SubBook(props: SubBookPropsType) {
         <StyledSubBookChapterGroupContainer>
           {
             props.subBook.chapterInfos.map((chapterInfo: ChapterInfoType, index: number) => (
-              <ChapterSquare
+              <ChapterAudioSquare
                 key={index}
                 chapterNumber={chapterInfo.chapterNumber}
-                translationStatus={chapterInfo.translationStatus || TRANSLATION_STATUS_NONE}
+                audioStatus={chapterInfo.chapterAudio?.[props.languageCode] || TRANSLATION_STATUS_NONE}
                 onClick={() => { }}
               />
             ))
@@ -49,4 +49,4 @@ function SubBook(props: SubBookPropsType) {
   )
 }
 
-export default SubBook;
+export default SubBookAudio;

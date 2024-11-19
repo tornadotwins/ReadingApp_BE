@@ -1,26 +1,26 @@
 import { Text } from "../Base";
-import SubBookText from "../SubBookText";
+import SubBookAudio from "../SubBookAudio";
 
 import { StyledContainer, StyledOverviewTitleContainer, StyledOverviewTitleIcon } from "./styles";
-import { ChapterTextOverviewPropsType } from "./types";
+import { ChapterAudioOverviewPropsType } from "./types";
 import { SubBookInfoType } from "@/pages/BookOverview/types";
 
 import Images from "@/config/images";
 
-const BookTextOverview = (props: ChapterTextOverviewPropsType) => {
+const BookAudioOverview = (props: ChapterAudioOverviewPropsType) => {
   return (
     <StyledContainer>
       <StyledOverviewTitleContainer>
-        <StyledOverviewTitleIcon src={Images.icon_book} />
+        <StyledOverviewTitleIcon src={Images.icon_audio} />
 
         <Text color="#155D74" fontFamily="'Baloo Da 2'" fontWeight="700">
-          {`${props.bookTitle} text - ${props.language} - chapters:`}
+          {`${props.bookTitle} Audio - ${props.language} - chapters:`}
         </Text>
       </StyledOverviewTitleContainer>
 
       {
         props.bookInfo.subBooks.map((subBook: SubBookInfoType, index: number) =>
-          <SubBookText
+          <SubBookAudio
             key={index}
             subBook={subBook}
             languageCode={props.languageCode}
@@ -31,4 +31,4 @@ const BookTextOverview = (props: ChapterTextOverviewPropsType) => {
   )
 }
 
-export default BookTextOverview;
+export default BookAudioOverview;

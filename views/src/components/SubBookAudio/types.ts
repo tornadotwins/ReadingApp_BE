@@ -1,10 +1,10 @@
 import { SubBookInfoType } from "@/pages/BookOverview/types"
 
-type SubBookPropsType = {
+type SubBookAudioPropsType = {
   subBook: SubBookInfoType,
   languageCode: string,
 }
 
 export type {
-  SubBookPropsType
+  SubBookAudioPropsType,
 }
