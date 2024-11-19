@@ -23,7 +23,12 @@ const StyledHeaderTitle = styled(Box) ({
   display: 'flex',
 
   '& .MuiBox-root': {
-    cursor: 'pointer'
+    cursor: 'pointer',
+    transitionDuration: '.25s',
+
+    '&:hover': {
+      transform: 'scale(1.2)',
+    }
   },
 
   '& :nth-of-type(2)': {

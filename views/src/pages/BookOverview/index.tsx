@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { connect } from "react-redux";
 import { Dispatch } from 'redux';
@@ -16,11 +16,12 @@ import {
   StyledBookSelectorContainer
 } from "./styles";
 import { BookOverviewPropsType } from "./types";
+import { LanguageType } from "../types";
 import { ACCESS_TOKEN } from "@/config";
 import actionTypes from "@/actions/actionTypes";
 import useOrientation from "@/hooks/useOrientation";
 import ChapterTextOverview from "@/components/ChapterTextOverview";
-import { getLanguageFromLanguageCode } from "@/utils";
+import { getLanguageCodeFromLanguage, getLanguageFromLanguageCode } from "@/utils";
 import {
   TRANSLATION_STATUS_COMPLETE,
   TRANSLATION_STATUS_NONE,
@@ -30,6 +31,7 @@ import {
 const BookOverview = (props: BookOverviewPropsType) => {
   const [selectedBook, setSelectedBook] = useState('Qur\'an');
   const [currentLanguage, setCurrentLanguage] = useState('id');
+  const [languages, setLanguages] = useState<LanguageType[]>([]);
 
   const navigate = useNavigate();
 
@@ -67,11 +69,11 @@ const BookOverview = (props: BookOverviewPropsType) => {
     },
   ];
 
-  const languages = [
-    { value: 'en', label: 'English' },
-    { value: 'ar', label: 'Arabic' },
-    { value: 'id', label: 'Indonesian' },
-  ];
+  // const languages = [
+  //   { value: 'en', label: 'English' },
+  //   { value: 'ar', label: 'Arabic' },
+  //   { value: 'id', label: 'Indonesian' },
+  // ];
 
   const chapters = [
     {
@@ -158,7 +160,39 @@ const BookOverview = (props: BookOverviewPropsType) => {
       chapterNumber: 20,
       status: TRANSLATION_STATUS_NONE,
     },
-  ]
+  ];
+
+  useEffect(() => {
+    if (!props.currentUser?.roles) return;
+
+    // Convert roles to language objects and remove duplicates
+    const uniqueLanguages = props.currentUser.roles.reduce<LanguageType[]>((acc, role) => {
+      const permission = role.role;
+
+      if (permission != 'none') {
+        const language = role.language;
+        const languageCode = getLanguageCodeFromLanguage(language);
+
+        // Check if this language is already in the accumulator
+        const exists = acc.some(item => item.value === languageCode);
+
+        if (!exists) {
+          acc.push({ value: languageCode, label: language });
+        }
+      }
+
+      return acc;
+    }, []);
+
+    setLanguages(uniqueLanguages);
+
+    // Set default language if current language isn't in the list
+    if (uniqueLanguages.length > 0 && !uniqueLanguages.some(lang => lang.value === currentLanguage)) {
+      setCurrentLanguage(uniqueLanguages[0].value);
+    }
+  }, [props.currentUser, currentLanguage]);
+
+
 
   const isPortrait = useOrientation();
 
