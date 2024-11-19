@@ -196,7 +196,7 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
 
           <StyledSelectContainer>
             <Text color="#155D74" fontWeight="700" fontFamily="'Baloo Da 2'">
-              {selectedBook}
+              {`${selectedBook} ${isSpecialBook ? 'overview' : ''}`}
             </Text>
 
             <SelectBox
@@ -208,23 +208,27 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
               onChange={handleLanguageChange}
             />
 
-            <SelectBox
-              label=""
-              options={BOOK_OVERVIEW_TYPES}
-              value={currentBookOverviewType}
-              backgroundColor="#fff"
-              textColor="#155D74"
-              onChange={handleBookOverviewTypeChange}
-            />
+            {!isSpecialBook &&
+              <SelectBox
+                label=""
+                options={BOOK_OVERVIEW_TYPES}
+                value={currentBookOverviewType}
+                backgroundColor="#fff"
+                textColor="#155D74"
+                onChange={handleBookOverviewTypeChange}
+              />
+            }
           </StyledSelectContainer>
 
-          <StyledUploadButtonContainer>
-            <Button
-              icon={<CloudUploadIcon />}
-              label={`Import ${currentBookOverviewType} into ${languageName} ${selectedBook}`}
-              onClick={() => { }}
-            />
-          </StyledUploadButtonContainer>
+          {!isSpecialBook &&
+            <StyledUploadButtonContainer>
+              <Button
+                icon={<CloudUploadIcon />}
+                label={`Import ${currentBookOverviewType} into ${languageName} ${selectedBook}`}
+                onClick={() => { }}
+              />
+            </StyledUploadButtonContainer>
+          }
 
           {bookInfo && !isSpecialBook && (
             <>
