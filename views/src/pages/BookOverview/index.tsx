@@ -5,7 +5,9 @@ import { Dispatch } from 'redux';
 import { AppStateType } from '@/reducers/types';
 import { toast, Bounce } from "material-react-toastify";
 
-import { SelectBox, Text, LoadingOverlay } from "@/components/Base";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+
+import { SelectBox, Text, LoadingOverlay, Button } from "@/components/Base";
 import Header from "@/components/Header";
 import Tools from "@/components/Tools";
 import BookSelector from "@/components/BookSelector";
@@ -13,8 +15,9 @@ import BookSelector from "@/components/BookSelector";
 import {
   StyledContainer,
   StyledBookOverviewContainer,
-  StyledLanguageContainer,
-  StyledBookSelectorContainer
+  StyledSelectContainer,
+  StyledBookSelectorContainer,
+  StyledUploadButtonContainer,
 } from "./styles";
 import { BookOverviewPropsType, BookType } from "./types";
 import { LanguageType } from "../types";
@@ -36,10 +39,12 @@ import {
 
 import bookService from '../../../services/book.services';
 import BookAudioOverview from "@/components/BookAudioOverview";
+import BookReferenceOverview from "@/components/BookReferenceOverview";
 
 const BookOverview = (props: BookOverviewPropsType) => {
   const [selectedBook, setSelectedBook] = useState(BOOK_QURAN);
   const [currentLanguage, setCurrentLanguage] = useState('');
+  const [currentBookOverviewType, setCurrentBookOverviewType] = useState('Text');
   const [languages, setLanguages] = useState<LanguageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [bookInfo, setBookInfo] = useState<BookType | null>(null);
@@ -78,6 +83,21 @@ const BookOverview = (props: BookOverviewPropsType) => {
       bookTitle: BOOK_TAWRAT,
       onClick: () => setSelectedBook("Tawrat"),
     },
+  ];
+
+  const typeOfHasChapterBook = [
+    {
+      value: 'Text',
+      label: 'Text'
+    },
+    {
+      value: 'Audio',
+      label: 'Audio'
+    },
+    {
+      value: 'Reference',
+      label: 'Reference',
+    }
   ];
 
   // Get Languages
@@ -157,6 +177,11 @@ const BookOverview = (props: BookOverviewPropsType) => {
     setCurrentLanguage(value);
   };
 
+  const handleBookOverviewTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const value = event.target.value as string;
+    setCurrentBookOverviewType(value);
+  }
+
   // Navigate to Login page
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
@@ -187,9 +212,9 @@ const BookOverview = (props: BookOverviewPropsType) => {
             />
           </StyledBookSelectorContainer>
 
-          <StyledLanguageContainer>
+          <StyledSelectContainer>
             <Text color="#155D74" fontWeight="700" fontFamily="'Baloo Da 2'">
-              {selectedBook + ' overview'}
+              {selectedBook}
             </Text>
 
             <SelectBox
@@ -200,20 +225,45 @@ const BookOverview = (props: BookOverviewPropsType) => {
               textColor="#155D74"
               onChange={handleLanguageChange}
             />
-          </StyledLanguageContainer>
 
-          {bookInfo && (
+            <SelectBox
+              label=""
+              options={typeOfHasChapterBook}
+              value={currentBookOverviewType}
+              backgroundColor="#fff"
+              textColor="#155D74"
+              onChange={handleBookOverviewTypeChange}
+            />
+          </StyledSelectContainer>
+
+          <StyledUploadButtonContainer>
+            <Button
+              icon={<CloudUploadIcon />}
+              label={`Import ${currentBookOverviewType} into ${getLanguageFromLanguageCode(currentLanguage)} ${selectedBook}`}
+              onClick={() => { }}
+            />
+          </StyledUploadButtonContainer>
+
+          {bookInfo && currentBookOverviewType == 'Text' && (
             <BookTextOverview
               bookTitle={selectedBook}
               language={getLanguageFromLanguageCode(currentLanguage)}
               languageCode={currentLanguage}
               bookInfo={bookInfo}
             />
-
           )}
 
-          {bookInfo && (
+          {bookInfo && currentBookOverviewType == 'Audio' && (
             <BookAudioOverview
+              bookTitle={selectedBook}
+              language={getLanguageFromLanguageCode(currentLanguage)}
+              languageCode={currentLanguage}
+              bookInfo={bookInfo}
+            />
+          )}
+
+          {bookInfo && currentBookOverviewType == 'Reference' && (
+            <BookReferenceOverview
               bookTitle={selectedBook}
               language={getLanguageFromLanguageCode(currentLanguage)}
               languageCode={currentLanguage}

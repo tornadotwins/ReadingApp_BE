@@ -1,7 +1,7 @@
 import { Box, styled } from "@mui/material";
 
 const StyledSubBookContainer = styled(Box) ({
-  margin: '10px 0px',
+  margin: '2px 0px',
   display: 'flex',
 });
 

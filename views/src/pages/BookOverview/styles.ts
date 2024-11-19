@@ -21,14 +21,13 @@ const StyledBookOverviewContainer = styled(Box) ({
   marginTop: '73px',
 });
 
-const StyledLanguageContainer = styled(Box) ({
-  width: '300px',
+const StyledSelectContainer = styled(Box) ({
+  width: '650px',
 
   display: 'flex',
-  justifyContent: 'space-between',
+  justifyContent: 'center',
   alignItems: 'center',
-  margin: '20px 40px',
-  paddingLeft: '200px',
+  margin: '20px 40px 0px 40px',
 
   '& .MuiFormControl-root' : {
     width: 'unset',
@@ -44,9 +43,33 @@ const StyledBookSelectorContainer = styled(Box) ({
   margin: "20px 40px",
 });
 
+const StyledUploadButtonContainer = styled(Box) ({
+  margin: '5px 40px',
+  padding: '15px',
+  maxWidth: '650px',
+  boxSizing: 'border-box',
+  display: 'flex',
+  justifyContent: 'center',
+  
+
+  '& .MuiButtonBase-root': {
+    boxSizing: 'border-box',
+    textTransform: 'none',
+    backgroundColor: '#FFAA5D',
+    padding: '8px 15px',
+    borderRadius: '0px',
+    border: '1px solid #474747',
+
+    '&:hover': {
+      backgroundColor: '#EECC5D'
+    },
+  }
+})
+
 export {
   StyledContainer,
   StyledBookOverviewContainer,
-  StyledLanguageContainer,
+  StyledSelectContainer,
   StyledBookSelectorContainer,
+  StyledUploadButtonContainer,
 }
