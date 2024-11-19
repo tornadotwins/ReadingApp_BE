@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { Dispatch } from 'redux';
 import { AppStateType } from '@/reducers/types';
 
-import { SelectBox, Text } from "@/components/Base";
+import { SelectBox, Text, LoadingOverlay } from "@/components/Base";
 import Header from "@/components/Header";
 import Tools from "@/components/Tools";
 import BookSelector from "@/components/BookSelector";
@@ -28,10 +28,13 @@ import {
   TRANSLATION_STATUS_PUBLISH
 } from "@/config";
 
+import bookService from '../../../services/book.services';
+
 const BookOverview = (props: BookOverviewPropsType) => {
   const [selectedBook, setSelectedBook] = useState('Qur\'an');
-  const [currentLanguage, setCurrentLanguage] = useState('id');
+  const [currentLanguage, setCurrentLanguage] = useState('');
   const [languages, setLanguages] = useState<LanguageType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -68,12 +71,6 @@ const BookOverview = (props: BookOverviewPropsType) => {
       onClick: () => setSelectedBook("Tawrat"),
     },
   ];
-
-  // const languages = [
-  //   { value: 'en', label: 'English' },
-  //   { value: 'ar', label: 'Arabic' },
-  //   { value: 'id', label: 'Indonesian' },
-  // ];
 
   const chapters = [
     {
@@ -162,6 +159,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
     },
   ];
 
+  // Get all available languages for the user
   useEffect(() => {
     if (!props.currentUser?.roles) return;
 
@@ -192,7 +190,20 @@ const BookOverview = (props: BookOverviewPropsType) => {
     }
   }, [props.currentUser, currentLanguage]);
 
-
+  // Get book information
+  useEffect(() => {
+    setIsLoading(true);
+    bookService
+      .getBookInfoByTitle(selectedBook)
+      .then(result => {
+        console.log(result);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.log(error);
+        setIsLoading(false);
+      })
+  }, [selectedBook])
 
   const isPortrait = useOrientation();
 
@@ -216,37 +227,41 @@ const BookOverview = (props: BookOverviewPropsType) => {
   };
 
   return (
-    <StyledContainer flexDirection={isPortrait ? 'column' : 'row'}>
-      <Header isLoggedIn={true} username={props.currentUser.username} isAdmin={props.currentUser.isAdmin} onLogOut={onLogout} />
+    <>
+      <StyledContainer flexDirection={isPortrait ? 'column' : 'row'}>
+        <Header isLoggedIn={true} username={props.currentUser.username} isAdmin={props.currentUser.isAdmin} onLogOut={onLogout} />
 
-      <StyledBookOverviewContainer>
-        <Tools tools={toolsProps} />
+        <StyledBookOverviewContainer>
+          <Tools tools={toolsProps} />
 
-        <StyledBookSelectorContainer>
-          <BookSelector
-            books={bookSelectors}
-            selectedBook={selectedBook}
-          />
-        </StyledBookSelectorContainer>
+          <StyledBookSelectorContainer>
+            <BookSelector
+              books={bookSelectors}
+              selectedBook={selectedBook}
+            />
+          </StyledBookSelectorContainer>
 
-        <StyledLanguageContainer>
-          <Text color="#155D74" fontWeight="700" fontFamily="'Baloo Da 2'">
-            {selectedBook + ' overview'}
-          </Text>
+          <StyledLanguageContainer>
+            <Text color="#155D74" fontWeight="700" fontFamily="'Baloo Da 2'">
+              {selectedBook + ' overview'}
+            </Text>
 
-          <SelectBox
-            label=""
-            options={languages}
-            value={currentLanguage}
-            backgroundColor="#fff"
-            textColor="#155D74"
-            onChange={handleLanguageChange}
-          />
-        </StyledLanguageContainer>
+            <SelectBox
+              label=""
+              options={languages}
+              value={currentLanguage}
+              backgroundColor="#fff"
+              textColor="#155D74"
+              onChange={handleLanguageChange}
+            />
+          </StyledLanguageContainer>
 
-        <ChapterTextOverview bookTitle={selectedBook} language={getLanguageFromLanguageCode(currentLanguage)} chapters={chapters} />
-      </StyledBookOverviewContainer>
-    </StyledContainer>
+          <ChapterTextOverview bookTitle={selectedBook} language={getLanguageFromLanguageCode(currentLanguage)} chapters={chapters} />
+        </StyledBookOverviewContainer>
+      </StyledContainer>
+
+      {isLoading && <LoadingOverlay />}
+    </>
   )
 }
 

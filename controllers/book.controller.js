@@ -713,6 +713,67 @@ exports.saveBookByFile = async (req, res) => {
   }
 };
 
+/////////////////////////////////////////////////////////////////////////
+////////////////// Get Book information from book title /////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.getBookInfomationByTitle = async (req, res) => {
+  try {
+    const { bookTitle } = req.params;
+
+    // Step 1: Find the book by bookId
+    const book = await Book.findOne({ 'title.en': bookTitle }).exec();
+    if (!book) {
+      return res
+        .status(404)
+        .json({ message: ERROR_MESSAGES.BOOK_NOT_FOUND });
+    }
+
+    const bookId = book._id;
+
+    // Step 2: Find all sub-books related to this book
+    const subBooks = await SubBook.find({ book: bookId })
+      .lean()
+      .exec();
+
+    // Step 3: For each sub-book, find the chapters
+    const subBooksWithChapters = await Promise.all(
+      subBooks.map(async (subBook) => {
+        const chapters = await Chapter.find({ subBook: subBook._id })
+          .select('chapterNumber audio isTranslated')
+          .lean()
+          .exec();
+        return {
+          subBookId: subBook._id,
+          subBookTitle: subBook.title,
+          subBookNumber: subBook.number,
+          noChapter: subBook.noChapter,
+          chapterInfos: chapters.map((chapter) => ({
+            chapterId: chapter._id,
+            chapterNumber: chapter.chapterNumber,
+            audio: chapter.audio,
+            isTranslated: chapter.isTranslated,
+          })),
+        };
+      }),
+    );
+
+    // Step 4: Structure the response
+    const result = {
+      bookId: book._id,
+      bookTitle: book.title,
+      subBooks: subBooksWithChapters,
+    };
+
+    // Step 5: Return the result
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error('Error in getBookInformation:', error);
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+};
+
 // Check if the book already exists in DB. If it doesn't exist, save it
 const getSavedBookId = async (languageCode, title) => {
   try {
