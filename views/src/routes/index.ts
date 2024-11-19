@@ -32,11 +32,6 @@ const routes: Routes = {
     path: '/admin/bookoverview',
     title: 'Book Overview',
   },
-  [Pages.ChapterOverview]: {
-    component: asyncComponentLoader(() => import('@/pages/ChapterOverview')),
-    path: '/admin/chapteroverview',
-    title: 'Chapter Overview',
-  },
   [Pages.Page2]: {
     component: asyncComponentLoader(() => import('@/pages/Page2')),
     path: '/page-2',
