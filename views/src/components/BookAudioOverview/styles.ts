@@ -1,11 +1,13 @@
 import {Box, styled} from '@mui/material';
 
-const StyledContainer = styled(Box) ({
+const StyledContainer = styled(Box) <{isquranorzabur: string}> (({isquranorzabur}) => ({
   backgroundColor: '#F0F5FB',
   margin: '5px 40px',
   padding: '15px',
+  paddingRight: isquranorzabur == 'true' ? '120px' : '0px',
+  boxSizing: 'border-box',
   maxWidth: '650px',
-});
+}));
 
 const StyledOverviewTitleContainer = styled(Box) ({
   display: 'flex',

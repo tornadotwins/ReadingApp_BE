@@ -9,7 +9,7 @@ import Images from "@/config/images";
 
 const BookAudioOverview = (props: ChapterAudioOverviewPropsType) => {
   return (
-    <StyledContainer>
+    <StyledContainer isquranorzabur={props.isQuranOrZabur ? 'true' : 'false'}>
       <StyledOverviewTitleContainer>
         <StyledOverviewTitleIcon src={Images.icon_audio} />
 
@@ -19,13 +19,23 @@ const BookAudioOverview = (props: ChapterAudioOverviewPropsType) => {
       </StyledOverviewTitleContainer>
 
       {
-        props.bookInfo.subBooks.map((subBook: SubBookInfoType, index: number) =>
+        !props.isQuranOrZabur && props.bookInfo.subBooks.map((subBook: SubBookInfoType, index: number) =>
           <SubBookAudio
             key={index}
             subBook={subBook}
             languageCode={props.languageCode}
+            isQuranOrZabur={props.isQuranOrZabur}
           />
         )
+      }
+
+      {
+        props.isQuranOrZabur &&
+        <SubBookAudio
+          book={props.bookInfo}
+          languageCode={props.languageCode}
+          isQuranOrZabur={props.isQuranOrZabur}
+        />
       }
     </StyledContainer>
   )

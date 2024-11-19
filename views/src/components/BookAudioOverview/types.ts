@@ -5,6 +5,7 @@ type ChapterAudioOverviewPropsType = {
   languageCode: string;
   bookTitle: string;
   bookInfo: BookType;
+  isQuranOrZabur?: boolean;
 }
 
 export type {

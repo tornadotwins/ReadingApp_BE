@@ -37,7 +37,7 @@ function SubBookText(props: SubBookTextPropsType) {
           !props.isQuranOrZabur &&
           <StyledSubBookChapterGroupContainer>
             {
-              props.subBook && props.subBook.chapterInfos.map((chapterInfo: ChapterInfoType, index: number) => (
+              props.subBook && props.subBook.chapterInfos?.map((chapterInfo: ChapterInfoType, index: number) => (
                 <ChapterSquare
                   key={index}
                   chapterNumber={chapterInfo.chapterNumber}
