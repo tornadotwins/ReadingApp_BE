@@ -1,9 +1,10 @@
-import { QuranChapterType } from "../QuranChapters/types";
+import { BookType } from "@/pages/BookOverview/types";
 
 type ChapterTextOverviewPropsType = {
   language: string;
+  languageCode: string;
   bookTitle: string;
-  chapters: QuranChapterType[];
+  bookInfo: BookType;
 }
 
 export type {

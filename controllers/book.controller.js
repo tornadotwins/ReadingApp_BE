@@ -747,21 +747,28 @@ exports.getBookInfomationByTitle = async (req, res) => {
           subBookTitle: subBook.title,
           subBookNumber: subBook.number,
           noChapter: subBook.noChapter,
-          chapterInfos: chapters.map((chapter) => ({
-            chapterId: chapter._id,
-            chapterNumber: chapter.chapterNumber,
-            audio: chapter.audio,
-            isTranslated: chapter.isTranslated,
-          })),
+          chapterInfos: chapters
+            .map((chapter) => ({
+              chapterId: chapter._id,
+              chapterNumber: chapter.chapterNumber,
+              audio: chapter.audio,
+              isTranslated: chapter.isTranslated,
+            }))
+            .sort((a, b) => a.chapterNumber - b.chapterNumber),
         };
       }),
+    );
+
+    // Sort subBooks by subBookNumber
+    const sortedSubBooks = subBooksWithChapters.sort(
+      (a, b) => a.subBookNumber - b.subBookNumber,
     );
 
     // Step 4: Structure the response
     const result = {
       bookId: book._id,
       bookTitle: book.title,
-      subBooks: subBooksWithChapters,
+      subBooks: sortedSubBooks,
     };
 
     // Step 5: Return the result

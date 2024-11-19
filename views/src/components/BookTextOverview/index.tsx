@@ -1,10 +1,13 @@
-import Images from "@/config/images";
 import { Text } from "../Base";
-import QuranChapters from "../QuranChapters";
+import SubBook from "../SubBook";
+
 import { StyledContainer, StyledOverviewTitleContainer, StyledOverviewTitleIcon } from "./styles";
 import { ChapterTextOverviewPropsType } from "./types";
+import { SubBookInfoType } from "@/pages/BookOverview/types";
 
-const ChapterTextOverview = (props: ChapterTextOverviewPropsType) => {
+import Images from "@/config/images";
+
+const BookTextOverview = (props: ChapterTextOverviewPropsType) => {
   return (
     <StyledContainer>
       <StyledOverviewTitleContainer>
@@ -15,9 +18,17 @@ const ChapterTextOverview = (props: ChapterTextOverviewPropsType) => {
         </Text>
       </StyledOverviewTitleContainer>
 
-      <QuranChapters chapters={props.chapters} />
+      {
+        props.bookInfo.subBooks.map((subBook: SubBookInfoType, index: number) =>
+          <SubBook
+            key={index}
+            subBook={subBook}
+            languageCode={props.languageCode}
+          />
+        )
+      }
     </StyledContainer>
   )
 }
 
-export default ChapterTextOverview;
+export default BookTextOverview;

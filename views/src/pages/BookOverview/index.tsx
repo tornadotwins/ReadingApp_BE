@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { connect } from "react-redux";
 import { Dispatch } from 'redux';
 import { AppStateType } from '@/reducers/types';
+import { toast, Bounce } from "material-react-toastify";
 
 import { SelectBox, Text, LoadingOverlay } from "@/components/Base";
 import Header from "@/components/Header";
@@ -15,18 +16,13 @@ import {
   StyledLanguageContainer,
   StyledBookSelectorContainer
 } from "./styles";
-import { BookOverviewPropsType } from "./types";
+import { BookOverviewPropsType, BookType } from "./types";
 import { LanguageType } from "../types";
 import { ACCESS_TOKEN } from "@/config";
 import actionTypes from "@/actions/actionTypes";
 import useOrientation from "@/hooks/useOrientation";
-import ChapterTextOverview from "@/components/ChapterTextOverview";
+import BookTextOverview from "@/components/BookTextOverview";
 import { getLanguageCodeFromLanguage, getLanguageFromLanguageCode } from "@/utils";
-import {
-  TRANSLATION_STATUS_COMPLETE,
-  TRANSLATION_STATUS_NONE,
-  TRANSLATION_STATUS_PUBLISH
-} from "@/config";
 
 import bookService from '../../../services/book.services';
 
@@ -35,6 +31,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
   const [currentLanguage, setCurrentLanguage] = useState('');
   const [languages, setLanguages] = useState<LanguageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [bookInfo, setBookInfo] = useState<BookType | null>(null);
 
   const navigate = useNavigate();
 
@@ -72,92 +69,92 @@ const BookOverview = (props: BookOverviewPropsType) => {
     },
   ];
 
-  const chapters = [
-    {
-      chapterNumber: 0,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 1,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 2,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 3,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 4,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 5,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 6,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 7,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 8,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 9,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 10,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 11,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 12,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 13,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 14,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 15,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 16,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 17,
-      status: TRANSLATION_STATUS_PUBLISH,
-    },
-    {
-      chapterNumber: 18,
-      status: TRANSLATION_STATUS_COMPLETE,
-    },
-    {
-      chapterNumber: 19,
-      status: TRANSLATION_STATUS_NONE,
-    },
-    {
-      chapterNumber: 20,
-      status: TRANSLATION_STATUS_NONE,
-    },
-  ];
+  // const chapters = [
+  //   {
+  //     chapterNumber: 0,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 1,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 2,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 3,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 4,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 5,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 6,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 7,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 8,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 9,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 10,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 11,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 12,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 13,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 14,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 15,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 16,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 17,
+  //     status: TRANSLATION_STATUS_PUBLISH,
+  //   },
+  //   {
+  //     chapterNumber: 18,
+  //     status: TRANSLATION_STATUS_COMPLETE,
+  //   },
+  //   {
+  //     chapterNumber: 19,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  //   {
+  //     chapterNumber: 20,
+  //     status: TRANSLATION_STATUS_NONE,
+  //   },
+  // ];
 
   // Get all available languages for the user
   useEffect(() => {
@@ -195,15 +192,24 @@ const BookOverview = (props: BookOverviewPropsType) => {
     setIsLoading(true);
     bookService
       .getBookInfoByTitle(selectedBook)
-      .then(result => {
-        console.log(result);
+      .then((result: BookType) => {
+        setBookInfo(result);
         setIsLoading(false);
       })
       .catch(error => {
-        console.log(error);
+        toast.error(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
         setIsLoading(false);
       })
-  }, [selectedBook])
+  }, [selectedBook]);
 
   const isPortrait = useOrientation();
 
@@ -256,7 +262,14 @@ const BookOverview = (props: BookOverviewPropsType) => {
             />
           </StyledLanguageContainer>
 
-          <ChapterTextOverview bookTitle={selectedBook} language={getLanguageFromLanguageCode(currentLanguage)} chapters={chapters} />
+          {bookInfo && (
+            <BookTextOverview
+              bookTitle={selectedBook}
+              language={getLanguageFromLanguageCode(currentLanguage)}
+              languageCode={currentLanguage}
+              bookInfo={bookInfo}
+            />
+          )}
         </StyledBookOverviewContainer>
       </StyledContainer>
 

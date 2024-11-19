@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 import {API_URL} from '../config'
+import { BookType } from '@/pages/BookOverview/types';
 
 class BookService {
-  getBookInfoByTitle = (bookTitle: string) => {
+  getBookInfoByTitle = (bookTitle: string): Promise<BookType> => {
     return new Promise((resolve, reject) => {
       const url = API_URL + `/books/${bookTitle}/bookInfoByTitle`;
       axios

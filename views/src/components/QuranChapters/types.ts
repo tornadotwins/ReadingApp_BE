@@ -1,10 +1,12 @@
+import { BookType } from "@/pages/BookOverview/types";
+
 type QuranChapterType = {
   chapterNumber: number;
   status: string;
 }
 
 type QuranChaptersPropsType = {
-  chapters: QuranChapterType[];
+  bookInfo: BookType;
   onChapterClick?: (chapterNumber: number) => void;
 }
 
