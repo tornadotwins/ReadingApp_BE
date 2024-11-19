@@ -56,6 +56,7 @@ const defaultMetaTags = {
 const giphy404 = 'https://giphy.com/embed/xTiN0L7EW5trfOvEk0';
 
 const ACCESS_TOKEN = "token";
+const BOOK_INFO = "bookInfo";
 
 const BOOK_QURAN = 'Qur\'an';
 const BOOK_INJIL = 'Injil';
@@ -277,6 +278,7 @@ export {
   giphy404,
 
   ACCESS_TOKEN,
+  BOOK_INFO,
 
   BOOK_QURAN,
   BOOK_INJIL,

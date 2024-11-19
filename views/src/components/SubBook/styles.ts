@@ -6,6 +6,7 @@ const StyledSubBookContainer = styled(Box) ({
 });
 
 const StyledSubBookTitleContainer = styled(Box) ({
+  width: '100px',
   minWidth: '100px',
   maxWidth: '200px',
   marginRight: '10px',

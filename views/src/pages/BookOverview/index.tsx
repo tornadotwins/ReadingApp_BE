@@ -18,16 +18,26 @@ import {
 } from "./styles";
 import { BookOverviewPropsType, BookType } from "./types";
 import { LanguageType } from "../types";
-import { ACCESS_TOKEN } from "@/config";
+import {
+  ACCESS_TOKEN,
+  BOOK_INFO,
+  BOOK_INJIL,
+  BOOK_QURAN,
+  BOOK_TAWRAT,
+  BOOK_ZABUR
+} from "@/config";
 import actionTypes from "@/actions/actionTypes";
 import useOrientation from "@/hooks/useOrientation";
 import BookTextOverview from "@/components/BookTextOverview";
-import { getLanguageCodeFromLanguage, getLanguageFromLanguageCode } from "@/utils";
+import {
+  getLanguageCodeFromLanguage,
+  getLanguageFromLanguageCode
+} from "@/utils";
 
 import bookService from '../../../services/book.services';
 
 const BookOverview = (props: BookOverviewPropsType) => {
-  const [selectedBook, setSelectedBook] = useState('Qur\'an');
+  const [selectedBook, setSelectedBook] = useState(BOOK_QURAN);
   const [currentLanguage, setCurrentLanguage] = useState('');
   const [languages, setLanguages] = useState<LanguageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,111 +62,24 @@ const BookOverview = (props: BookOverviewPropsType) => {
       onClick: () => setSelectedBook("App Text"),
     },
     {
-      bookTitle: "Qur'an",
+      bookTitle: BOOK_QURAN,
       onClick: () => setSelectedBook("Qur'an"),
     },
     {
-      bookTitle: "Injil",
+      bookTitle: BOOK_INJIL,
       onClick: () => setSelectedBook("Injil"),
     },
     {
-      bookTitle: "Zabur",
+      bookTitle: BOOK_ZABUR,
       onClick: () => setSelectedBook("Zabur"),
     },
     {
-      bookTitle: "Tawrat",
+      bookTitle: BOOK_TAWRAT,
       onClick: () => setSelectedBook("Tawrat"),
     },
   ];
 
-  // const chapters = [
-  //   {
-  //     chapterNumber: 0,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 1,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 2,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 3,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 4,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 5,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 6,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 7,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 8,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 9,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 10,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 11,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 12,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 13,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 14,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 15,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 16,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 17,
-  //     status: TRANSLATION_STATUS_PUBLISH,
-  //   },
-  //   {
-  //     chapterNumber: 18,
-  //     status: TRANSLATION_STATUS_COMPLETE,
-  //   },
-  //   {
-  //     chapterNumber: 19,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  //   {
-  //     chapterNumber: 20,
-  //     status: TRANSLATION_STATUS_NONE,
-  //   },
-  // ];
-
-  // Get all available languages for the user
+  // Get Languages
   useEffect(() => {
     if (!props.currentUser?.roles) return;
 
@@ -190,25 +113,40 @@ const BookOverview = (props: BookOverviewPropsType) => {
   // Get book information
   useEffect(() => {
     setIsLoading(true);
-    bookService
-      .getBookInfoByTitle(selectedBook)
-      .then((result: BookType) => {
-        setBookInfo(result);
-        setIsLoading(false);
-      })
-      .catch(error => {
-        toast.error(error, {
-          position: 'top-right',
-          draggable: true,
-          theme: 'colored',
-          transition: Bounce,
-          closeOnClick: true,
-          pauseOnHover: true,
-          hideProgressBar: false,
-          autoClose: 3000
-        });
-        setIsLoading(false);
-      })
+
+    // Check if the current book is existing in local storage. if not, fetch the book data
+    const strSavedBookInfo = localStorage.getItem(BOOK_INFO);
+    const jsonSavedBookInfo = strSavedBookInfo != null ? JSON.parse(strSavedBookInfo) : [];
+    const bookInfo = jsonSavedBookInfo.find((book: BookType) => book.bookTitle.en == selectedBook);
+    if (bookInfo) {
+      setBookInfo(bookInfo)
+
+      setIsLoading(false);
+    } else {
+      bookService
+        .getBookInfoByTitle(selectedBook)
+        .then((result: BookType) => {
+          setBookInfo(result);
+
+          // Save the book info to local storage for performance
+          localStorage.setItem(BOOK_INFO, JSON.stringify([...jsonSavedBookInfo, result]));
+
+          setIsLoading(false);
+        })
+        .catch(error => {
+          toast.error(error, {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
+          });
+          setIsLoading(false);
+        })
+    }
   }, [selectedBook]);
 
   const isPortrait = useOrientation();
@@ -221,6 +159,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
   // Navigate to Login page
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
+    localStorage.removeItem(BOOK_INFO);
 
     props.dispatch({
       type: actionTypes.SET_CURRENT_USER,
