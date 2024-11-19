@@ -33,6 +33,10 @@ const StyledLanguageContainer = styled(Box) ({
   '& .MuiFormControl-root' : {
     width: 'unset',
     marginLeft: '15px',
+  },
+
+  '& .MuiBox-root': {
+    fontFamily: '"Baloo Da 2" !important',
   }
 });
 

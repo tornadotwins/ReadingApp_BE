@@ -88,6 +88,7 @@ function AdminPortal(props: AdminPortalPropsType) {
 
         setTableHeaders(tableHeaders);
         setUsers(users);
+        setIsLoading(false);
       })
       .catch((error) => {
         toast.error(error, {
@@ -100,12 +101,8 @@ function AdminPortal(props: AdminPortalPropsType) {
           hideProgressBar: false,
           autoClose: 3000
         });
-      })
-      .finally(() => {
         setIsLoading(false);
       });
-
-    setIsLoading(false)
   }, []);
 
   // Navigate to Login page
@@ -146,6 +143,7 @@ function AdminPortal(props: AdminPortalPropsType) {
           autoClose: 3000,
         });
         setShowEditPersonDlg(false);
+        setIsLoading(false);
       })
       .catch((error) => {
         toast.error(error, {
@@ -157,8 +155,8 @@ function AdminPortal(props: AdminPortalPropsType) {
           pauseOnHover: true,
           autoClose: 3000,
         });
+        setIsLoading(false);
       });
-    setIsLoading(false);
   };
 
   // Delete Person
@@ -186,6 +184,8 @@ function AdminPortal(props: AdminPortalPropsType) {
             pauseOnHover: true,
             autoClose: 3000,
           });
+
+          setIsLoading(false);
         })
         .catch((error) => {
           toast.error(error, {
@@ -197,12 +197,13 @@ function AdminPortal(props: AdminPortalPropsType) {
             pauseOnHover: true,
             autoClose: 3000,
           });
+
+          setIsLoading(false);
         });
     }
 
     setShowDeleteConfirmDlg(false);
     setDeletePerson(false);
-    setIsLoading(false);
   };
 
   // Show dialog when user click "Edit" button
@@ -244,6 +245,7 @@ function AdminPortal(props: AdminPortalPropsType) {
 
         setShowEditPersonDlg(false);
         setPersonToEdit(undefined);
+        setIsLoading(false);
       })
       .catch((error) => {
         toast.error(error, {
@@ -255,9 +257,9 @@ function AdminPortal(props: AdminPortalPropsType) {
           pauseOnHover: true,
           autoClose: 3000,
         });
-      });
 
-    setIsLoading(false);
+        setIsLoading(false);
+      });
   };
 
   // Add language
@@ -285,6 +287,8 @@ function AdminPortal(props: AdminPortalPropsType) {
           pauseOnHover: true,
           autoClose: 3000,
         });
+
+        setIsLoading(false);
       })
       .catch((error) => {
         toast.error(error, {
@@ -296,9 +300,9 @@ function AdminPortal(props: AdminPortalPropsType) {
           pauseOnHover: true,
           autoClose: 3000,
         });
-      });
 
-    setIsLoading(false);
+        setIsLoading(false);
+      });
   };
 
   // Delete language
@@ -325,6 +329,8 @@ function AdminPortal(props: AdminPortalPropsType) {
             pauseOnHover: true,
             autoClose: 3000,
           });
+
+          setIsLoading(false);
         })
         .catch((error) => {
           toast.error(error, {
@@ -336,9 +342,10 @@ function AdminPortal(props: AdminPortalPropsType) {
             pauseOnHover: true,
             autoClose: 3000,
           });
+
+          setIsLoading(false);
         });
 
-      setIsLoading(false);
       setShowDeleteConfirmDlg(false);
       setShowDeleteLanguageDlg(false);
       setLanguageToDelete('');
@@ -362,6 +369,8 @@ function AdminPortal(props: AdminPortalPropsType) {
           pauseOnHover: true,
           autoClose: 3000,
         });
+
+        setIsLoading(false);
       })
       .catch((error) => {
         toast.error(error, {
@@ -373,10 +382,11 @@ function AdminPortal(props: AdminPortalPropsType) {
           pauseOnHover: true,
           autoClose: 3000,
         });
+
+        setIsLoading(false);
       });
 
     setIsUsersChanged(false);
-    setIsLoading(false);
   }
 
   return (
