@@ -7,18 +7,20 @@ import { QuranChaptersPropsType, QuranChapterType } from './types';
 const QuranChapters = (props: QuranChaptersPropsType) => {
   return (
     <StyledQuranContainer>
-      <StyledIntroContainer>
-        <ChapterSquare
-          chapterNumber={0}
-          translationStatus={TRANSLATION_STATUS_NONE}
-          onClick={() => console.log("Intro Chapter clicked")
-          }
-        />
-      </StyledIntroContainer>
+      {props.chapters[0].chapterNumber == 0 &&
+        <StyledIntroContainer>
+          <ChapterSquare
+            chapterNumber={0}
+            translationStatus={TRANSLATION_STATUS_NONE}
+            onClick={() => console.log("Intro Chapter clicked")
+            }
+          />
+        </StyledIntroContainer>
+      }
 
       <StyledChapterContainer>
         {props.chapters.map((chapter: QuranChapterType, index: number) => (
-          <ChapterSquare
+          chapter.chapterNumber > 0 && <ChapterSquare
             key={index}
             chapterNumber={chapter.chapterNumber}
             translationStatus={chapter.status}
