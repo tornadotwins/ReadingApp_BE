@@ -19,7 +19,16 @@ const StyledHeaderContainer = styled(Box) ({
 });
 
 const StyledHeaderTitle = styled(Box) ({
-  alignContent: 'center'
+  alignContent: 'center',
+  display: 'flex',
+
+  '& .MuiBox-root': {
+    cursor: 'pointer'
+  },
+
+  '& :nth-of-type(2)': {
+    marginLeft: '50px'
+  }
 });
 
 const StyledNavbar = styled(Box) ({

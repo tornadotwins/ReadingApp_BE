@@ -20,17 +20,29 @@ import {
   StyledAdminText,
 } from './styles';
 import PersonInfoDialog from '@/components/Base/PersonInfoDialog';
-import { LoadingOverlay, Text, UserTablePanel } from '@/components/Base';
+import {
+  LoadingOverlay,
+  Text,
+  UserTablePanel
+} from '@/components/Base';
 import { ACCESS_TOKEN } from '@/config';
 import authService from '../../../services/auth.services';
 import { AdminPortalPropsType } from './types';
 import { RoleType, UserType } from '../types';
 import { AppStateType } from '@/reducers/types';
-import { ADD_PERSON_SUCCESS, DELETE_LANGUAGE_MESSAGE, DELETE_LANGUAGE_TITLE, DELETE_PERSON_MESSAGE, DELETE_PERSON_SUCCESS, DELETE_PERSON_TITLE } from '@/config/messages';
+import {
+  ADD_PERSON_SUCCESS,
+  DELETE_LANGUAGE_MESSAGE,
+  DELETE_LANGUAGE_TITLE,
+  DELETE_PERSON_MESSAGE,
+  DELETE_PERSON_SUCCESS,
+  DELETE_PERSON_TITLE
+} from '@/config/messages';
 import DeleteDialog from '@/components/Base/DeleteDialog';
 import DeleteConfirmDialog from '@/components/Base/DeleteConfirmDialog';
 import LanguageDialog from '@/components/Base/LanguageDialog';
 import DeleteLanguageDialog from '@/components/Base/DeleteLanguageDialog';
+import actionTypes from '@/actions/actionTypes';
 
 function AdminPortal(props: AdminPortalPropsType) {
   const [isLoading, setIsLoading] = useState(false);
@@ -99,6 +111,14 @@ function AdminPortal(props: AdminPortalPropsType) {
   // Navigate to Login page
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
+
+    props.dispatch({
+      type: actionTypes.SET_CURRENT_USER,
+      payload: {
+        user: null,
+      },
+    });
+
     navigate('/admin');
   };
 
@@ -363,7 +383,7 @@ function AdminPortal(props: AdminPortalPropsType) {
     <>
       <Meta title="Admin Portal" />
       <StyledAdminPortalContainer>
-        <Header header='Admin Portal' isLoggedIn={true} username={props.currentUser.username} onLogOut={onLogout} />
+        <Header isAdmin isLoggedIn={true} username={props.currentUser.username} onLogOut={onLogout} isAdminPage />
 
         <StyledAdminPortalBodyContainer>
           <StyledTablePanelHeader>
