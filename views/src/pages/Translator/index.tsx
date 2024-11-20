@@ -251,7 +251,6 @@ function Translator(props: TranslatorPropsType) {
    * Effect hook for error handling
   */
   useEffect(() => {
-
     const necessaryHeaders: string[] = [
       'SubBook_English',
       `SubBook_${languageLabel}`,

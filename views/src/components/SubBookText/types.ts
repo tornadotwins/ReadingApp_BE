@@ -5,6 +5,8 @@ type SubBookTextPropsType = {
   book?: BookType,
   languageCode: string,
   isQuranOrZabur?: boolean,
+
+  onChapterClick: (chapterId: string) => void;
 }
 
 export type {

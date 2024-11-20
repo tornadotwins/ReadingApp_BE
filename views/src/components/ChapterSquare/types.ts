@@ -1,8 +1,11 @@
+import { ChapterInfoType, SubBookInfoType } from "@/pages/BookOverview/types";
+
 type ChapterSquarePropsType = {
-  chapterNumber: number;
+  subBookInfo?: SubBookInfoType;
+  chapterInfo?: ChapterInfoType;
   translationStatus: string;
 
-  onClick: () => void;
+  onClick: (chapterId: string) => void;
 }
 
 export type {

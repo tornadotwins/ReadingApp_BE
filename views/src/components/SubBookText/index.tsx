@@ -26,9 +26,9 @@ function SubBookText(props: SubBookTextPropsType) {
           {
             props.subBook && !!props.subBook.noChapter && props.subBook.chapterInfos[0].chapterNumber == 0 &&
             <ChapterSquare
-              chapterNumber={0}
-              onClick={() => { }}
+              chapterInfo={props.subBook.chapterInfos[0]}
               translationStatus={TRANSLATION_STATUS_NONE}
+              onClick={props.onChapterClick}
             />
           }
         </StyledSubBookIntroChapterContainer>
@@ -40,9 +40,10 @@ function SubBookText(props: SubBookTextPropsType) {
               props.subBook && props.subBook.chapterInfos?.map((chapterInfo: ChapterInfoType, index: number) => (
                 <ChapterSquare
                   key={index}
-                  chapterNumber={chapterInfo.chapterNumber}
+                  subBookInfo={props.subBook}
+                  chapterInfo={chapterInfo}
                   translationStatus={chapterInfo.translationStatus || TRANSLATION_STATUS_NONE}
-                  onClick={() => { }}
+                  onClick={props.onChapterClick}
                 />
               ))
             }
@@ -56,7 +57,7 @@ function SubBookText(props: SubBookTextPropsType) {
               props.book && props.book.subBooks && props.book.subBooks.map((subBook: SubBookInfoType, index: number) => (
                 <ChapterSquare
                   key={index}
-                  chapterNumber={subBook.subBookNumber}
+                  subBookInfo={subBook}
                   translationStatus={subBook.chapterInfos[0].translationStatus || TRANSLATION_STATUS_NONE}
                   onClick={() => { }}
                 />

@@ -2,6 +2,7 @@ import {Box, styled} from '@mui/material';
 
 const StyledBookSelectorContainer = styled(Box) ({
   display: 'flex',
+  justifyContent: 'center'
 });
 
 const StyledBookSelector = styled(Box)<{ isselected?: string }>(({ isselected }) => ({

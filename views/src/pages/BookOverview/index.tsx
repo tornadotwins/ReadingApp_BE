@@ -24,13 +24,15 @@ import {
 } from "./styles";
 
 // Type Imports
-import { BookOverviewPropsType, BookType } from "./types";
+import {
+  BookOverviewPropsType,
+  BookType
+} from "./types";
 import { LanguageType } from "../types";
 
 // Config and Utility Imports
 import {
   ACCESS_TOKEN,
-  BOOK_INFO,
   BOOK_INJIL,
   BOOK_QURAN,
   BOOK_TAWRAT,
@@ -66,7 +68,7 @@ const TOOLS = [
   { toolName: 'Arabic', onClick: () => { } }
 ];
 
-const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
+const BookOverview = (props: BookOverviewPropsType) => {
   const [selectedBook, setSelectedBook] = useState(BOOK_QURAN);
   const [currentLanguage, setCurrentLanguage] = useState('');
   const [currentBookOverviewType, setCurrentBookOverviewType] = useState('Text');
@@ -111,10 +113,7 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
     const fetchBookInfo = async () => {
       setIsLoading(true);
       try {
-        const strSavedBookInfo = localStorage.getItem(BOOK_INFO);
-        const jsonSavedBookInfo = strSavedBookInfo ? JSON.parse(strSavedBookInfo) : [];
-
-        const existingBookInfo = jsonSavedBookInfo.find((book: BookType) => book.bookTitle.en === selectedBook);
+        const existingBookInfo = props.bookInfos.find((book: BookType) => book.bookTitle.en === selectedBook);
 
         if (existingBookInfo) {
           setBookInfo(existingBookInfo);
@@ -122,9 +121,15 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
           const result = await bookService.getBookInfoByTitle(selectedBook);
           setBookInfo(result);
 
-          const updatedBookInfo = [...jsonSavedBookInfo, result];
-          localStorage.setItem(BOOK_INFO, JSON.stringify(updatedBookInfo));
+          props.dispatch({
+            type: actionTypes.ADD_BOOKINFO,
+            payload: {
+              bookInfo: result
+            }
+          });
         }
+
+        setIsLoading(false);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : String(error), {
           position: 'top-right',
@@ -136,13 +141,13 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
           hideProgressBar: false,
           autoClose: 3000
         });
-      } finally {
+
         setIsLoading(false);
       }
     };
 
     fetchBookInfo();
-  }, [selectedBook]);
+  }, [selectedBook, props.bookInfos]);
 
   // Event Handlers
   const handleLanguageChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -155,14 +160,22 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
     setCurrentBookOverviewType(value);
   };
 
+  const moveToChapterOverview = (chapterId: string) => {
+    const passData = { chapterId, bookTitle: selectedBook };
+
+    navigate('/admin/chapteroverview', { state: passData });
+  }
+
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
-    localStorage.removeItem(BOOK_INFO);
 
     props.dispatch({
-      type: actionTypes.SET_CURRENT_USER,
-      payload: { user: null },
+      type: actionTypes.RESET_USER
     });
+
+    props.dispatch({
+      type: actionTypes.RESET_BOOK
+    })
 
     navigate('/admin');
   };
@@ -239,6 +252,8 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
                   languageCode={currentLanguage}
                   bookInfo={bookInfo}
                   isQuranOrZabur={false}
+
+                  onClickSquare={moveToChapterOverview}
                 />
               )}
               {currentBookOverviewType === 'Audio' && (
@@ -269,6 +284,8 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
                 languageCode={currentLanguage}
                 bookInfo={bookInfo}
                 isQuranOrZabur={true}
+
+                onClickSquare={() => { }}
               />
               <BookAudioOverview
                 bookTitle={selectedBook}
@@ -294,6 +311,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 function mapStateToProps(state: AppStateType) {
   return {
     currentUser: state.user.currentUser,
+    bookInfos: state.book.bookInfos,
   };
 }
 
