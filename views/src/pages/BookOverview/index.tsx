@@ -26,7 +26,9 @@ import {
 // Type Imports
 import {
   BookOverviewPropsType,
-  BookType
+  BookType,
+  ChapterInfoType,
+  SubBookInfoType
 } from "./types";
 import { LanguageType } from "../types";
 
@@ -69,12 +71,13 @@ const TOOLS = [
 ];
 
 const BookOverview = (props: BookOverviewPropsType) => {
-  const [selectedBook, setSelectedBook] = useState(BOOK_QURAN);
-  const [currentLanguage, setCurrentLanguage] = useState('');
-  const [currentBookOverviewType, setCurrentBookOverviewType] = useState('Text');
   const [languages, setLanguages] = useState<LanguageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [bookInfo, setBookInfo] = useState<BookType | null>(null);
+
+  const [selectedBook, setSelectedBook] = useState(BOOK_QURAN);
+  const [currentLanguage, setCurrentLanguage] = useState('');
+  const [currentBookOverviewType, setCurrentBookOverviewType] = useState('Text');
 
   const navigate = useNavigate();
   const isPortrait = useOrientation();
@@ -153,6 +156,13 @@ const BookOverview = (props: BookOverviewPropsType) => {
   const handleLanguageChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const value = event.target.value as string;
     setCurrentLanguage(value);
+
+    props.dispatch({
+      type: actionTypes.SET_CURRENT_LANGUAGE,
+      payload: {
+        language: value,
+      }
+    })
   };
 
   const handleBookOverviewTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -161,7 +171,20 @@ const BookOverview = (props: BookOverviewPropsType) => {
   };
 
   const moveToChapterOverview = (chapterId: string) => {
-    const passData = { chapterId, bookTitle: selectedBook };
+    const subBookInfo = bookInfo?.subBooks.find(
+      (subBook: SubBookInfoType) => subBook.chapterInfos.find(
+        (chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId
+      ));
+
+    const chapterInfo = subBookInfo?.chapterInfos.find((chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId);
+
+    const passData = {
+      chapterId,
+      bookTitle: selectedBook,
+      subBookInfo: subBookInfo,
+      chapterInfo: chapterInfo,
+      languages: languages
+    };
 
     navigate('/admin/chapteroverview', { state: passData });
   }
@@ -312,6 +335,7 @@ function mapStateToProps(state: AppStateType) {
   return {
     currentUser: state.user.currentUser,
     bookInfos: state.book.bookInfos,
+    currentLanguage: state.book.language,
   };
 }
 

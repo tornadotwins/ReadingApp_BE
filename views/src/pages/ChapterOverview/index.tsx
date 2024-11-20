@@ -1,13 +1,21 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { AppStateType } from "@/reducers/types";
-import useOrientation from "@/hooks/useOrientation";
-import { useNavigate, useLocation } from "react-router-dom";
 import { toast, Bounce } from "material-react-toastify";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
-import { LoadingOverlay, TablePanel, Text } from "@/components/Base";
+import { AppStateType } from "@/reducers/types";
+import useOrientation from "@/hooks/useOrientation";
+import actionTypes from "@/actions/actionTypes";
+import bookService from "../../../services/book.services";
+
+import {
+  LoadingOverlay,
+  SelectBox,
+  TablePanel,
+  Text
+} from "@/components/Base";
 
 import {
   StyledContainer,
@@ -15,9 +23,13 @@ import {
   StyledBookSelectorContainer,
   StyledTableContainer,
   StyledBackContainer,
+  StyledSelectGroupContainer,
+  StyledSelectContainer
 } from "./styles";
-import { ChapterOverviewPropsType } from "./types";
+
 import Header from "@/components/Header";
+import Tools from "@/components/Tools";
+import BookSelector from "@/components/BookSelector";
 
 import {
   ACCESS_TOKEN,
@@ -26,16 +38,20 @@ import {
   BOOK_ZABUR,
   BOOK_TAWRAT,
 } from "@/config";
-import actionTypes from "@/actions/actionTypes";
-import Tools from "@/components/Tools";
-import BookSelector from "@/components/BookSelector";
-import { BookType, ChapterInfoType, SubBookInfoType, VerseType } from "../BookOverview/types";
 
-import bookService from "../../../services/book.services";
+import {
+  BookType,
+  ChapterInfoType,
+  SubBookInfoType,
+  VerseType
+} from "../BookOverview/types";
+
+import {
+  ChapterOverviewPropsType,
+  SelectOptionType
+} from "./types";
 import { TableRowType } from "@/components/Base/TablePanel/types";
-import { StyledSelectContainer } from "../BookOverview/styles";
 
-// Constants
 const BOOK_SELECTORS = [
   { bookTitle: "App Text", value: "App Text" },
   { bookTitle: BOOK_QURAN, value: "Qur'an" },
@@ -50,58 +66,64 @@ const TOOLS = [
 ];
 
 function ChapterOverview(props: ChapterOverviewPropsType) {
-  const [selectedBook, setSelectedBook] = useState('Qur\'an');
+  const location = useLocation();
+  const locationState = location.state as {
+    bookTitle: string,
+    chapterId: string,
+    subBookInfo: SubBookInfoType,
+    chapterInfo: ChapterInfoType
+  };
+
   const [isLoading, setIsLoading] = useState(false);
-  const [chapterInfo, setChapterInfo] = useState<ChapterInfoType | null>(null);
-  const [subBookInfo, setSubBookInfo] = useState<SubBookInfoType | null>(null);
+  const [bookInfo, setBookInfo] = useState<BookType | null>(null);
   const [verseInfos, setVerseInfos] = useState<VerseType[]>([]);
   const [tableRows, setTableRows] = useState<TableRowType[]>([]);
 
+  const [subBookSelectOptions, setSubBookSelectOptions] = useState<SelectOptionType[]>([]);
+  const [chapterSelectOptions, setChapterSelectOptions] = useState<SelectOptionType[]>([]);
+
+  const [selectedBook, setSelectedBook] = useState(location.state.bookTitle);
+  const [selectedSubBook, setSelectedSubBook] = useState<string>(location.state.subBookInfo.subBookTitle.en);
+  const [selectedChapter, setSelectedChapter] = useState<string>();
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(props.currentLanguage);
+
+  const languages = useMemo(() => location.state.languages, [props.currentUser]);
+
   const isPortrait = useOrientation();
   const navigate = useNavigate();
-  const location = useLocation();
-  const data = useMemo(() => location.state, [location]);
 
-  // Get chapter information from data passed from the previous page
   useEffect(() => {
-    const bookTitle = data.bookTitle;
-    // get chapter information by chapter id
-    const chapterId = data.chapterId;
-    const bookInfo = props.bookInfos.find((bookInfo: BookType) => bookInfo.bookTitle.en == bookTitle);
-    const subBookInfo = bookInfo?.subBooks.find(
-      (subBook: SubBookInfoType) => subBook.chapterInfos.find(
-        (chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId
-      )
-    );
-
-    const chapterInfo = subBookInfo?.chapterInfos.find((chapterInfo: ChapterInfoType) => chapterInfo?.chapterId == chapterId);
-
-    subBookInfo && setSubBookInfo(subBookInfo);
-    chapterInfo && setChapterInfo(chapterInfo);
-  }, [data, props.bookInfos]);
-
-  // Fetch Verses by chapterId
-  useEffect(() => {
-    const fetchVersesInfo = async () => {
+    const fetchBookInfo = async () => {
       setIsLoading(true);
-
       try {
-        const chapterInfo: ChapterInfoType = await bookService.getVersesByChapterId(data.chapterId);
-        chapterInfo.verses.map((verse: VerseType) => {
-          setTableRows((prevTableRows) =>
-            [
-              ...prevTableRows,
-              {
-                SubBook_English: subBookInfo?.subBookTitle?.en || '',
-                Chapter_Number: chapterInfo.chapterNumber.toString() || '',
-                Verse_Number: verse.verseNumber.toString() || '',
-                Verse_English: verse.verseText.en || ''
-              }
-            ]
-          )
+        const existingBookInfo = props.bookInfos.find((book: BookType) => book.bookTitle.en === selectedBook);
+        const bookResult = existingBookInfo || await bookService.getBookInfoByTitle(selectedBook);
+
+        props.dispatch({
+          type: actionTypes.ADD_BOOKINFO,
+          payload: { bookInfo: bookResult }
         });
 
-        setVerseInfos(chapterInfo.verses);
+        setBookInfo(bookResult);
+
+        // Deduplicate sub-books
+        const uniqueSubBooks = Array.from(
+          new Set(bookResult.subBooks.map(sb => sb.subBookId))
+        ).map(id => bookResult.subBooks.find(sb => sb.subBookId === id)!);
+
+        const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
+          label: subBook.subBookTitle.en,
+          value: subBook.subBookId
+        }));
+
+        setSubBookSelectOptions(newSubBookOptions);
+
+        setSelectedSubBook(newSubBookOptions.length ? newSubBookOptions[0].value : '');
+
+        // Set first sub-book if no selection exists
+        if (newSubBookOptions.length > 0 && !selectedSubBook) {
+          setSelectedSubBook(newSubBookOptions[0].value);
+        }
 
         setIsLoading(false);
       } catch (error) {
@@ -115,22 +137,123 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           hideProgressBar: false,
           autoClose: 3000
         });
+        setIsLoading(false);
+      }
+    };
+
+    fetchBookInfo();
+  }, [selectedBook]);
+
+  useEffect(() => {
+    if (!locationState || !props.bookInfos.length) return;
+
+    const { bookTitle, chapterId } = locationState;
+    const bookInfo = props.bookInfos.find((book: BookType) => book.bookTitle.en === bookTitle);
+
+    const subBookInfo = bookInfo?.subBooks.find((subBook: SubBookInfoType) =>
+      subBook.chapterInfos.some((chapterInfo: ChapterInfoType) =>
+        chapterInfo.chapterId === chapterId
+      )
+    );
+
+    if (subBookInfo) {
+      setSelectedSubBook(subBookInfo.subBookId);
+    }
+
+    const chapterInfo = subBookInfo?.chapterInfos.find(
+      (chapter: ChapterInfoType) => chapter.chapterId === chapterId
+    );
+
+    if (chapterInfo) {
+      setSelectedChapter(chapterInfo.chapterId);
+    }
+  }, [locationState, props.bookInfos]);
+
+  useEffect(() => {
+    if (!bookInfo || !selectedSubBook) return;
+
+    setChapterSelectOptions([]);
+    const subBookInfo = bookInfo.subBooks.find(
+      (subBook: SubBookInfoType) => subBook.subBookId === selectedSubBook
+    );
+
+    const chapterInfos = subBookInfo?.chapterInfos || [];
+    const newChapterOptions = chapterInfos.map((chapterInfo: ChapterInfoType) => ({
+      value: chapterInfo.chapterId,
+      label: chapterInfo.chapterNumber.toString(),
+    }));
+
+    setChapterSelectOptions(newChapterOptions);
+    setSelectedChapter(newChapterOptions.length ? newChapterOptions[0].value : '');
+
+    if (newChapterOptions.length > 0 && !selectedChapter) {
+      setSelectedChapter(newChapterOptions[0].value);
+    }
+  }, [selectedSubBook, bookInfo]);
+
+  useEffect(() => {
+    const fetchVersesInfo = async () => {
+      if (!locationState || !selectedChapter) return;
+
+      setIsLoading(true);
+      setTableRows([]);
+
+      try {
+        const chapterInfo: ChapterInfoType = await bookService.getVersesByChapterId(selectedChapter);
+        const newTableRows = chapterInfo.verses.map((verse: VerseType) => ({
+          SubBook_English: location.state.subBookInfo?.subBookTitle?.[selectedLanguage],
+          Chapter_Number: chapterInfo.chapterNumber.toString() || '',
+          Verse_Number: verse.verseNumber.toString() || '',
+          Verse_English: verse.verseText?.[selectedLanguage] || ''
+        }));
+
+        setTableRows(newTableRows);
+        setVerseInfos(chapterInfo.verses);
+        setIsLoading(false);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : String(error), {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+        setIsLoading(false);
       }
     };
 
     fetchVersesInfo();
-  }, [data]);
+  }, [selectedChapter, selectedLanguage]);
+
+  const handleSelectSubBookChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const value = event.target.value as string;
+    setSelectedSubBook(value);
+  }
+
+  const handleSelectChapterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const value = event.target.value as string;
+    setSelectedChapter(value);
+  }
+
+  const handleSelectLanguageChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const value = event.target.value as string;
+    setSelectedLanguage(value);
+
+    props.dispatch({
+      type: actionTypes.SET_CURRENT_LANGUAGE,
+      payload: {
+        language: value,
+      }
+    })
+  };
 
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
-    props.dispatch({
-      type: actionTypes.RESET_USER
-    });
-
-    props.dispatch({
-      type: actionTypes.RESET_BOOK
-    })
-
+    props.dispatch({ type: actionTypes.RESET_USER });
+    props.dispatch({ type: actionTypes.RESET_BOOK });
     navigate('/admin');
   };
 
@@ -157,11 +280,41 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
             />
           </StyledBookSelectorContainer>
 
-          <StyledSelectContainer onClick={() => navigate('/admin/bookoverview')}>
-            <StyledBackContainer>
+          <StyledSelectContainer>
+            <StyledBackContainer onClick={() => navigate('/admin/bookoverview')}>
               <KeyboardBackspaceIcon />
               <Text fontFamily="Inter" color="#155D74" fontWeight="500">overview</Text>
             </StyledBackContainer>
+
+            <StyledSelectGroupContainer>
+              <Text fontFamily="Inter" color="#155D74" fontWeight="500">Go to:</Text>
+              <SelectBox
+                label=""
+                options={subBookSelectOptions}
+                value={subBookSelectOptions.find(option => option.value === selectedSubBook) ? selectedSubBook : ''}
+                backgroundColor="#fff"
+                textColor="#155D74"
+                onChange={handleSelectSubBookChange}
+              />
+
+              <SelectBox
+                label=""
+                options={chapterSelectOptions}
+                value={chapterSelectOptions.find(option => option.value === selectedChapter) ? selectedChapter : ''}
+                backgroundColor="#fff"
+                textColor="#155D74"
+                onChange={handleSelectChapterChange}
+              />
+
+              <SelectBox
+                label=""
+                options={languages}
+                value={selectedLanguage}
+                backgroundColor="#fff"
+                textColor="#155D74"
+                onChange={handleSelectLanguageChange}
+              />
+            </StyledSelectGroupContainer>
           </StyledSelectContainer>
 
           <StyledTableContainer>
@@ -186,6 +339,7 @@ function mapStateToProps(state: AppStateType) {
   return {
     currentUser: state.user.currentUser,
     bookInfos: state.book.bookInfos,
+    currentLanguage: state.book.language,
   };
 }
 

@@ -61,12 +61,20 @@ type ChapterActionType = {
   }
 }
 
+type LanguageActionType = {
+  type: string,
+  payload: {
+    language: string
+  }
+}
+
 type AppStateType = {
   user: {
     currentUser: UserType | null;
   },
   book: {
     bookInfos: BookType[] | [];
+    language: string,
   }
 }
 
@@ -80,5 +88,6 @@ export type {
   SubBookActionType,
   SubBookIdActionType,
   ChapterActionType,
+  LanguageActionType,
   AppStateType,
 }

@@ -5,7 +5,7 @@ import {
 
 const StyledContainer = styled(Box) ({
   position: 'relative',
-  minHeight: '100vh',
+  minHeight: 'calc(100vh - 37px)',
   width: '100%',
   
   '& >.MuiBox-root:first-of-type': {
@@ -36,19 +36,34 @@ const StyledTableContainer = styled(Box) ({
 })
 
 const StyledSelectContainer = styled(Box) ({
-  width: '100%',
   margin: '20px 40px',
   display: 'flex',
   alignItems: 'center',
 });
 
 const StyledBackContainer = styled(Box) ({
-  width: '20%',
   display: 'flex',
   alignItems: 'center',
+  cursor: 'pointer',
+  marginRight: '100px',
 
   '& .MuiSvgIcon-root' : {
     fill: '#155D74'
+  }
+});
+
+const StyledSelectGroupContainer = styled(Box) ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+
+  '& >.MuiBox-root': {
+    minWidth: '50px',
+    marginRight: '20px'
+  },
+
+  '& > .MuiFormControl-root': {
+    marginRight: '20px'
   }
 })
 
@@ -59,4 +74,5 @@ export {
   StyledTableContainer,
   StyledSelectContainer,
   StyledBackContainer,
+  StyledSelectGroupContainer,
 }

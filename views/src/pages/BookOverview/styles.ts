@@ -27,7 +27,6 @@ const StyledSelectContainer = styled(Box) ({
   display: 'flex',
   alignItems: 'center',
   margin: '20px 40px 0px 40px',
-  cursor: 'pointer',
 
   '& .MuiFormControl-root' : {
     width: 'unset',

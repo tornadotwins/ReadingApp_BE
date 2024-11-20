@@ -11,9 +11,16 @@ type ChapterOverviewPropsType = {
   subBookInfo?: SubBookInfoType;
   currentUser: UserType;
   bookInfos: BookType[];
+  currentLanguage: string;
   dispatch: Dispatch;
+}
+
+type SelectOptionType = {
+  label: string;
+  value: string;
 }
 
 export type {
   ChapterOverviewPropsType,
+  SelectOptionType,
 }

@@ -7,7 +7,8 @@ import {
   SubBooksActionType,
   SubBookActionType,
   SubBookIdActionType,
-  ChapterActionType
+  ChapterActionType,
+  LanguageActionType
 } from './types';
 import { SubBookInfoType } from '@/pages/BookOverview/types';
 
@@ -15,6 +16,7 @@ export const initialState = {
   bookInfos: [],
   subBookInfos: [],
   chapterInfos: [],
+  language: '',
 };
 
 //////////////////////////////////////////////////////////////////
@@ -86,6 +88,18 @@ const addChapterInfo = (state: BookStateType, action: ChapterActionType) => {
     chapterInfos: [...state.chapterInfos, chapterInfo],
   };
 };
+//////////////////////////////////////////////////////////////////
+////////////////////// Set Current Language //////////////////////
+//////////////////////////////////////////////////////////////////
+const setCurrentLanguage = (state: BookStateType, action: LanguageActionType) => {
+  const {language} = action.payload;
+
+  return {
+    ...state,
+    language: language
+  }
+}
+
 
 //////////////////////////////////////////////////////////////////
 ///////////////////////// Reset book info ////////////////////////
@@ -101,6 +115,8 @@ const actionHandler = {
   [Types.ADD_SUBBOOKINFO]: addSubBookInfo,
   [Types.REMOVE_SUBBOOKINFO]: removeSubBookInfo,
   [Types.ADD_CHAPTERINFO]: addChapterInfo,
+  
+  [Types.SET_CURRENT_LANGUAGE]: setCurrentLanguage,
 
   [Types.RESET_BOOK]: resetBookInfo,
 }
