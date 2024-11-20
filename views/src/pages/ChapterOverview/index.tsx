@@ -5,14 +5,16 @@ import { AppStateType } from "@/reducers/types";
 import useOrientation from "@/hooks/useOrientation";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast, Bounce } from "material-react-toastify";
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
-import { LoadingOverlay, TablePanel } from "@/components/Base";
+import { LoadingOverlay, TablePanel, Text } from "@/components/Base";
 
 import {
   StyledContainer,
   StyledChapterOverviewContainer,
   StyledBookSelectorContainer,
   StyledTableContainer,
+  StyledBackContainer,
 } from "./styles";
 import { ChapterOverviewPropsType } from "./types";
 import Header from "@/components/Header";
@@ -31,6 +33,7 @@ import { BookType, ChapterInfoType, SubBookInfoType, VerseType } from "../BookOv
 
 import bookService from "../../../services/book.services";
 import { TableRowType } from "@/components/Base/TablePanel/types";
+import { StyledSelectContainer } from "../BookOverview/styles";
 
 // Constants
 const BOOK_SELECTORS = [
@@ -154,50 +157,18 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
             />
           </StyledBookSelectorContainer>
 
+          <StyledSelectContainer onClick={() => navigate('/admin/bookoverview')}>
+            <StyledBackContainer>
+              <KeyboardBackspaceIcon />
+              <Text fontFamily="Inter" color="#155D74" fontWeight="500">overview</Text>
+            </StyledBackContainer>
+          </StyledSelectContainer>
+
           <StyledTableContainer>
             <TablePanel
               headers={['SubBook_English', 'Chapter_Number', 'Verse_Number', 'Verse_English']}
               rows={tableRows}
             />
-            {/*   <StyledTable>
-              <StyledTableHead>
-                <StyledTableRow>
-                  <StyledTableCell>
-                    {'Subbook_English'}
-                  </StyledTableCell>
-                  <StyledTableCell>
-                    {'Chapter'}
-                  </StyledTableCell>
-                  <StyledTableCell>
-                    {'Verse_Number'}
-                  </StyledTableCell>
-                  <StyledTableCell>
-                    {'Verse_English'}
-                  </StyledTableCell>
-                </StyledTableRow>
-              </StyledTableHead>
-
-              <StyledTableBody>
-                {
-                  verseInfos.map((verseInfo: VerseType, index: number) => (
-                    <StyledTableRow key={index}>
-                      <StyledTableCell>
-                        {subBookInfo?.subBookTitle.en}
-                      </StyledTableCell>
-                      <StyledTableCell>
-                        {chapterInfo?.chapterNumber}
-                      </StyledTableCell>
-                      <StyledTableCell>
-                        {verseInfo.verseNumber}
-                      </StyledTableCell>
-                      <StyledTableCell>
-                        {verseInfo.verseText.en}
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))
-                }
-              </StyledTableBody>
-            </StyledTable> */}
           </StyledTableContainer>
         </StyledChapterOverviewContainer>
       </StyledContainer>

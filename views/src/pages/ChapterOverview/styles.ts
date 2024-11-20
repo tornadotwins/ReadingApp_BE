@@ -1,11 +1,6 @@
 import {
   Box,
-  styled,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow
+  styled
 } from "@mui/material";
 
 const StyledContainer = styled(Box) ({
@@ -34,45 +29,27 @@ const StyledBookSelectorContainer = styled(Box) ({
 });
 
 const StyledTableContainer = styled(Box) ({
-  display: "flex",
-  justifyContent: 'center',
   margin: '20px 40px',
+  display: 'flex',
+  justifyContent: 'center',
+  boxSizing: 'border-box'
+})
+
+const StyledSelectContainer = styled(Box) ({
+  width: '100%',
+  margin: '20px 40px',
+  display: 'flex',
+  alignItems: 'center',
 });
 
-const StyledTable = styled(Table) ({
-  width: '100%',
-});
+const StyledBackContainer = styled(Box) ({
+  width: '20%',
+  display: 'flex',
+  alignItems: 'center',
 
-const StyledTableBody = styled(TableBody) ({
-  width: '100%',
-
-  '& .MuiTableCell-root': {
-    border: '1px solid gray',
-    padding: '5px'
+  '& .MuiSvgIcon-root' : {
+    fill: '#155D74'
   }
-});
-
-const StyledTableHead = styled(TableHead) ({
-  color: '#000',
-
-  '& .MuiTableRow-root': {
-    backgroundColor: '#ececec'
-  },
-  
-  '& .MuiTableCell-root': {
-    fontWeight: 'bold',
-    border: '1px solid gray',
-    textAlign: 'center',
-    padding: '5px',
-  }
-});
-
-const StyledTableRow = styled(TableRow) ({
-  width: '100%',
-});
-
-const StyledTableCell = styled(TableCell) ({
-  color: '#000'
 })
 
 export {
@@ -80,9 +57,6 @@ export {
   StyledChapterOverviewContainer,
   StyledBookSelectorContainer,
   StyledTableContainer,
-  StyledTable,
-  StyledTableBody,
-  StyledTableHead,
-  StyledTableRow,
-  StyledTableCell,
+  StyledSelectContainer,
+  StyledBackContainer,
 }
