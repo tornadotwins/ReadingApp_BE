@@ -66,6 +66,7 @@ const StyledMenuItem = styled(MuiMenuItem)<{dividelinecolor: string}>(({ selecte
 
 // Custom styles for the Paper component
 const MenuProps = {
+  disableScrollLock: true,
   PaperProps: {
     sx: {
       bgcolor: '#C0C0C0',
