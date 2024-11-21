@@ -36,7 +36,11 @@ const StyledSelectContainer = styled(Box) ({
 
   '& .MuiBox-root': {
     fontFamily: '"Baloo Da 2" !important',
-  }
+  },
+
+  '@media screen and (max-width: 670px)': {
+    width: 'unset'
+  },
 });
 
 const StyledBookSelectorContainer = styled(Box) ({
