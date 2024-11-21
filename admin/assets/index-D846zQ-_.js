@@ -1,1 +1,0 @@
-import{j as e}from"./createTheme-DavofyfB.js";import{K as r,af as a,T as t}from"./App-CY2O0GiX.js";import"./index-BUEI90ZM.js";function o(){return e.jsxs(e.Fragment,{children:[e.jsx(r,{title:"page 3"}),e.jsx(a,{children:e.jsx(t,{variant:"h3",children:"Page 3"})})]})}export{o as default};
