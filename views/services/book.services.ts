@@ -25,7 +25,7 @@ class BookService {
     })
   };
 
-  getVersesByChapterId = (chapterId: string): Promise<ChapterInfoType> => {
+  getChapterInfoByChapterId = (chapterId: string): Promise<ChapterInfoType> => {
     return new Promise((resolve, reject) => {
       const url = API_URL + `/books/${chapterId}/verses`;
       axios

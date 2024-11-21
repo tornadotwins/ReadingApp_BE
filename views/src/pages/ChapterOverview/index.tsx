@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -51,6 +51,7 @@ import {
   SelectOptionType
 } from "./types";
 import { TableRowType } from "@/components/Base/TablePanel/types";
+import { getLanguageFromLanguageCode } from "@/utils";
 
 const BOOK_SELECTORS = [
   { bookTitle: "App Text", value: "App Text" },
@@ -75,16 +76,18 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   };
 
   const [isLoading, setIsLoading] = useState(false);
-  const [bookInfo, setBookInfo] = useState<BookType | null>(null);
-  // const [verseInfos, setVerseInfos] = useState<VerseType[]>([]);
+  const [activeBookInfo, setActiveBookInfo] = useState<BookType | null>(null);
+  const [activeChapterInfo, setActiveChapterInfo] = useState<ChapterInfoType>(locationState.chapterInfo);
+  const [verseInfos, setVerseInfos] = useState<VerseType[]>([]);
+  const [tableHeaders, setTableHeaders] = useState<string[]>([]);
   const [tableRows, setTableRows] = useState<TableRowType[]>([]);
 
   const [subBookSelectOptions, setSubBookSelectOptions] = useState<SelectOptionType[]>([]);
   const [chapterSelectOptions, setChapterSelectOptions] = useState<SelectOptionType[]>([]);
 
   const [selectedBook, setSelectedBook] = useState(locationState.bookTitle);
-  const [selectedSubBook, setSelectedSubBook] = useState<string>(locationState.subBookInfo.subBookTitle.en);
-  const [selectedChapter, setSelectedChapter] = useState(locationState.chapterId);
+  const [selectedSubBook, setSelectedSubBook] = useState<string>(locationState.subBookInfo.subBookId);
+  const [selectedChapter, setSelectedChapter] = useState<string>(locationState.chapterId);
   const [selectedLanguage, setSelectedLanguage] = useState<string>(props.currentLanguage);
 
   const languages = useMemo(() => location.state.languages, [props.currentUser]);
@@ -92,27 +95,21 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const isPortrait = useOrientation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchBookInfo = async () => {
-      setIsLoading(true);
-      try {
-        const existingBookInfo = props.bookInfos.find((book: BookType) => book.bookTitle.en === selectedBook);
-        const bookResult = existingBookInfo || await bookService.getBookInfoByTitle(selectedBook);
-
-        props.dispatch({
-          type: actionTypes.ADD_BOOKINFO,
-          payload: { bookInfo: bookResult }
-        });
-
-        setBookInfo(bookResult);
+  // Fetch book info by book title
+  const fetchBookInfoByTitle = useCallback((bookTitle: string) => {
+    setIsLoading(true);
+    bookService
+      .getBookInfoByTitle(bookTitle)
+      .then((result: BookType) => {
+        setActiveBookInfo(result);
 
         // Deduplicate sub-books
         const uniqueSubBooks = Array.from(
-          new Set(bookResult.subBooks.map(sb => sb.subBookId))
-        ).map(id => bookResult.subBooks.find(sb => sb.subBookId === id)!);
+          new Set(result.subBooks.map(sb => sb.subBookId))
+        ).map(id => result.subBooks.find(sb => sb.subBookId === id)!);
 
         const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
-          label: subBook.subBookTitle.en,
+          label: subBook.subBookTitle?.[selectedLanguage],
           value: subBook.subBookId
         }));
 
@@ -125,8 +122,47 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           setSelectedSubBook(newSubBookOptions[0].value);
         }
 
+        // Set first chapter if no selection exists
+        if (chapterSelectOptions.length > 0 && !selectedChapter)
+          setSelectedChapter(chapterSelectOptions[0].value);
         setIsLoading(false);
-      } catch (error) {
+      })
+      .catch((error) => {
+        toast.error(error instanceof Error ? error.message : String(error), {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      });
+  }, []);
+
+  // Fetch Chapter info by chapterId
+  const fetchChapterInfoByChapterId = useCallback((chapterId: string) => {
+    setIsLoading(true);
+
+    bookService
+      .getChapterInfoByChapterId(chapterId)
+      .then((result) => {
+        setActiveChapterInfo(result);
+        setVerseInfos(result.verses);
+
+        props.dispatch({
+          type: actionTypes.ADD_CHAPTERINFO,
+          payload: {
+            chapterInfo: result
+          }
+        })
+
+        setIsLoading(false);
+      })
+      .catch((error) => {
         toast.error(error instanceof Error ? error.message : String(error), {
           position: 'top-right',
           draggable: true,
@@ -138,90 +174,122 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           autoClose: 3000
         });
         setIsLoading(false);
-      }
-    };
+      })
+  }, []);
 
-    fetchBookInfo();
+  // Set cell data for table
+  const configureTableData = useCallback(() => {
+    const currentSubBook = activeBookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
+    console.log({ activeBookInfo, selectedSubBook });
+    if (selectedLanguage == 'en') {
+      setTableHeaders(['SubBook_English', 'Chapter_Number', 'Verse_Number', 'Verse_English']);
+
+      const rows = verseInfos.map(verseInfo => ({
+        SubBook_English: currentSubBook?.subBookTitle.en || '',
+        Chapter_Number: activeChapterInfo?.chapterNumber.toString() || '1',
+        Verse_Number: verseInfo.verseNumber.toString() || '1',
+        Verse_English: verseInfo.verseText.en || '',
+      }));
+
+      rows ? setTableRows(rows) : setTableRows([]);
+    }
+    else {
+      const language = getLanguageFromLanguageCode(selectedLanguage);
+      setTableHeaders(['SubBook_English', `SubBook_${language}`, 'Chapter_Number', 'Verse_Number', `Verse_${language}`]);
+
+      const rows = verseInfos.map(verseInfo => ({
+        SubBook_English: currentSubBook?.subBookTitle.en || '',
+        [`SubBook_${language}`]: currentSubBook?.subBookTitle?.[selectedLanguage] || currentSubBook?.subBookTitle.en || '',
+        Chapter_Number: activeChapterInfo?.chapterNumber.toString() || '1',
+        Verse_Number: verseInfo.verseNumber.toString() || '1',
+        [`Verse_${language}`]: verseInfo.verseText?.[selectedLanguage] || verseInfo.verseText.en || '',
+      }));
+
+      rows ? setTableRows(rows) : setTableRows([]);
+    }
+  }, []);
+
+  // Book Title Effect
+  useEffect(() => {
+    // Check if the selected book is existing in redux store
+    const existingBook = props.bookInfos.find((bookInfo: BookType) => bookInfo.bookTitle.en == selectedBook);
+    if (existingBook) {
+      setActiveBookInfo(existingBook);
+
+      // Deduplicate sub-books
+      const uniqueSubBooks = Array.from(
+        new Set(existingBook.subBooks.map(sb => sb.subBookId))
+      ).map(id => existingBook.subBooks.find(sb => sb.subBookId === id)!);
+
+      const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
+        label: subBook.subBookTitle?.[selectedLanguage],
+        value: subBook.subBookId
+      }));
+
+      setSubBookSelectOptions(newSubBookOptions);
+
+      setSelectedSubBook(
+        newSubBookOptions.some(newSubBookOption => newSubBookOption.value == selectedSubBook) ?
+          selectedSubBook :
+          newSubBookOptions.length ?
+            newSubBookOptions[0].value :
+            ''
+      );
+
+      // Set first sub-book if no selection exists
+      if (newSubBookOptions.length > 0 && !selectedSubBook) {
+        setSelectedSubBook(newSubBookOptions[0].value);
+      }
+
+      // Set first chapter if no selection exists
+      if (chapterSelectOptions.length > 0 && !selectedChapter)
+        setSelectedChapter(chapterSelectOptions[0].value);
+    } else { // If the book is not existing in redux store, fetch from database
+      fetchBookInfoByTitle(selectedBook);
+    }
+    configureTableData();
   }, [selectedBook]);
 
+  // Sub Book Effect
   useEffect(() => {
-    if (!locationState || !props.bookInfos.length) return;
+    const bookInfo = props.bookInfos.find(bookInfo => bookInfo.subBooks.find(subBook => subBook.subBookId == selectedSubBook));
+    const subBookInfo = bookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
 
-    const { bookTitle, chapterId } = locationState;
-    const bookInfo = props.bookInfos.find((book: BookType) => book.bookTitle.en === bookTitle);
-
-    const subBookInfo = bookInfo?.subBooks.find((subBook: SubBookInfoType) =>
-      subBook.chapterInfos.some((chapterInfo: ChapterInfoType) =>
-        chapterInfo.chapterId === chapterId
-      )
-    );
-
-    if (subBookInfo) {
-      setSelectedSubBook(subBookInfo.subBookId);
-    }
-
-    const chapterInfo = subBookInfo?.chapterInfos.find(
-      (chapter: ChapterInfoType) => chapter.chapterId === chapterId
-    );
-
-    if (chapterInfo) {
-      setSelectedChapter(chapterInfo.chapterId);
-    }
-  }, [locationState, props.bookInfos]);
-
-  useEffect(() => {
-    if (!bookInfo || !selectedSubBook) return;
-
-    setChapterSelectOptions([]);
-    const subBookInfo = bookInfo.subBooks.find(
-      (subBook: SubBookInfoType) => subBook.subBookId === selectedSubBook
-    );
-
-    const chapterInfos = subBookInfo?.chapterInfos || [];
-    const newChapterOptions = chapterInfos.map((chapterInfo: ChapterInfoType) => ({
+    const newChapterOptions = subBookInfo?.chapterInfos?.map(chapterInfo => ({
       value: chapterInfo.chapterId,
       label: chapterInfo.chapterNumber.toString(),
     }));
 
-    setChapterSelectOptions(newChapterOptions);
-  }, [selectedSubBook, bookInfo]);
+    newChapterOptions ? setChapterSelectOptions(newChapterOptions) : setChapterSelectOptions([]);
 
+    configureTableData();
+  }, [selectedSubBook]);
+
+  // Chapter Effect
   useEffect(() => {
-    const fetchVersesInfo = async () => {
-      if (!locationState || !selectedChapter) return;
+    // Check if the chapter is existing in Redux store
+    const existingChapterInfo = props.chapterInfos.find(chapterInfo => chapterInfo.chapterId == selectedChapter);
+    if (existingChapterInfo) {
+      setActiveChapterInfo(existingChapterInfo);
+      setVerseInfos(existingChapterInfo.verses);
+    } else {
+      fetchChapterInfoByChapterId(selectedChapter);
+    }
 
-      setIsLoading(true);
-      setTableRows([]);
+    configureTableData();
+  }, [selectedChapter]);
 
-      try {
-        const chapterInfo: ChapterInfoType = await bookService.getVersesByChapterId(selectedChapter);
-        const newTableRows = chapterInfo.verses.map((verse: VerseType) => ({
-          SubBook_English: location.state.subBookInfo?.subBookTitle?.[selectedLanguage],
-          Chapter_Number: chapterInfo.chapterNumber.toString() || '',
-          Verse_Number: verse.verseNumber.toString() || '',
-          Verse_English: verse.verseText?.[selectedLanguage] || ''
-        }));
+  // Language Effect
+  useEffect(() => {
+    const newLanguageSubBookOptions = activeBookInfo?.subBooks.map(subBook => ({
+      value: subBook.subBookId,
+      label: subBook.subBookTitle?.[selectedLanguage] || subBook.subBookTitle.en
+    }));
 
-        setTableRows(newTableRows);
-        // setVerseInfos(chapterInfo.verses);
-        setIsLoading(false);
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : String(error), {
-          position: 'top-right',
-          draggable: true,
-          theme: 'colored',
-          transition: Bounce,
-          closeOnClick: true,
-          pauseOnHover: true,
-          hideProgressBar: false,
-          autoClose: 3000
-        });
-        setIsLoading(false);
-      }
-    };
+    newLanguageSubBookOptions ? setSubBookSelectOptions(newLanguageSubBookOptions) : [];
 
-    fetchVersesInfo();
-  }, [selectedChapter, selectedLanguage]);
+    configureTableData();
+  }, [selectedLanguage]);
 
   const handleSelectSubBookChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const value = event.target.value as string;
@@ -286,7 +354,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
               <SelectBox
                 label=""
                 options={subBookSelectOptions}
-                value={selectedSubBook}
+                value={subBookSelectOptions.find(option => option.value === selectedSubBook) ? selectedSubBook : ''}
                 backgroundColor="#fff"
                 textColor="#155D74"
                 onChange={handleSelectSubBookChange}
@@ -295,7 +363,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
               <SelectBox
                 label=""
                 options={chapterSelectOptions}
-                value={selectedChapter}
+                value={chapterSelectOptions.find(option => option.value === selectedChapter) ? selectedChapter : ''}
                 backgroundColor="#fff"
                 textColor="#155D74"
                 onChange={handleSelectChapterChange}
@@ -314,7 +382,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
           <StyledTableContainer>
             <TablePanel
-              headers={['SubBook_English', 'Chapter_Number', 'Verse_Number', 'Verse_English']}
+              headers={tableHeaders}
               rows={tableRows}
             />
           </StyledTableContainer>
@@ -334,6 +402,7 @@ function mapStateToProps(state: AppStateType) {
   return {
     currentUser: state.user.currentUser,
     bookInfos: state.book.bookInfos,
+    chapterInfos: state.book.chapterInfos,
     currentLanguage: state.book.language,
   };
 }

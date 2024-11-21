@@ -77,7 +77,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
 
   const [selectedBook, setSelectedBook] = useState(BOOK_QURAN);
   const [currentLanguage, setCurrentLanguage] = useState('');
-  const [currentBookOverviewType, setCurrentBookOverviewType] = useState('Text');
+  const [currentBookOverviewType, setCurrentBookOverviewType] = useState(BOOK_OVERVIEW_TYPES[0].value);
 
   const navigate = useNavigate();
   const isPortrait = useOrientation();
@@ -95,8 +95,17 @@ const BookOverview = (props: BookOverviewPropsType) => {
           acc.push({ value: languageCode, label: role.language });
         }
       }
+
       return acc;
     }, []);
+
+    if (!props.currentLanguage)
+      props.dispatch({
+        type: actionTypes.SET_CURRENT_LANGUAGE,
+        payload: {
+          language: uniqueLanguages[0].value
+        }
+      })
 
     return uniqueLanguages;
   }, [props.currentUser]);

@@ -11,6 +11,7 @@ type ChapterOverviewPropsType = {
   subBookInfo?: SubBookInfoType;
   currentUser: UserType;
   bookInfos: BookType[];
+  chapterInfos: ChapterInfoType[];
   currentLanguage: string;
   dispatch: Dispatch;
 }

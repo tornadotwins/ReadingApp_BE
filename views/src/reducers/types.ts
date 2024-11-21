@@ -1,9 +1,12 @@
 import { BookType, ChapterInfoType, SubBookInfoType } from "@/pages/BookOverview/types";
+import { ChapterType } from "@/pages/Translator/types";
 import { UserType } from "@/pages/types";
 
 type StateType = {
   currentUser: UserType | null;
   bookInfos: BookType[] | [];
+  chapterInfos: ChapterInfoType[] | [];
+  language: string | '';
 }
 
 type BookStateType = {
@@ -74,6 +77,7 @@ type AppStateType = {
   },
   book: {
     bookInfos: BookType[] | [];
+    chapterInfos: ChapterType[] | [];
     language: string,
   }
 }

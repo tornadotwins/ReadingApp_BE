@@ -4,6 +4,7 @@ import { UserType } from "../types"
 type BookOverviewPropsType = {
   currentUser: UserType;
   bookInfos: BookType[];
+  currentLanguage: string;
   dispatch: Dispatch;
 };
 
