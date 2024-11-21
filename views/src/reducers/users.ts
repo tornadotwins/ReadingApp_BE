@@ -2,8 +2,11 @@ import { createReducer } from 'reduxsauce';
 import Types from '../actions/actionTypes';
 import { StateType, UserActionType } from './types';
 
-export const initialState = {
+export const initialState: StateType = {
   currentUser: null,
+  bookInfos: [],
+  chapterInfos: [],
+  language: ''
 };
 
 //////////////////////////////////////////////////////////////////
