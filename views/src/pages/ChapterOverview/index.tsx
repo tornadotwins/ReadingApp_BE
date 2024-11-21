@@ -386,6 +386,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     )
   };
 
+  // const _renderSummary
+
   const _renderTable = () => {
     return (
       <StyledTableContainer>

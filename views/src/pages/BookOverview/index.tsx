@@ -351,7 +351,6 @@ const BookOverview = (props: BookOverviewPropsType) => {
     )
   }
 
-
   const _renderOverview = () => {
     return (
       <>
