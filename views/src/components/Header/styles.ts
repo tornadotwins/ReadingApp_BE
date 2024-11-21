@@ -16,23 +16,62 @@ const StyledHeaderContainer = styled(Box) ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+
+  boxSizing: 'border-box',
+
+  '@media screen and (max-width: 670px)': {
+    justifyContent: 'left',
+    paddingLeft: '50px'
+  },
+
+  '@media screen and (max-width: 380px)': {
+    paddingLeft: '10px'
+  },
 });
 
 const StyledHeaderTitle = styled(Box) ({
   alignContent: 'center',
   display: 'flex',
 
+  '@media screen and (max-width: 520px)': {
+    display: 'block',
+  },
+
   '& .MuiBox-root': {
     cursor: 'pointer',
     transitionDuration: '.25s',
 
+    '@media screen and (max-width: 900px)': {
+      fontSize: '24px !important',
+    },
+
+    '@media screen and (max-width: 670px)': {
+      fontSize: '20px !important',
+    },
+
+    '@media screen and (max-width: 520px)': {
+      lineHeight: '25px !important'
+    },
+
     '&:hover': {
       transform: 'scale(1.2)',
+
+      '@media screen and (max-width: 900px)': {
+        transform: 'scale(1.1)',
+      },
     }
   },
 
   '& :nth-of-type(2)': {
-    marginLeft: '50px'
+    marginLeft: '50px',
+
+    '@media screen and (max-width: 900px)': {
+      marginLeft: '20px'
+    },
+
+    '@media screen and (max-width: 520px)': {
+      marginLeft: '0px'
+    },
   }
 });
 
@@ -58,6 +97,10 @@ const StyledNavbar = styled(Box) ({
       fontWeight: '700 !important',
       lineHeight: '24px !important',
 
+      '@media screen and (max-width: 900px)': {
+        fontSize: '14px !important'
+      },
+
       '&::after': {
         content: '""',
         position: 'absolute',
@@ -71,15 +114,21 @@ const StyledNavbar = styled(Box) ({
         transformOrigin: 'left'
       },
 
-  '&:hover::after': {
-    transform: 'scaleX(1)', // Full width on hover
-  },
+      '&:hover::after': {
+        transform: 'scaleX(1)', // Full width on hover
+      },
     }
   }
 });
 
 const StyledUserName = styled(Box) ({
-  marginRight: '15px'
+  marginRight: '15px',
+
+  '& .MuiBox-root': {
+    '@media screen and (max-width: 900px)': {
+      fontSize: '14px !important'
+    },
+  }
 })
 
 export {
