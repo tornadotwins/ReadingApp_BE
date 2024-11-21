@@ -320,73 +320,103 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     navigate('/admin');
   };
 
+  const _renderHeader = () => {
+    return (
+      <Header
+        isLoggedIn
+        username={props.currentUser.username}
+        isAdmin={props.currentUser.isAdmin}
+        onLogOut={onLogout}
+      />
+    )
+  }
+
+  const _renderBookSelector = () => {
+    return (
+      <StyledBookSelectorContainer>
+        <BookSelector
+          books={BOOK_SELECTORS.map(book => ({
+            bookTitle: book.bookTitle,
+            onClick: () => setSelectedBook(book.value)
+          }))}
+          selectedBook={selectedBook}
+        />
+      </StyledBookSelectorContainer>
+    )
+  };
+
+  const _renderDetailSelector = () => {
+    return (
+      <StyledSelectContainer>
+        <StyledBackContainer onClick={() => navigate('/admin/bookoverview')}>
+          <KeyboardBackspaceIcon />
+          <Text fontFamily="Inter" color="#155D74" fontWeight="500">overview</Text>
+        </StyledBackContainer>
+
+        <StyledSelectGroupContainer>
+          <Text fontFamily="Inter" color="#155D74" fontWeight="500">Go to:</Text>
+          <SelectBox
+            label=""
+            options={subBookSelectOptions}
+            value={subBookSelectOptions.find(option => option.value === selectedSubBook) ? selectedSubBook : ''}
+            backgroundColor="#fff"
+            textColor="#155D74"
+            onChange={handleSelectSubBookChange}
+          />
+
+          <SelectBox
+            label=""
+            options={chapterSelectOptions}
+            value={chapterSelectOptions.find(option => option.value === selectedChapter) ? selectedChapter : ''}
+            backgroundColor="#fff"
+            textColor="#155D74"
+            onChange={handleSelectChapterChange}
+          />
+
+          <SelectBox
+            label=""
+            options={languages}
+            value={selectedLanguage}
+            backgroundColor="#fff"
+            textColor="#155D74"
+            onChange={handleSelectLanguageChange}
+          />
+        </StyledSelectGroupContainer>
+      </StyledSelectContainer>
+    )
+  };
+
+  const _renderTable = () => {
+    return (
+      <StyledTableContainer>
+        <TablePanel
+          headers={tableHeaders}
+          rows={tableRows}
+        />
+      </StyledTableContainer>
+    )
+  }
+
+  const _renderBody = () => {
+    return (
+      <StyledChapterOverviewContainer>
+        <Tools tools={TOOLS} />
+
+        {_renderBookSelector()}
+
+        {_renderDetailSelector()}
+
+        {_renderTable()}
+      </StyledChapterOverviewContainer>
+    )
+  }
+
   return (
     <>
       <StyledContainer flexDirection={isPortrait ? 'column' : 'row'}>
-        <Header
-          isLoggedIn
-          username={props.currentUser.username}
-          isAdmin={props.currentUser.isAdmin}
-          onLogOut={onLogout}
-        />
+        {_renderHeader()}
 
-        <StyledChapterOverviewContainer>
-          <Tools tools={TOOLS} />
-
-          <StyledBookSelectorContainer>
-            <BookSelector
-              books={BOOK_SELECTORS.map(book => ({
-                bookTitle: book.bookTitle,
-                onClick: () => setSelectedBook(book.value)
-              }))}
-              selectedBook={selectedBook}
-            />
-          </StyledBookSelectorContainer>
-
-          <StyledSelectContainer>
-            <StyledBackContainer onClick={() => navigate('/admin/bookoverview')}>
-              <KeyboardBackspaceIcon />
-              <Text fontFamily="Inter" color="#155D74" fontWeight="500">overview</Text>
-            </StyledBackContainer>
-
-            <StyledSelectGroupContainer>
-              <Text fontFamily="Inter" color="#155D74" fontWeight="500">Go to:</Text>
-              <SelectBox
-                label=""
-                options={subBookSelectOptions}
-                value={subBookSelectOptions.find(option => option.value === selectedSubBook) ? selectedSubBook : ''}
-                backgroundColor="#fff"
-                textColor="#155D74"
-                onChange={handleSelectSubBookChange}
-              />
-
-              <SelectBox
-                label=""
-                options={chapterSelectOptions}
-                value={chapterSelectOptions.find(option => option.value === selectedChapter) ? selectedChapter : ''}
-                backgroundColor="#fff"
-                textColor="#155D74"
-                onChange={handleSelectChapterChange}
-              />
-
-              <SelectBox
-                label=""
-                options={languages}
-                value={selectedLanguage}
-                backgroundColor="#fff"
-                textColor="#155D74"
-                onChange={handleSelectLanguageChange}
-              />
-            </StyledSelectGroupContainer>
-          </StyledSelectContainer>
-
-          <StyledTableContainer>
-            <TablePanel
-              headers={tableHeaders}
-              rows={tableRows}
-            />
-          </StyledTableContainer>
-        </StyledChapterOverviewContainer>
+        {_renderBody()}
       </StyledContainer>
 
       {isLoading && <LoadingOverlay />}

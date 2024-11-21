@@ -216,66 +216,78 @@ const BookOverview = (props: BookOverviewPropsType) => {
   const isSpecialBook = selectedBook === BOOK_QURAN || selectedBook === BOOK_ZABUR;
   const languageName = getLanguageFromLanguageCode(currentLanguage);
 
-  return (
-    <>
-      <StyledContainer flexDirection={isPortrait ? 'column' : 'row'}>
-        <Header
-          isLoggedIn={true}
-          username={props.currentUser.username}
-          isAdmin={props.currentUser.isAdmin}
-          onLogOut={onLogout}
+  const _renderHeader = () => {
+    return (
+      <Header
+        isLoggedIn={true}
+        username={props.currentUser.username}
+        isAdmin={props.currentUser.isAdmin}
+        onLogOut={onLogout}
+      />
+    )
+  }
+
+  const _renderBookSelector = () => {
+    return (
+      <StyledBookSelectorContainer>
+        <BookSelector
+          books={BOOK_SELECTORS.map(book => ({
+            bookTitle: book.bookTitle,
+            onClick: () => setSelectedBook(book.value)
+          }))}
+          selectedBook={selectedBook}
+        />
+      </StyledBookSelectorContainer>
+    )
+  };
+
+  const _renderDetailSelector = () => {
+    return (
+      <StyledSelectContainer>
+        <Text color="#155D74" fontWeight="700" fontFamily="'Baloo Da 2'">
+          {`${selectedBook} ${isSpecialBook ? 'overview' : ''}`}
+        </Text>
+
+        <SelectBox
+          label=""
+          options={languages}
+          value={currentLanguage}
+          backgroundColor="#fff"
+          textColor="#155D74"
+          onChange={handleLanguageChange}
         />
 
-        <StyledBookOverviewContainer>
-          <Tools tools={TOOLS} />
+        {!isSpecialBook &&
+          <SelectBox
+            label=""
+            options={BOOK_OVERVIEW_TYPES}
+            value={currentBookOverviewType}
+            backgroundColor="#fff"
+            textColor="#155D74"
+            onChange={handleBookOverviewTypeChange}
+          />
+        }
+      </StyledSelectContainer>
+    )
+  }
 
-          <StyledBookSelectorContainer>
-            <BookSelector
-              books={BOOK_SELECTORS.map(book => ({
-                bookTitle: book.bookTitle,
-                onClick: () => setSelectedBook(book.value)
-              }))}
-              selectedBook={selectedBook}
-            />
-          </StyledBookSelectorContainer>
+  const _renderUploadButtonForInjil = () => {
+    return (
+      <StyledUploadButtonContainer>
+        <Button
+          icon={<CloudUploadIcon />}
+          label={`Import ${currentBookOverviewType} into ${languageName} ${selectedBook}`}
+          onClick={() => { }}
+        />
+      </StyledUploadButtonContainer>
+    )
+  }
 
-          <StyledSelectContainer>
-            <Text color="#155D74" fontWeight="700" fontFamily="'Baloo Da 2'">
-              {`${selectedBook} ${isSpecialBook ? 'overview' : ''}`}
-            </Text>
-
-            <SelectBox
-              label=""
-              options={languages}
-              value={currentLanguage}
-              backgroundColor="#fff"
-              textColor="#155D74"
-              onChange={handleLanguageChange}
-            />
-
-            {!isSpecialBook &&
-              <SelectBox
-                label=""
-                options={BOOK_OVERVIEW_TYPES}
-                value={currentBookOverviewType}
-                backgroundColor="#fff"
-                textColor="#155D74"
-                onChange={handleBookOverviewTypeChange}
-              />
-            }
-          </StyledSelectContainer>
-
-          {!isSpecialBook &&
-            <StyledUploadButtonContainer>
-              <Button
-                icon={<CloudUploadIcon />}
-                label={`Import ${currentBookOverviewType} into ${languageName} ${selectedBook}`}
-                onClick={() => { }}
-              />
-            </StyledUploadButtonContainer>
-          }
-
-          {bookInfo && !isSpecialBook && (
+  const _renderNonSpecialBooks = () => {
+    return (
+      <>
+        {
+          bookInfo && !isSpecialBook && (
             <>
               {currentBookOverviewType === 'Text' && (
                 <BookTextOverview
@@ -306,29 +318,72 @@ const BookOverview = (props: BookOverviewPropsType) => {
                 />
               )}
             </>
-          )}
+          )
+        }
+      </>
+    )
+  };
 
-          {bookInfo && isSpecialBook && (
-            <>
-              <BookTextOverview
-                bookTitle={selectedBook}
-                language={languageName}
-                languageCode={currentLanguage}
-                bookInfo={bookInfo}
-                isQuranOrZabur={true}
+  const _renderSpecialBooks = () => {
+    return (
+      <>
+        {bookInfo && isSpecialBook && (
+          <>
+            <BookTextOverview
+              bookTitle={selectedBook}
+              language={languageName}
+              languageCode={currentLanguage}
+              bookInfo={bookInfo}
+              isQuranOrZabur={true}
 
-                onClickSquare={() => { }}
-              />
-              <BookAudioOverview
-                bookTitle={selectedBook}
-                language={languageName}
-                languageCode={currentLanguage}
-                bookInfo={bookInfo}
-                isQuranOrZabur={true}
-              />
-            </>
-          )}
-        </StyledBookOverviewContainer>
+              onClickSquare={() => { }}
+            />
+            <BookAudioOverview
+              bookTitle={selectedBook}
+              language={languageName}
+              languageCode={currentLanguage}
+              bookInfo={bookInfo}
+              isQuranOrZabur={true}
+            />
+          </>
+        )}
+      </>
+    )
+  }
+
+
+  const _renderOverview = () => {
+    return (
+      <>
+        {_renderNonSpecialBooks()}
+
+        {_renderSpecialBooks()}
+      </>
+    )
+  }
+
+  const _renderBody = () => {
+    return (
+      <StyledBookOverviewContainer>
+        <Tools tools={TOOLS} />
+
+        {_renderBookSelector()}
+
+        {_renderDetailSelector()}
+
+        {!isSpecialBook && _renderUploadButtonForInjil()}
+
+        {_renderOverview()}
+      </StyledBookOverviewContainer>
+    )
+  }
+
+  return (
+    <>
+      <StyledContainer flexDirection={isPortrait ? 'column' : 'row'}>
+        {_renderHeader()}
+
+        {_renderBody()}
       </StyledContainer>
 
       {isLoading && <LoadingOverlay />}
