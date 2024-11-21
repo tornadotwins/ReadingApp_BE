@@ -76,15 +76,15 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [bookInfo, setBookInfo] = useState<BookType | null>(null);
-  const [verseInfos, setVerseInfos] = useState<VerseType[]>([]);
+  // const [verseInfos, setVerseInfos] = useState<VerseType[]>([]);
   const [tableRows, setTableRows] = useState<TableRowType[]>([]);
 
   const [subBookSelectOptions, setSubBookSelectOptions] = useState<SelectOptionType[]>([]);
   const [chapterSelectOptions, setChapterSelectOptions] = useState<SelectOptionType[]>([]);
 
-  const [selectedBook, setSelectedBook] = useState(location.state.bookTitle);
-  const [selectedSubBook, setSelectedSubBook] = useState<string>(location.state.subBookInfo.subBookTitle.en);
-  const [selectedChapter, setSelectedChapter] = useState<string>();
+  const [selectedBook, setSelectedBook] = useState(locationState.bookTitle);
+  const [selectedSubBook, setSelectedSubBook] = useState<string>(locationState.subBookInfo.subBookTitle.en);
+  const [selectedChapter, setSelectedChapter] = useState(locationState.chapterId);
   const [selectedLanguage, setSelectedLanguage] = useState<string>(props.currentLanguage);
 
   const languages = useMemo(() => location.state.languages, [props.currentUser]);
@@ -184,11 +184,6 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     }));
 
     setChapterSelectOptions(newChapterOptions);
-    setSelectedChapter(newChapterOptions.length ? newChapterOptions[0].value : '');
-
-    if (newChapterOptions.length > 0 && !selectedChapter) {
-      setSelectedChapter(newChapterOptions[0].value);
-    }
   }, [selectedSubBook, bookInfo]);
 
   useEffect(() => {
@@ -208,7 +203,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         }));
 
         setTableRows(newTableRows);
-        setVerseInfos(chapterInfo.verses);
+        // setVerseInfos(chapterInfo.verses);
         setIsLoading(false);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : String(error), {
@@ -291,7 +286,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
               <SelectBox
                 label=""
                 options={subBookSelectOptions}
-                value={subBookSelectOptions.find(option => option.value === selectedSubBook) ? selectedSubBook : ''}
+                value={selectedSubBook}
                 backgroundColor="#fff"
                 textColor="#155D74"
                 onChange={handleSelectSubBookChange}
@@ -300,7 +295,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
               <SelectBox
                 label=""
                 options={chapterSelectOptions}
-                value={chapterSelectOptions.find(option => option.value === selectedChapter) ? selectedChapter : ''}
+                value={selectedChapter}
                 backgroundColor="#fff"
                 textColor="#155D74"
                 onChange={handleSelectChapterChange}

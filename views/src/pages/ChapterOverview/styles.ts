@@ -45,9 +45,11 @@ const StyledBackContainer = styled(Box) ({
   display: 'flex',
   alignItems: 'center',
   cursor: 'pointer',
-  marginRight: '100px',
+  marginRight: '250px',
 
   '& .MuiSvgIcon-root' : {
+    width: '16px',
+    marginRight: '10px',
     fill: '#155D74'
   }
 });
