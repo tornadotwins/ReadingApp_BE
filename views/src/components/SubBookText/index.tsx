@@ -1,4 +1,3 @@
-import { TRANSLATION_STATUS_NONE } from "@/config";
 import { Text } from "../Base";
 import ChapterSquare from "../ChapterSquare";
 import {
@@ -27,7 +26,8 @@ function SubBookText(props: SubBookTextPropsType) {
             props.subBook && !!props.subBook.noChapter && props.subBook.chapterInfos[0].chapterNumber == 0 &&
             <ChapterSquare
               chapterInfo={props.subBook.chapterInfos[0]}
-              translationStatus={TRANSLATION_STATUS_NONE}
+              isCompleted={props.subBook.chapterInfos[0].chapterIsCompleted?.[props.languageCode]}
+              isPublished={props.subBook.chapterInfos[0].chapterIsPublished?.[props.languageCode]}
               onClick={props.onChapterClick}
             />
           }
@@ -42,7 +42,8 @@ function SubBookText(props: SubBookTextPropsType) {
                   key={index}
                   subBookInfo={props.subBook}
                   chapterInfo={chapterInfo}
-                  translationStatus={chapterInfo.translationStatus || TRANSLATION_STATUS_NONE}
+                  isCompleted={chapterInfo.chapterIsCompleted?.[props.languageCode]}
+                  isPublished={chapterInfo.chapterIsPublished?.[props.languageCode]}
                   onClick={props.onChapterClick}
                 />
               ))
@@ -58,7 +59,8 @@ function SubBookText(props: SubBookTextPropsType) {
                 <ChapterSquare
                   key={index}
                   subBookInfo={subBook}
-                  translationStatus={subBook.chapterInfos[0].translationStatus || TRANSLATION_STATUS_NONE}
+                  isCompleted={subBook.chapterInfos[0].chapterIsCompleted?.[props.languageCode]}
+                  isPublished={subBook.chapterInfos[0].chapterIsPublished?.[props.languageCode]}
                   onClick={() => { }}
                 />
               ))

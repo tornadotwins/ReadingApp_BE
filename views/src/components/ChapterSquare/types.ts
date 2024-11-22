@@ -3,7 +3,8 @@ import { ChapterInfoType, SubBookInfoType } from "@/pages/BookOverview/types";
 type ChapterSquarePropsType = {
   subBookInfo?: SubBookInfoType;
   chapterInfo?: ChapterInfoType;
-  translationStatus: string;
+  isCompleted?: boolean;
+  isPublished: boolean;
 
   onClick: (chapterId: string) => void;
 }

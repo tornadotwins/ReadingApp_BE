@@ -546,8 +546,8 @@ exports.getSubBookInfomation = async (req, res) => {
           chapterNumber: chapter.chapterNumber,
           chapterAudio: chapter.audio,
           chapterTranslated: chapter.isTranslated,
-          isCompleted: chapter.isCompleted,
-          isPublished: chapter.isPublished,
+          chapterIsCompleted: chapter.isCompleted,
+          chapterIsPublished: chapter.isPublished,
           verses: [],
         };
 
@@ -790,16 +790,32 @@ exports.getBookInfomationByTitle = async (req, res) => {
       .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
- 
+
 /////////////////////////////////////////////////////////////////////////
 /////////////////////// Update Chapter Information //////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.updateChapterInfo = async (req, res) => {
-  const { bookId, subBookId, chapterId, newChapterInfo } = req.body;
+  try {
+    const { chapterId, newChapterInfo } = req.body;
 
-  console.log({ bookId, subBookId, chapterId, newChapterInfo });
+    const chapter = await Chapter.findById(chapterId);
+    const updatedChapter = await Chapter.findByIdAndUpdate(
+      chapterId,
+      newChapterInfo,
+      { new: true, runValidators: true },
+    );
 
-  return res.status(200).json('Ok');
+    if (!updatedChapter)
+      return res
+        .status(400)
+        .json({ message: ERROR_MESSAGES.CHAPTER_NOT_FOUND });
+
+    return res.status(200).json({ chapter });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.NETWORK_ERROR });
+  }
 };
 
 // Check if the book already exists in DB. If it doesn't exist, save it

@@ -45,7 +45,16 @@ type ChapterInfoType = {
   };
   subBookId?: string;
   verses: VerseType[];
-  translationStatus?: string;
+  chapterIsCompleted: {
+    ar: boolean;
+    en: boolean;
+    [key: string]: boolean;
+  };
+  chapterIsPublished: {
+    ar: boolean;
+    en: boolean;
+    [key: string]: boolean;
+  };
 };
 
 type SubBookInfoType = {
