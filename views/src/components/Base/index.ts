@@ -13,6 +13,7 @@ import PageContainer from './PageContainer';
 import PaginationButtons from './PaginationButtons';
 import Radios from './Radio';
 import SelectBox from './Select';
+import Switch from './Switch';
 import UserTablePanel from './UserTablePanel';
 import TablePanel from './TablePanel';
 import Text from './Text';
@@ -35,6 +36,7 @@ export {
   PaginationButtons,
   Radios,
   SelectBox,
+  Switch,
   UserTablePanel,
   TablePanel,
   Text,

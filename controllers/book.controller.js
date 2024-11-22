@@ -117,6 +117,8 @@ exports.getVerses = async (req, res) => {
       chapterId: verses[0].chapter._id,
       chapterNumber: verses[0].chapter.chapterNumber,
       chapterTranslated: verses[0].chapter.isTranslated,
+      chapterIsCompleted: verses[0].chapter.isCompleted,
+      chapterIsPublished: verses[0].chapter.isPublished,
       chapterAudio: verses[0].chapter.audio,
       verses: [],
     };
@@ -497,6 +499,8 @@ exports.getBookInformation = async (req, res) => {
             chapterNumber: chapter.chapterNumber,
             audio: chapter.audio,
             isTranslated: chapter.isTranslated,
+            isCompleted: chapter.isCompleted,
+            isPublished: chapter.isPublished,
           })),
         };
       }),
@@ -542,6 +546,8 @@ exports.getSubBookInfomation = async (req, res) => {
           chapterNumber: chapter.chapterNumber,
           chapterAudio: chapter.audio,
           chapterTranslated: chapter.isTranslated,
+          isCompleted: chapter.isCompleted,
+          isPublished: chapter.isPublished,
           verses: [],
         };
 
@@ -624,6 +630,8 @@ exports.getIntroVerses = async (req, res) => {
       chapterId: introVerses[0].chapter._id,
       chapterNumber: introVerses[0].chapter.chapterNumber,
       chapterTranslated: introVerses[0].chapter.isTranslated,
+      isCompleted: introVerses[0].chapter.isCompleted,
+      isPublished: introVerses[0].chapter.isPublished,
       chapterAudio: introVerses[0].chapter.audio,
       verses: [],
     };
@@ -753,6 +761,8 @@ exports.getBookInfomationByTitle = async (req, res) => {
               chapterNumber: chapter.chapterNumber,
               audio: chapter.audio,
               isTranslated: chapter.isTranslated,
+              isCompleted: chapter.isCompleted,
+              isPublished: chapter.isPublished,
             }))
             .sort((a, b) => a.chapterNumber - b.chapterNumber),
         };
@@ -779,6 +789,17 @@ exports.getBookInfomationByTitle = async (req, res) => {
       .status(500)
       .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
+};
+ 
+/////////////////////////////////////////////////////////////////////////
+/////////////////////// Update Chapter Information //////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.updateChapterInfo = async (req, res) => {
+  const { bookId, subBookId, chapterId, newChapterInfo } = req.body;
+
+  console.log({ bookId, subBookId, chapterId, newChapterInfo });
+
+  return res.status(200).json('Ok');
 };
 
 // Check if the book already exists in DB. If it doesn't exist, save it

@@ -2,17 +2,24 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import { toast, Bounce } from "material-react-toastify";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import DownloadIcon from '@mui/icons-material/Download';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 
 import { AppStateType } from "@/reducers/types";
 import useOrientation from "@/hooks/useOrientation";
 import actionTypes from "@/actions/actionTypes";
-import bookService from "../../../services/book.services";
+import bookService from "@/services/book.services";
 
 import {
+  Button,
   LoadingOverlay,
   SelectBox,
+  Switch,
   TablePanel,
   Text
 } from "@/components/Base";
@@ -24,7 +31,13 @@ import {
   StyledTableContainer,
   StyledBackContainer,
   StyledSelectGroupContainer,
-  StyledSelectContainer
+  StyledSelectContainer,
+  StyledSummaryContainer,
+  StyledSummaryItemContainer,
+  StyledTableInfoContainer,
+  StyledExportButtonContainer,
+  StyledToggleContainer,
+  StyledToggleItemContainer,
 } from "./styles";
 
 import Header from "@/components/Header";
@@ -36,8 +49,9 @@ import {
   BOOK_QURAN,
   BOOK_INJIL,
   BOOK_ZABUR,
-  BOOK_TAWRAT,
+  BOOK_TAWRAT
 } from "@/config";
+import { DOWNLOAD_SUCCESS } from '@/config/messages';
 
 import {
   BookType,
@@ -51,7 +65,7 @@ import {
   SelectOptionType
 } from "./types";
 import { TableRowType } from "@/components/Base/TablePanel/types";
-import { getLanguageFromLanguageCode } from "@/utils";
+import { getLabelFromValueInDropdownOptions, getLanguageFromLanguageCode } from "@/utils";
 
 const BOOK_SELECTORS = [
   { bookTitle: "App Text", value: "App Text" },
@@ -89,6 +103,11 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const [selectedSubBook, setSelectedSubBook] = useState<string>(locationState.subBookInfo.subBookId);
   const [selectedChapter, setSelectedChapter] = useState<string>(locationState.chapterId);
   const [selectedLanguage, setSelectedLanguage] = useState<string>(props.currentLanguage);
+
+  const [isImport, setIsImport] = useState(false);
+
+  const [isComplete, setIsComplete] = useState(false);
+  const [isPublish, setIsPublish] = useState(false);
 
   const languages = useMemo(() => location.state.languages, [props.currentUser]);
 
@@ -207,6 +226,30 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
       rows ? setTableRows(rows) : setTableRows([]);
     }
+  }, []);
+
+  // Export table data to Excel
+  const exportTable2Excel = useCallback(() => {
+    const fileName = `${selectedBook}-${getLabelFromValueInDropdownOptions(selectedSubBook, subBookSelectOptions)}-${getLabelFromValueInDropdownOptions(selectedChapter, chapterSelectOptions)}`;
+
+    const worksheet = XLSX.utils.json_to_sheet(tableRows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+    saveAs(blob, `${fileName}.xlsx`);
+
+    toast.success(DOWNLOAD_SUCCESS, {
+      position: 'top-right',
+      draggable: true,
+      theme: 'colored',
+      transition: Bounce,
+      closeOnClick: true,
+      pauseOnHover: true,
+      hideProgressBar: false,
+      autoClose: 3000
+    });
   }, []);
 
   // Book Title Effect
@@ -386,7 +429,111 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     )
   };
 
-  // const _renderSummary
+  const _renderSummary = () => {
+    return (
+      <StyledSummaryContainer>
+        <StyledSummaryItemContainer>
+          <Text
+            fontFamily="Inter"
+            fontWeight="500"
+            fontSize={16}
+            lineHeight={24}
+            color="#155D74"
+          >
+            Ayas filled:
+          </Text>
+
+          <Text
+            fontFamily="Inter"
+            fontWeight="500"
+            fontSize={16}
+            lineHeight={24}
+            color="#000"
+          >
+            100 of 100
+          </Text>
+        </StyledSummaryItemContainer>
+
+        <StyledSummaryItemContainer>
+          <Switch
+            label="Complete: "
+            value={isComplete}
+            disable={
+              (props.currentUser.isAdmin ||
+                props.currentUser.roles.some(
+                  role => role.language == getLanguageFromLanguageCode(selectedLanguage) &&
+                    (role.role.toLowerCase() == "translator".toLowerCase() || role.role.toLowerCase() == "publisher".toLowerCase())
+                )) ?
+                false :
+                true
+            }
+            onChange={(value: boolean) => setIsComplete(value)}
+          />
+        </StyledSummaryItemContainer>
+
+        <StyledSummaryItemContainer>
+          <Switch
+            label="Publish: "
+            value={isPublish}
+            disable={
+              (props.currentUser.isAdmin ||
+                props.currentUser.roles.some(
+                  role => role.language == getLanguageFromLanguageCode(selectedLanguage) &&
+                    role.role.toLowerCase() == "publisher".toLowerCase()
+                )) ?
+                false :
+                true
+            }
+            onChange={(value: boolean) => setIsPublish(value)}
+          />
+        </StyledSummaryItemContainer>
+      </StyledSummaryContainer>
+    )
+  };
+
+  const _renderToggle = () => {
+    return (
+      <StyledToggleContainer>
+        <StyledToggleItemContainer
+          active={!isImport ? 'true' : 'false'}
+          onClick={() => setIsImport(false)}
+        >
+          <CloudDownloadIcon />
+          <Text fontFamily="'Baloo Da 2'">
+            Database
+          </Text>
+        </StyledToggleItemContainer>
+
+        <StyledToggleItemContainer
+          active={isImport ? 'true' : 'false'}
+          onClick={() => setIsImport(true)}
+        >
+          <CloudUploadIcon />
+          <Text fontFamily="'Baloo Da 2'">
+            Import
+          </Text>
+        </StyledToggleItemContainer>
+      </StyledToggleContainer>
+    )
+  }
+
+  const _renderTableInfo = () => {
+    return (
+      <StyledTableInfoContainer>
+        <Text fontFamily="Inter" color="#155D74" fontWeight="500">
+          {`${selectedBook} - ${getLabelFromValueInDropdownOptions(selectedSubBook, subBookSelectOptions)} ${getLabelFromValueInDropdownOptions(selectedChapter, chapterSelectOptions)}`}
+        </Text>
+
+        <StyledExportButtonContainer>
+          <Button
+            label="Export to Excel"
+            icon={<DownloadIcon />}
+            onClick={exportTable2Excel}
+          />
+        </StyledExportButtonContainer>
+      </StyledTableInfoContainer>
+    )
+  }
 
   const _renderTable = () => {
     return (
@@ -407,6 +554,12 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         {_renderBookSelector()}
 
         {_renderDetailSelector()}
+
+        {_renderSummary()}
+
+        {_renderToggle()}
+
+        {_renderTableInfo()}
 
         {_renderTable()}
       </StyledChapterOverviewContainer>

@@ -13,7 +13,7 @@ import useOrientation from '@/hooks/useOrientation';
 import { StyledLoginContainer, StyledLoginBody } from './styles';
 import LoginBox from '@/components/Login';
 
-import authService from '../../../services/auth.services';
+import authService from '@/services/auth.services';
 import { LoadingOverlay } from '@/components/Base';
 import actionTypes from '@/actions/actionTypes';
 import { UserType } from '../types';

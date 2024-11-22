@@ -1,6 +1,6 @@
 const express = require('express');
 const BookController = require('../controllers/book.controller');
-const {checkToken} = require('../utils');
+const { checkToken } = require('../utils');
 
 const router = express.Router();
 
@@ -17,7 +17,10 @@ router.get('/:userId/:bookId/history', BookController.getHistory);
 router.get('/:userId/histories', BookController.getAllHistory);
 router.post('/history', checkToken, BookController.createHistory);
 router.get('/:bookId/bookInfo', BookController.getBookInformation);
-router.get('/:subBookId/subBookInfo', BookController.getSubBookInfomation);
+router.get(
+  '/:subBookId/subBookInfo',
+  BookController.getSubBookInfomation,
+);
 
 router.post('/createSubBook', BookController.createSubBook);
 router.post('/createChapter', BookController.createChapter);
@@ -27,6 +30,11 @@ router.get('/:chapterId/intro', BookController.getIntroVerses);
 
 router.post('/saveBookByFile', BookController.saveBookByFile);
 
-router.get('/:bookTitle/bookInfoByTitle', BookController.getBookInfomationByTitle)
+router.get(
+  '/:bookTitle/bookInfoByTitle',
+  BookController.getBookInfomationByTitle,
+);
+
+router.put('/chapter', BookController.updateChapterInfo);
 
 module.exports = router;

@@ -47,7 +47,7 @@ import {
   getLanguageFromLanguageCode
 } from "@/utils";
 
-import bookService from '../../../services/book.services';
+import bookService from "@/services/book.services";
 import { AppStateType } from '@/reducers/types';
 
 // Constants

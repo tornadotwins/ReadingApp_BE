@@ -26,7 +26,7 @@ import {
   UserTablePanel
 } from '@/components/Base';
 import { ACCESS_TOKEN } from '@/config';
-import authService from '../../../services/auth.services';
+import authService from '@/services/auth.services';
 import { AdminPortalPropsType } from './types';
 import { RoleType, UserType } from '../types';
 import { AppStateType } from '@/reducers/types';
