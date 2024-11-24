@@ -3,21 +3,31 @@ import Types from '../actions/actionTypes';
 import {
   BookStateType,
   BooksActionType,
-  BookActionType,
+  BookInfoActionType,
   SubBooksActionType,
-  SubBookActionType,
+  SubBookInfoActionType,
   SubBookIdActionType,
   ChapterActionType,
-  LanguageActionType
+  LanguageActionType,
+  BookActionType
 } from './types';
 import { SubBookInfoType } from '@/pages/BookOverview/types';
 
 export const initialState = {
+  book: '',
   bookInfos: [],
   subBookInfos: [],
   chapterInfos: [],
   language: '',
 };
+
+//////////////////////////////////////////////////////////////////
+//////////////////// Set Current Selected Book ///////////////////
+//////////////////////////////////////////////////////////////////
+const setBook = (state: BookStateType, action: BookActionType) => {
+  const {bookTitle} = action.payload;
+  return {...state, book: bookTitle};
+}
 
 //////////////////////////////////////////////////////////////////
 ////////////////////////// Set BookInfos /////////////////////////
@@ -30,7 +40,7 @@ const setBookInfos = (state: BookStateType, action: BooksActionType) => {
 //////////////////////////////////////////////////////////////////
 ////////////////////////// Add BookInfo //////////////////////////
 //////////////////////////////////////////////////////////////////
-const addBookInfo = (state: BookStateType, action: BookActionType) => {
+const addBookInfo = (state: BookStateType, action: BookInfoActionType) => {
   const { bookInfo } = action.payload;
 
   return {
@@ -50,7 +60,7 @@ const setSubBookInfos = (state: BookStateType, action: SubBooksActionType) => {
 //////////////////////////////////////////////////////////////////
 ///////////////////// Add subbook Information ////////////////////
 //////////////////////////////////////////////////////////////////
-const addSubBookInfo = (state: BookStateType, action: SubBookActionType) => {
+const addSubBookInfo = (state: BookStateType, action: SubBookInfoActionType) => {
   const { subBookInfo } = action.payload;
 
   return {
@@ -109,6 +119,7 @@ const resetBookInfo = () => ({
 });
 
 const actionHandler = {
+  [Types.SET_BOOK]: setBook,
   [Types.SET_BOOKINFOS]: setBookInfos,
   [Types.ADD_BOOKINFO]: addBookInfo,
   [Types.SET_SUBBOOKINFO]: setSubBookInfos,

@@ -46,10 +46,7 @@ import BookSelector from "@/components/BookSelector";
 
 import {
   ACCESS_TOKEN,
-  BOOK_QURAN,
-  BOOK_INJIL,
-  BOOK_ZABUR,
-  BOOK_TAWRAT
+  BOOK_SELECTORS,
 } from "@/config";
 import { DOWNLOAD_SUCCESS } from '@/config/messages';
 
@@ -67,14 +64,6 @@ import {
 } from "./types";
 import { TableRowType } from "@/components/Base/TablePanel/types";
 import { getLabelFromValueInDropdownOptions, getLanguageFromLanguageCode } from "@/utils";
-
-const BOOK_SELECTORS = [
-  { bookTitle: "App Text", value: "App Text" },
-  { bookTitle: BOOK_QURAN, value: "Qur'an" },
-  { bookTitle: BOOK_INJIL, value: "Injil" },
-  { bookTitle: BOOK_ZABUR, value: "Zabur" },
-  { bookTitle: BOOK_TAWRAT, value: "Tawrat" },
-];
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -100,7 +89,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const [subBookSelectOptions, setSubBookSelectOptions] = useState<SelectOptionType[]>([]);
   const [chapterSelectOptions, setChapterSelectOptions] = useState<SelectOptionType[]>([]);
 
-  const [selectedBook, setSelectedBook] = useState(locationState.bookTitle);
+  const [selectedBook, setSelectedBook] = useState(props.currentBook);
   const [selectedSubBook, setSelectedSubBook] = useState<string>(locationState.subBookInfo.subBookId);
   const [selectedChapter, setSelectedChapter] = useState<string>(locationState.chapterId);
   const [selectedLanguage, setSelectedLanguage] = useState<string>(props.currentLanguage);
@@ -350,6 +339,17 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     configureTableData();
   }, [selectedLanguage]);
 
+  const handleSelectedBook = (bookTitle: string) => {
+    setSelectedBook(bookTitle);
+
+    props.dispatch({
+      type: actionTypes.SET_BOOK,
+      payload: {
+        bookTitle
+      }
+    })
+  }
+
   const handleSelectSubBookChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const value = event.target.value as string;
     setSelectedSubBook(value);
@@ -525,7 +525,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         <BookSelector
           books={BOOK_SELECTORS.map(book => ({
             bookTitle: book.bookTitle,
-            onClick: () => setSelectedBook(book.value)
+            onClick: () => { handleSelectedBook(book.value) }
           }))}
           selectedBook={selectedBook}
         />
@@ -733,6 +733,7 @@ function mapStateToProps(state: AppStateType) {
     currentUser: state.user.currentUser,
     bookInfos: state.book.bookInfos,
     chapterInfos: state.book.chapterInfos,
+    currentBook: state.book.book,
     currentLanguage: state.book.language,
   };
 }

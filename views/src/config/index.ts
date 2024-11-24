@@ -267,6 +267,14 @@ const LANGUAGE_CODE_TABLE = [
   { language: "Zulu", code: "zu" }
 ];
 
+const BOOK_SELECTORS = [
+  { bookTitle: "App Text", value: "App Text" },
+  { bookTitle: BOOK_QURAN, value: BOOK_QURAN },
+  { bookTitle: BOOK_INJIL, value: BOOK_INJIL },
+  { bookTitle: BOOK_ZABUR, value: BOOK_ZABUR },
+  { bookTitle: BOOK_TAWRAT, value: BOOK_TAWRAT },
+];
+
 export {
   API_URL,
   CURRENT_USER,
@@ -308,4 +316,5 @@ export {
   SOUND_LANGUAGE,
   COLOR,
   LANGUAGE_CODE_TABLE,
+  BOOK_SELECTORS,
 };

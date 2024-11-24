@@ -5,6 +5,7 @@ type BookOverviewPropsType = {
   currentUser: UserType;
   bookInfos: BookType[];
   currentLanguage: string;
+  currentBook: string;
   dispatch: Dispatch;
 };
 

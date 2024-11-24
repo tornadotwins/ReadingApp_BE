@@ -35,10 +35,9 @@ import { LanguageType } from "../types";
 // Config and Utility Imports
 import {
   ACCESS_TOKEN,
-  BOOK_INJIL,
   BOOK_QURAN,
-  BOOK_TAWRAT,
-  BOOK_ZABUR
+  BOOK_ZABUR,
+  BOOK_SELECTORS,
 } from "@/config";
 import actionTypes from "@/actions/actionTypes";
 import useOrientation from "@/hooks/useOrientation";
@@ -51,14 +50,6 @@ import bookService from "@/services/book.services";
 import { AppStateType } from '@/reducers/types';
 
 // Constants
-const BOOK_SELECTORS = [
-  { bookTitle: "App Text", value: "App Text" },
-  { bookTitle: BOOK_QURAN, value: "Qur'an" },
-  { bookTitle: BOOK_INJIL, value: "Injil" },
-  { bookTitle: BOOK_ZABUR, value: "Zabur" },
-  { bookTitle: BOOK_TAWRAT, value: "Tawrat" },
-];
-
 const BOOK_OVERVIEW_TYPES = [
   { value: 'Text', label: 'Text' },
   { value: 'Audio', label: 'Audio' },
@@ -75,7 +66,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
   const [isLoading, setIsLoading] = useState(false);
   const [bookInfo, setBookInfo] = useState<BookType | null>(null);
 
-  const [selectedBook, setSelectedBook] = useState(BOOK_QURAN);
+  const [selectedBook, setSelectedBook] = useState(props.currentBook || BOOK_QURAN);
   const [currentLanguage, setCurrentLanguage] = useState('');
   const [currentBookOverviewType, setCurrentBookOverviewType] = useState(BOOK_OVERVIEW_TYPES[0].value);
 
@@ -179,6 +170,17 @@ const BookOverview = (props: BookOverviewPropsType) => {
     setCurrentBookOverviewType(value);
   };
 
+  const handleSelectedBook = (bookTitle: string) => {
+    setSelectedBook(bookTitle);
+
+    props.dispatch({
+      type: actionTypes.SET_BOOK,
+      payload: {
+        bookTitle
+      }
+    })
+  }
+
   const moveToChapterOverview = (chapterId: string) => {
     const subBookInfo = bookInfo?.subBooks.find(
       (subBook: SubBookInfoType) => subBook.chapterInfos.find(
@@ -189,7 +191,6 @@ const BookOverview = (props: BookOverviewPropsType) => {
 
     const passData = {
       chapterId,
-      bookTitle: selectedBook,
       subBookInfo: subBookInfo,
       chapterInfo: chapterInfo,
       languages: languages
@@ -233,7 +234,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
         <BookSelector
           books={BOOK_SELECTORS.map(book => ({
             bookTitle: book.bookTitle,
-            onClick: () => setSelectedBook(book.value)
+            onClick: () => handleSelectedBook(book.value)
           }))}
           selectedBook={selectedBook}
         />
@@ -399,6 +400,7 @@ function mapStateToProps(state: AppStateType) {
     currentUser: state.user.currentUser,
     bookInfos: state.book.bookInfos,
     currentLanguage: state.book.language,
+    currentBook: state.book.book,
   };
 }
 

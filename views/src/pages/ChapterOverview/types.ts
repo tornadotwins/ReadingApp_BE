@@ -13,6 +13,7 @@ type ChapterOverviewPropsType = {
   bookInfos: BookType[];
   chapterInfos: ChapterInfoType[];
   currentLanguage: string;
+  currentBook: string;
   dispatch: Dispatch;
 }
 

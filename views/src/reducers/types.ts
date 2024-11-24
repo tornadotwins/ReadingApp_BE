@@ -22,6 +22,13 @@ type UserActionType = {
   }
 }
 
+type BookActionType = {
+  type: string,
+  payload: {
+    bookTitle: string,
+  }
+}
+
 type BooksActionType = {
   type: string,
   payload: {
@@ -29,7 +36,7 @@ type BooksActionType = {
   }
 }
 
-type BookActionType = {
+type BookInfoActionType = {
   type: string,
   payload: {
     bookInfo: BookType
@@ -43,7 +50,7 @@ type SubBooksActionType = {
   }
 }
 
-type SubBookActionType = {
+type SubBookInfoActionType = {
   type: string,
   payload: {
     subBookInfo: SubBookInfoType
@@ -85,6 +92,7 @@ type AppStateType = {
   book: {
     bookInfos: BookType[] | [];
     chapterInfos: ChapterType[] | [];
+    book: string;
     language: string,
   }
 }
@@ -93,10 +101,11 @@ export type {
   StateType,
   BookStateType,
   UserActionType,
-  BooksActionType,
   BookActionType,
+  BooksActionType,
+  BookInfoActionType,
   SubBooksActionType,
-  SubBookActionType,
+  SubBookInfoActionType,
   SubBookIdActionType,
   ChapterActionType,
   ChapterUpdateActionType,
