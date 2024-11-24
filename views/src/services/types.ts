@@ -1,4 +1,3 @@
-import { ChapterInfoType } from "@/pages/BookOverview/types";
 import { ParseDataType } from "@/pages/Translator/types";
 
 type UserRequestType = {
@@ -8,21 +7,28 @@ type UserRequestType = {
   isAdmin?: boolean;
 }
 
+type ChapterRequestType = {
+  chapterNumber: number,
+  subBook: string,
+  audio: object,
+  isTranslated: object,
+  isCompleted: object,
+  isPublished: object,
+}
+
 type TranslatorRequestType = {
   bookInfos: ParseDataType[],
   bookTitle: string,
   language: string,
 }
 
-type UpdateChapterInfoType = {
-  bookId: string,
-  subBookId: string,
+type UpdateChapterRequestType = {
   chapterId: string,
-  newChapterInfo: ChapterInfoType,
+  newChapterInfo: ChapterRequestType,
 }
 
 export type {
   UserRequestType,
   TranslatorRequestType,
-  UpdateChapterInfoType,
+  UpdateChapterRequestType,
 }

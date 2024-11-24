@@ -798,10 +798,20 @@ exports.updateChapterInfo = async (req, res) => {
   try {
     const { chapterId, newChapterInfo } = req.body;
 
-    const chapter = await Chapter.findById(chapterId);
+    if (!chapterId || !newChapterInfo) {
+      return res
+        .status(400)
+        .json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+    }
+
+    const newChapterInfoWithUpdatedDate = {
+      ...newChapterInfo,
+      updatedAt: Date.now(),
+    };
+
     const updatedChapter = await Chapter.findByIdAndUpdate(
       chapterId,
-      newChapterInfo,
+      newChapterInfoWithUpdatedDate,
       { new: true, runValidators: true },
     );
 
@@ -810,7 +820,7 @@ exports.updateChapterInfo = async (req, res) => {
         .status(400)
         .json({ message: ERROR_MESSAGES.CHAPTER_NOT_FOUND });
 
-    return res.status(200).json({ chapter });
+    return res.status(200).json(updatedChapter);
   } catch (error) {
     return res
       .status(500)

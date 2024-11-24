@@ -5,7 +5,8 @@ import {
   BookType,
   ChapterInfoType
 } from '@/pages/BookOverview/types';
-import { UpdateChapterInfoType } from './types';
+import { UpdateChapterRequestType } from './types';
+import { ChapterModelType } from '@/pages/ChapterOverview/types';
 
 class BookService {
   // Get Book information by en title
@@ -47,7 +48,7 @@ class BookService {
   }
 
   // Update Chapter Infomation
-  updateChapterInfo = (data: UpdateChapterInfoType): Promise<ChapterInfoType> => {
+  updateChapterInfo = (data: UpdateChapterRequestType): Promise<ChapterModelType> => {
     return new Promise((resolve, reject) => {
       const url = API_URL + '/books/chapter';
 

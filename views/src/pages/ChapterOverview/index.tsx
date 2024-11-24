@@ -61,6 +61,7 @@ import {
 } from "../BookOverview/types";
 
 import {
+  ChapterModelType,
   ChapterOverviewPropsType,
   SelectOptionType
 } from "./types";
@@ -108,6 +109,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   const [isComplete, setIsComplete] = useState(false);
   const [isPublish, setIsPublish] = useState(false);
+  const [totalCountVerse, setTotalCountVerse] = useState(0);
+  const [languageCountVerse, setLanguageCountVerse] = useState(0);
 
   const languages = useMemo(() => location.state.languages, [props.currentUser]);
 
@@ -199,7 +202,6 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   // Set cell data for table
   const configureTableData = useCallback(() => {
     const currentSubBook = activeBookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
-    console.log({ activeBookInfo, selectedSubBook });
     if (selectedLanguage == 'en') {
       setTableHeaders(['SubBook_English', 'Chapter_Number', 'Verse_Number', 'Verse_English']);
 
@@ -251,6 +253,20 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       autoClose: 3000
     });
   }, []);
+
+  // Set the default values when render the page first
+  useEffect(() => {
+    setLanguageCountVerse(0);
+    const isCompleted = activeChapterInfo?.chapterIsCompleted?.[selectedLanguage] || false;
+    const isPublished = activeChapterInfo?.chapterIsPublished?.[selectedLanguage] || false;
+    setTotalCountVerse(activeChapterInfo?.verses?.length || 0);
+    activeChapterInfo.verses?.map(verse =>
+      setLanguageCountVerse((prevLanguageCountVerse) => (verse?.verseText?.[selectedLanguage] ? prevLanguageCountVerse + 1 : prevLanguageCountVerse))
+    );
+
+    setIsComplete(isCompleted);
+    setIsPublish(isPublished);
+  }, [selectedBook, selectedSubBook, selectedChapter, selectedLanguage]);
 
   // Book Title Effect
   useEffect(() => {
@@ -356,6 +372,135 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     })
   };
 
+  const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
+    // Update book info with updated Chapter Information
+    const updatedChapterInfoInChapterType: ChapterInfoType = {
+      chapterId: selectedChapter,
+      chapterNumber: updatedChapterInfo.chapterNumber,
+      chapterTranslated: updatedChapterInfo.isTranslated,
+      chapterAudio: updatedChapterInfo.audio,
+      subBookId: selectedSubBook,
+      verses: activeChapterInfo.verses,
+      chapterIsCompleted: updatedChapterInfo.isCompleted,
+      chapterIsPublished: updatedChapterInfo.isPublished
+    };
+
+    // Find the sub book
+    const currentSubBook = activeBookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
+    const updatedCurrentSubBook = currentSubBook?.chapterInfos.map(
+      chapterInfo =>
+        chapterInfo.chapterId == selectedChapter ?
+          { ...chapterInfo, chapterInfo: updatedChapterInfoInChapterType } :
+          chapterInfo
+    );
+
+    const updatedCurrentBook = {
+      ...activeBookInfo, subBooks: activeBookInfo?.subBooks.map(
+        subBook =>
+          subBook.subBookId == selectedSubBook ?
+            { ...subBook, updatedCurrentSubBook } :
+            subBook
+      )
+    };
+
+    const bookInfos = props.bookInfos;
+    const updatedBookInfos = bookInfos.map(
+      bookInfo =>
+        bookInfo.bookId == updatedCurrentBook.bookId ?
+          { ...bookInfo, updatedCurrentBook } :
+          bookInfo
+    )
+
+    props.dispatch({
+      type: actionTypes.SET_BOOKINFOS,
+      payload: {
+        bookInfos: updatedBookInfos
+      }
+    })
+  }
+
+  // Update chapter in backend with isCompleted
+  const handleTranslateComplete = async (isTranslateCompleted: boolean) => {
+    setIsComplete(isTranslateCompleted);
+    setIsLoading(true);
+
+    const newChapter = {
+      chapterNumber: activeChapterInfo.chapterNumber || 1,
+      subBook: activeChapterInfo.subBookId || '',
+      audio: activeChapterInfo.chapterAudio,
+      isTranslated: activeChapterInfo.chapterTranslated,
+      isCompleted: {
+        ...activeChapterInfo.chapterIsCompleted,
+        [selectedLanguage]: isTranslateCompleted
+      },
+      isPublished: activeChapterInfo.chapterIsPublished
+    };
+
+    bookService
+      .updateChapterInfo({
+        chapterId: selectedChapter,
+        newChapterInfo: newChapter
+      })
+      .then(updatedChapter => {
+        updateReduxBookInfoWithChapter(updatedChapter)
+        setIsLoading(false);
+      })
+      .catch(error => {
+        toast.error(error instanceof Error ? error.message : String(error), {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      });
+  }
+
+  // Update chapter in backend with isPublished
+  const handleTranslatePublish = async (isTranslatePublished: boolean) => {
+    setIsPublish(isTranslatePublished);
+
+    const newChapter = {
+      chapterNumber: activeChapterInfo.chapterNumber || 1,
+      subBook: activeChapterInfo.subBookId || '',
+      audio: activeChapterInfo.chapterAudio,
+      isTranslated: activeChapterInfo.chapterTranslated,
+      isCompleted: activeChapterInfo.chapterIsCompleted,
+      isPublished: {
+        ...activeChapterInfo.chapterIsPublished, [selectedLanguage]: isTranslatePublished
+      }
+    };
+
+    bookService
+      .updateChapterInfo({
+        chapterId: selectedChapter,
+        newChapterInfo: newChapter
+      })
+      .then(updatedChapter => {
+        updateReduxBookInfoWithChapter(updatedChapter)
+        setIsLoading(false);
+      })
+      .catch(error => {
+        toast.error(error instanceof Error ? error.message : String(error), {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      });
+  }
+
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
     props.dispatch({ type: actionTypes.RESET_USER });
@@ -450,7 +595,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
             lineHeight={24}
             color="#000"
           >
-            100 of 100
+            {`${languageCountVerse} of ${totalCountVerse}`}
           </Text>
         </StyledSummaryItemContainer>
 
@@ -467,7 +612,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
                 false :
                 true
             }
-            onChange={(value: boolean) => setIsComplete(value)}
+            onChange={(value: boolean) => handleTranslateComplete(value)}
           />
         </StyledSummaryItemContainer>
 
@@ -484,7 +629,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
                 false :
                 true
             }
-            onChange={(value: boolean) => setIsPublish(value)}
+            onChange={(value: boolean) => handleTranslatePublish(value)}
           />
         </StyledSummaryItemContainer>
       </StyledSummaryContainer>

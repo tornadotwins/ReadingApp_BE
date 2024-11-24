@@ -16,7 +16,7 @@ import { HEADER_TRANSLATOR_PORTAL } from '@/config/messages';
 import { ACCESS_TOKEN } from '@/config';
 import useOrientation from '@/hooks/useOrientation';
 
-import translatorService from '../../../services/translator.services';
+import translatorService from '@/services/translator.services';
 
 import {
   StyledTranslatorContainer,

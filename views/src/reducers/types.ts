@@ -64,6 +64,13 @@ type ChapterActionType = {
   }
 }
 
+type ChapterUpdateActionType = {
+  type: string,
+  payload: {
+    newChapter: object
+  }
+}
+
 type LanguageActionType = {
   type: string,
   payload: {
@@ -92,6 +99,7 @@ export type {
   SubBookActionType,
   SubBookIdActionType,
   ChapterActionType,
+  ChapterUpdateActionType,
   LanguageActionType,
   AppStateType,
 }
