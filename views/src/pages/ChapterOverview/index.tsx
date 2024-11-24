@@ -19,7 +19,6 @@ import {
   Button,
   LoadingOverlay,
   SelectBox,
-  Switch,
   TablePanel,
   Text
 } from "@/components/Base";
@@ -32,8 +31,6 @@ import {
   StyledBackContainer,
   StyledSelectGroupContainer,
   StyledSelectContainer,
-  StyledSummaryContainer,
-  StyledSummaryItemContainer,
   StyledTableInfoContainer,
   StyledExportButtonContainer,
   StyledToggleContainer,
@@ -46,7 +43,9 @@ import BookSelector from "@/components/BookSelector";
 
 import {
   ACCESS_TOKEN,
+  BOOK_QURAN,
   BOOK_SELECTORS,
+  BOOK_ZABUR,
 } from "@/config";
 import { DOWNLOAD_SUCCESS } from '@/config/messages';
 
@@ -64,6 +63,7 @@ import {
 } from "./types";
 import { TableRowType } from "@/components/Base/TablePanel/types";
 import { getLabelFromValueInDropdownOptions, getLanguageFromLanguageCode } from "@/utils";
+import Summary from "@/components/Summary";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -576,63 +576,18 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   const _renderSummary = () => {
     return (
-      <StyledSummaryContainer>
-        <StyledSummaryItemContainer>
-          <Text
-            fontFamily="Inter"
-            fontWeight="500"
-            fontSize={16}
-            lineHeight={24}
-            color="#155D74"
-          >
-            Ayas filled:
-          </Text>
-
-          <Text
-            fontFamily="Inter"
-            fontWeight="500"
-            fontSize={16}
-            lineHeight={24}
-            color="#000"
-          >
-            {`${languageCountVerse} of ${totalCountVerse}`}
-          </Text>
-        </StyledSummaryItemContainer>
-
-        <StyledSummaryItemContainer>
-          <Switch
-            label="Complete: "
-            value={isComplete}
-            disable={
-              (props.currentUser.isAdmin ||
-                props.currentUser.roles.some(
-                  role => role.language == getLanguageFromLanguageCode(selectedLanguage) &&
-                    (role.role.toLowerCase() == "translator".toLowerCase() || role.role.toLowerCase() == "publisher".toLowerCase())
-                )) ?
-                false :
-                true
-            }
-            onChange={(value: boolean) => handleTranslateComplete(value)}
-          />
-        </StyledSummaryItemContainer>
-
-        <StyledSummaryItemContainer>
-          <Switch
-            label="Publish: "
-            value={isPublish}
-            disable={
-              (props.currentUser.isAdmin ||
-                props.currentUser.roles.some(
-                  role => role.language == getLanguageFromLanguageCode(selectedLanguage) &&
-                    role.role.toLowerCase() == "publisher".toLowerCase()
-                )) ?
-                false :
-                true
-            }
-            onChange={(value: boolean) => handleTranslatePublish(value)}
-          />
-        </StyledSummaryItemContainer>
-      </StyledSummaryContainer>
+      <Summary
+        currentUser={props.currentUser}
+        currentBook={props.currentBook}
+        totalCountVerse={totalCountVerse}
+        languageCountVerse={languageCountVerse}
+        isComplete={isComplete}
+        isPublish={isPublish}
+        isSpecialBook={selectedBook == BOOK_QURAN || selectedBook == BOOK_ZABUR}
+        currentLanguage={selectedLanguage}
+        translateComplete={(value: boolean) => handleTranslateComplete(value)}
+        translatePublish={(value: boolean) => handleTranslatePublish(value)}
+      />
     )
   };
 
@@ -660,7 +615,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         </StyledToggleItemContainer>
       </StyledToggleContainer>
     )
-  }
+  };
 
   const _renderTableInfo = () => {
     return (
@@ -678,7 +633,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         </StyledExportButtonContainer>
       </StyledTableInfoContainer>
     )
-  }
+  };
 
   const _renderTable = () => {
     return (
@@ -689,7 +644,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         />
       </StyledTableContainer>
     )
-  }
+  };
 
   const _renderBody = () => {
     return (
@@ -709,7 +664,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         {_renderTable()}
       </StyledChapterOverviewContainer>
     )
-  }
+  };
 
   return (
     <>

@@ -2,7 +2,6 @@ import {Box, styled} from '@mui/material';
 
 const StyledInputContainer = styled(Box) ({
   width: '100%',
-  padding: '12px',
 
   display: 'flex',
   alignItems: 'center',
