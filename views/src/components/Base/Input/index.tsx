@@ -15,7 +15,7 @@ function Input(props: InputType) {
   return (
     <>
       <StyledInputContainer>
-        <Text fontFamily='"Baloo Da 2"' fontWeight="400" fontSize={16} lineHeight={24} textAlign="center">{props.label}</Text>
+        {props.label && <Text fontFamily='"Baloo Da 2"' fontWeight="400" fontSize={16} lineHeight={24} textAlign="center">{props.label}</Text>}
         <TextField
           required={props.required}
           type={props.type}

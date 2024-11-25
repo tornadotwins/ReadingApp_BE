@@ -1,35 +1,58 @@
-import { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 
-import { StyledAccordionPanel } from './styled';
+import { StyledAccordionPanel, StyledLabelContainer } from './styled';
 import Text from '../Text';
-import { SettingsContext } from '@/contexts/SettingsProvider';
-import getColorsByTheme from '@/utils/theme';
 import { AccordionExpandProps } from './types';
+import Input from '../Input';
 
 function AccordionPanel(props: AccordionExpandProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const { theme } = useContext(SettingsContext);
-  const { backgroundColor, topTextColor, altTextColor } = getColorsByTheme(theme);
-
   return (
-    <StyledAccordionPanel iconcolor={topTextColor} isoutarrow={props.outArrow ? 'true' : 'false'} outerarrowcolor={altTextColor}>
-      <Accordion onChange={() => setIsExpanded((prevIsExpanded) => !prevIsExpanded)} style={{ backgroundColor: backgroundColor }}>
+    <StyledAccordionPanel
+      iconcolor="#1B7695"
+      isoutarrow={props.outArrow ? 'true' : 'false'}
+      outerarrowcolor="#1B7695"
+    >
+      <Accordion
+        onChange={() => setIsExpanded((prevIsExpanded) => !prevIsExpanded)}
+        style={{ backgroundColor: 'transparent' }}
+      >
         <AccordionSummary
           expandIcon={
-            props.showArrow == false ?
-              null :
-              isExpanded ?
-                <ArrowDropUpIcon /> :
-                <ArrowRightIcon />
+            props.showArrow === false
+              ? null
+              : isExpanded
+                ? <ArrowDropUpIcon />
+                : <ArrowRightIcon />
           }
         >
-          <Text color={topTextColor} fontWeight='700'>{props.label}</Text>
-        </AccordionSummary>
+          <StyledLabelContainer>
+            <Text color="#1B7695" fontWeight="700" fontFamily='Inter'>
+              {props.label}
+            </Text>
 
+            {
+              props.summaryTitle &&
+              <Input
+                value={props.summaryTitle}
+                label=''
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange && props.onChange(event)}
+                onKeyDown={
+                  (event: React.KeyboardEvent<HTMLInputElement>) => {
+                    event.key == 'Enter' &&
+                      props.onCurrentChapterTitleEnterPressed &&
+                      props.summaryTitle &&
+                      props.onCurrentChapterTitleEnterPressed(props.summaryTitle)
+                  }
+                }
+              />
+            }
+          </StyledLabelContainer>
+        </AccordionSummary>
         <AccordionDetails>{props.detail}</AccordionDetails>
       </Accordion>
     </StyledAccordionPanel>

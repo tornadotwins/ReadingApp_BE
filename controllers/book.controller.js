@@ -117,6 +117,8 @@ exports.getVerses = async (req, res) => {
       chapterId: verses[0].chapter._id,
       chapterNumber: verses[0].chapter.chapterNumber,
       chapterTranslated: verses[0].chapter.isTranslated,
+      chapterIsCompleted: verses[0].chapter.isCompleted,
+      chapterIsPublished: verses[0].chapter.isPublished,
       chapterAudio: verses[0].chapter.audio,
       verses: [],
     };
@@ -497,6 +499,8 @@ exports.getBookInformation = async (req, res) => {
             chapterNumber: chapter.chapterNumber,
             audio: chapter.audio,
             isTranslated: chapter.isTranslated,
+            isCompleted: chapter.isCompleted,
+            isPublished: chapter.isPublished,
           })),
         };
       }),
@@ -542,6 +546,8 @@ exports.getSubBookInfomation = async (req, res) => {
           chapterNumber: chapter.chapterNumber,
           chapterAudio: chapter.audio,
           chapterTranslated: chapter.isTranslated,
+          chapterIsCompleted: chapter.isCompleted,
+          chapterIsPublished: chapter.isPublished,
           verses: [],
         };
 
@@ -624,6 +630,8 @@ exports.getIntroVerses = async (req, res) => {
       chapterId: introVerses[0].chapter._id,
       chapterNumber: introVerses[0].chapter.chapterNumber,
       chapterTranslated: introVerses[0].chapter.isTranslated,
+      isCompleted: introVerses[0].chapter.isCompleted,
+      isPublished: introVerses[0].chapter.isPublished,
       chapterAudio: introVerses[0].chapter.audio,
       verses: [],
     };
@@ -753,6 +761,8 @@ exports.getBookInfomationByTitle = async (req, res) => {
               chapterNumber: chapter.chapterNumber,
               audio: chapter.audio,
               isTranslated: chapter.isTranslated,
+              isCompleted: chapter.isCompleted,
+              isPublished: chapter.isPublished,
             }))
             .sort((a, b) => a.chapterNumber - b.chapterNumber),
         };
@@ -778,6 +788,80 @@ exports.getBookInfomationByTitle = async (req, res) => {
     return res
       .status(500)
       .json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+};
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////// Update Chapter Information //////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.updateChapterInfo = async (req, res) => {
+  try {
+    const { chapterId, newChapterInfo } = req.body;
+
+    if (!chapterId || !newChapterInfo) {
+      return res
+        .status(400)
+        .json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+    }
+
+    const newChapterInfoWithUpdatedDate = {
+      ...newChapterInfo,
+      updatedAt: Date.now(),
+    };
+
+    const updatedChapter = await Chapter.findByIdAndUpdate(
+      chapterId,
+      newChapterInfoWithUpdatedDate,
+      { new: true, runValidators: true },
+    );
+
+    if (!updatedChapter)
+      return res
+        .status(400)
+        .json({ message: ERROR_MESSAGES.CHAPTER_NOT_FOUND });
+
+    return res.status(200).json(updatedChapter);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.NETWORK_ERROR });
+  }
+};
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////// Update SubBook Information //////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.updateSubBookInfo = async (req, res) => {
+  try {
+    const { subBookId, newSubBookInfo } = req.body;
+
+    if (!subBookId || !newSubBookInfo) {
+      return res
+        .status(400)
+        .json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+    }
+
+    const newSubBookInfoWithUpdatedDate = {
+      ...newSubBookInfo,
+      updatedAt: Date.now(),
+    };
+
+    const updatedSubBook = await SubBook.findByIdAndUpdate(
+      subBookId,
+      newSubBookInfoWithUpdatedDate,
+      { new: true, runValidators: true },
+    );
+
+    if (!updatedSubBook)
+      return res
+        .status(400)
+        .json({ message: ERROR_MESSAGES.SUBBOOK_NOT_FOUND });
+
+    return res.status(200).json(updatedSubBook);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.NETWORK_ERROR });
   }
 };
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 import { connect } from "react-redux";
 import { Dispatch } from 'redux';
-import { toast, Bounce } from "material-react-toastify";
+import { toast, Bounce, ToastContainer } from "material-react-toastify";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 // Component Imports
@@ -24,17 +24,20 @@ import {
 } from "./styles";
 
 // Type Imports
-import { BookOverviewPropsType, BookType } from "./types";
+import {
+  BookOverviewPropsType,
+  BookType,
+  ChapterInfoType,
+  SubBookInfoType
+} from "./types";
 import { LanguageType } from "../types";
 
 // Config and Utility Imports
 import {
   ACCESS_TOKEN,
-  BOOK_INFO,
-  BOOK_INJIL,
   BOOK_QURAN,
-  BOOK_TAWRAT,
-  BOOK_ZABUR
+  BOOK_ZABUR,
+  BOOK_SELECTORS,
 } from "@/config";
 import actionTypes from "@/actions/actionTypes";
 import useOrientation from "@/hooks/useOrientation";
@@ -43,18 +46,10 @@ import {
   getLanguageFromLanguageCode
 } from "@/utils";
 
-import bookService from '../../../services/book.services';
+import bookService from "@/services/book.services";
 import { AppStateType } from '@/reducers/types';
 
 // Constants
-const BOOK_SELECTORS = [
-  { bookTitle: "App Text", value: "App Text" },
-  { bookTitle: BOOK_QURAN, value: "Qur'an" },
-  { bookTitle: BOOK_INJIL, value: "Injil" },
-  { bookTitle: BOOK_ZABUR, value: "Zabur" },
-  { bookTitle: BOOK_TAWRAT, value: "Tawrat" },
-];
-
 const BOOK_OVERVIEW_TYPES = [
   { value: 'Text', label: 'Text' },
   { value: 'Audio', label: 'Audio' },
@@ -66,13 +61,14 @@ const TOOLS = [
   { toolName: 'Arabic', onClick: () => { } }
 ];
 
-const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
-  const [selectedBook, setSelectedBook] = useState(BOOK_QURAN);
-  const [currentLanguage, setCurrentLanguage] = useState('');
-  const [currentBookOverviewType, setCurrentBookOverviewType] = useState('Text');
+const BookOverview = (props: BookOverviewPropsType) => {
   const [languages, setLanguages] = useState<LanguageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [bookInfo, setBookInfo] = useState<BookType | null>(null);
+
+  const [selectedBook, setSelectedBook] = useState(props.currentBook || BOOK_QURAN);
+  const [currentLanguage, setCurrentLanguage] = useState('');
+  const [currentBookOverviewType, setCurrentBookOverviewType] = useState(BOOK_OVERVIEW_TYPES[0].value);
 
   const navigate = useNavigate();
   const isPortrait = useOrientation();
@@ -90,8 +86,17 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
           acc.push({ value: languageCode, label: role.language });
         }
       }
+
       return acc;
     }, []);
+
+    if (!props.currentLanguage)
+      props.dispatch({
+        type: actionTypes.SET_CURRENT_LANGUAGE,
+        payload: {
+          language: uniqueLanguages[0].value
+        }
+      })
 
     return uniqueLanguages;
   }, [props.currentUser]);
@@ -111,10 +116,7 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
     const fetchBookInfo = async () => {
       setIsLoading(true);
       try {
-        const strSavedBookInfo = localStorage.getItem(BOOK_INFO);
-        const jsonSavedBookInfo = strSavedBookInfo ? JSON.parse(strSavedBookInfo) : [];
-
-        const existingBookInfo = jsonSavedBookInfo.find((book: BookType) => book.bookTitle.en === selectedBook);
+        const existingBookInfo = props.bookInfos.find((book: BookType) => book.bookTitle.en === selectedBook);
 
         if (existingBookInfo) {
           setBookInfo(existingBookInfo);
@@ -122,9 +124,15 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
           const result = await bookService.getBookInfoByTitle(selectedBook);
           setBookInfo(result);
 
-          const updatedBookInfo = [...jsonSavedBookInfo, result];
-          localStorage.setItem(BOOK_INFO, JSON.stringify(updatedBookInfo));
+          props.dispatch({
+            type: actionTypes.ADD_BOOKINFO,
+            payload: {
+              bookInfo: result
+            }
+          });
         }
+
+        setIsLoading(false);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : String(error), {
           position: 'top-right',
@@ -136,18 +144,25 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
           hideProgressBar: false,
           autoClose: 3000
         });
-      } finally {
+
         setIsLoading(false);
       }
     };
 
     fetchBookInfo();
-  }, [selectedBook]);
+  }, [selectedBook, props.bookInfos]);
 
   // Event Handlers
   const handleLanguageChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const value = event.target.value as string;
     setCurrentLanguage(value);
+
+    props.dispatch({
+      type: actionTypes.SET_CURRENT_LANGUAGE,
+      payload: {
+        language: value,
+      }
+    })
   };
 
   const handleBookOverviewTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -155,14 +170,46 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
     setCurrentBookOverviewType(value);
   };
 
-  const onLogout = () => {
-    localStorage.removeItem(ACCESS_TOKEN);
-    localStorage.removeItem(BOOK_INFO);
+  const handleSelectedBook = (bookTitle: string) => {
+    setSelectedBook(bookTitle);
 
     props.dispatch({
-      type: actionTypes.SET_CURRENT_USER,
-      payload: { user: null },
+      type: actionTypes.SET_BOOK,
+      payload: {
+        bookTitle
+      }
+    })
+  }
+
+  const moveToChapterOverview = (chapterId: string, isImport: boolean = false) => {
+    const subBookInfo = bookInfo?.subBooks.find(
+      (subBook: SubBookInfoType) => subBook?.chapterInfos?.find(
+        (chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId
+      ));
+
+    const chapterInfo = subBookInfo?.chapterInfos.find((chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId);
+
+    const passData = {
+      chapterId,
+      isImport,
+      subBookInfo: subBookInfo,
+      chapterInfo: chapterInfo,
+      languages: languages
+    };
+
+    navigate('/admin/chapteroverview', { state: passData });
+  }
+
+  const onLogout = () => {
+    localStorage.removeItem(ACCESS_TOKEN);
+
+    props.dispatch({
+      type: actionTypes.RESET_USER
     });
+
+    props.dispatch({
+      type: actionTypes.RESET_BOOK
+    })
 
     navigate('/admin');
   };
@@ -171,66 +218,78 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
   const isSpecialBook = selectedBook === BOOK_QURAN || selectedBook === BOOK_ZABUR;
   const languageName = getLanguageFromLanguageCode(currentLanguage);
 
-  return (
-    <>
-      <StyledContainer flexDirection={isPortrait ? 'column' : 'row'}>
-        <Header
-          isLoggedIn={true}
-          username={props.currentUser.username}
-          isAdmin={props.currentUser.isAdmin}
-          onLogOut={onLogout}
+  const _renderHeader = () => {
+    return (
+      <Header
+        isLoggedIn={true}
+        username={props.currentUser.username}
+        isAdmin={props.currentUser.isAdmin}
+        onLogOut={onLogout}
+      />
+    )
+  }
+
+  const _renderBookSelector = () => {
+    return (
+      <StyledBookSelectorContainer>
+        <BookSelector
+          books={BOOK_SELECTORS.map(book => ({
+            bookTitle: book.bookTitle,
+            onClick: () => handleSelectedBook(book.value)
+          }))}
+          selectedBook={selectedBook}
+        />
+      </StyledBookSelectorContainer>
+    )
+  };
+
+  const _renderDetailSelector = () => {
+    return (
+      <StyledSelectContainer>
+        <Text color="#155D74" fontWeight="700" fontFamily="'Baloo Da 2'">
+          {`${selectedBook} ${isSpecialBook ? 'overview' : ''}`}
+        </Text>
+
+        <SelectBox
+          label=""
+          options={languages}
+          value={currentLanguage}
+          backgroundColor="#fff"
+          textColor="#155D74"
+          onChange={handleLanguageChange}
         />
 
-        <StyledBookOverviewContainer>
-          <Tools tools={TOOLS} />
+        {!isSpecialBook &&
+          <SelectBox
+            label=""
+            options={BOOK_OVERVIEW_TYPES}
+            value={currentBookOverviewType}
+            backgroundColor="#fff"
+            textColor="#155D74"
+            onChange={handleBookOverviewTypeChange}
+          />
+        }
+      </StyledSelectContainer>
+    )
+  }
 
-          <StyledBookSelectorContainer>
-            <BookSelector
-              books={BOOK_SELECTORS.map(book => ({
-                bookTitle: book.bookTitle,
-                onClick: () => setSelectedBook(book.value)
-              }))}
-              selectedBook={selectedBook}
-            />
-          </StyledBookSelectorContainer>
+  const _renderUploadButtonForInjil = () => {
+    return (
+      <StyledUploadButtonContainer>
+        <Button
+          icon={<CloudUploadIcon />}
+          label={`Import ${currentBookOverviewType} into ${languageName} ${selectedBook}`}
+          onClick={() => moveToChapterOverview(bookInfo?.subBooks[0].chapterInfos[0].chapterId || '', true)}
+        />
+      </StyledUploadButtonContainer>
+    )
+  }
 
-          <StyledSelectContainer>
-            <Text color="#155D74" fontWeight="700" fontFamily="'Baloo Da 2'">
-              {`${selectedBook} ${isSpecialBook ? 'overview' : ''}`}
-            </Text>
-
-            <SelectBox
-              label=""
-              options={languages}
-              value={currentLanguage}
-              backgroundColor="#fff"
-              textColor="#155D74"
-              onChange={handleLanguageChange}
-            />
-
-            {!isSpecialBook &&
-              <SelectBox
-                label=""
-                options={BOOK_OVERVIEW_TYPES}
-                value={currentBookOverviewType}
-                backgroundColor="#fff"
-                textColor="#155D74"
-                onChange={handleBookOverviewTypeChange}
-              />
-            }
-          </StyledSelectContainer>
-
-          {!isSpecialBook &&
-            <StyledUploadButtonContainer>
-              <Button
-                icon={<CloudUploadIcon />}
-                label={`Import ${currentBookOverviewType} into ${languageName} ${selectedBook}`}
-                onClick={() => { }}
-              />
-            </StyledUploadButtonContainer>
-          }
-
-          {bookInfo && !isSpecialBook && (
+  const _renderNonSpecialBooks = () => {
+    return (
+      <>
+        {
+          bookInfo && !isSpecialBook && (
             <>
               {currentBookOverviewType === 'Text' && (
                 <BookTextOverview
@@ -239,6 +298,8 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
                   languageCode={currentLanguage}
                   bookInfo={bookInfo}
                   isQuranOrZabur={false}
+
+                  onClickSquare={moveToChapterOverview}
                 />
               )}
               {currentBookOverviewType === 'Audio' && (
@@ -259,29 +320,74 @@ const BookOverview: React.FC<BookOverviewPropsType> = (props) => {
                 />
               )}
             </>
-          )}
+          )
+        }
+      </>
+    )
+  };
 
-          {bookInfo && isSpecialBook && (
-            <>
-              <BookTextOverview
-                bookTitle={selectedBook}
-                language={languageName}
-                languageCode={currentLanguage}
-                bookInfo={bookInfo}
-                isQuranOrZabur={true}
-              />
-              <BookAudioOverview
-                bookTitle={selectedBook}
-                language={languageName}
-                languageCode={currentLanguage}
-                bookInfo={bookInfo}
-                isQuranOrZabur={true}
-              />
-            </>
-          )}
-        </StyledBookOverviewContainer>
+  const _renderSpecialBooks = () => {
+    return (
+      <>
+        {bookInfo && isSpecialBook && (
+          <>
+            <BookTextOverview
+              bookTitle={selectedBook}
+              language={languageName}
+              languageCode={currentLanguage}
+              bookInfo={bookInfo}
+              isQuranOrZabur={true}
+
+              onClickSquare={moveToChapterOverview}
+            />
+            <BookAudioOverview
+              bookTitle={selectedBook}
+              language={languageName}
+              languageCode={currentLanguage}
+              bookInfo={bookInfo}
+              isQuranOrZabur={true}
+            />
+          </>
+        )}
+      </>
+    )
+  }
+
+  const _renderOverview = () => {
+    return (
+      <>
+        {_renderNonSpecialBooks()}
+
+        {_renderSpecialBooks()}
+      </>
+    )
+  }
+
+  const _renderBody = () => {
+    return (
+      <StyledBookOverviewContainer>
+        <Tools tools={TOOLS} />
+
+        {_renderBookSelector()}
+
+        {_renderDetailSelector()}
+
+        {!isSpecialBook && _renderUploadButtonForInjil()}
+
+        {_renderOverview()}
+      </StyledBookOverviewContainer>
+    )
+  }
+
+  return (
+    <>
+      <StyledContainer flexDirection={isPortrait ? 'column' : 'row'}>
+        {_renderHeader()}
+
+        {_renderBody()}
       </StyledContainer>
 
+      <ToastContainer />
       {isLoading && <LoadingOverlay />}
     </>
   );
@@ -294,6 +400,9 @@ function mapDispatchToProps(dispatch: Dispatch) {
 function mapStateToProps(state: AppStateType) {
   return {
     currentUser: state.user.currentUser,
+    bookInfos: state.book.bookInfos,
+    currentLanguage: state.book.language,
+    currentBook: state.book.book,
   };
 }
 

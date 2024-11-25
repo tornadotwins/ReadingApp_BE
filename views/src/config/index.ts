@@ -5,6 +5,9 @@ import type { Notifications } from './types';
 // const API_URL = 'http://localhost:5000';
 const API_URL = 'https://readingapp-d5944320053c.herokuapp.com';
 
+const ACCESS_TOKEN = 'accessToken';
+const CURRENT_USER = 'currentUser';
+
 const title = 'React PWA';
 
 const email = 'auther-email@gmail.com';
@@ -55,7 +58,6 @@ const defaultMetaTags = {
 };
 const giphy404 = 'https://giphy.com/embed/xTiN0L7EW5trfOvEk0';
 
-const ACCESS_TOKEN = "token";
 const BOOK_INFO = "bookInfo";
 
 const BOOK_QURAN = 'Qur\'an';
@@ -265,8 +267,17 @@ const LANGUAGE_CODE_TABLE = [
   { language: "Zulu", code: "zu" }
 ];
 
+const BOOK_SELECTORS = [
+  { bookTitle: "App Text", value: "App Text" },
+  { bookTitle: BOOK_QURAN, value: BOOK_QURAN },
+  { bookTitle: BOOK_INJIL, value: BOOK_INJIL },
+  { bookTitle: BOOK_ZABUR, value: BOOK_ZABUR },
+  { bookTitle: BOOK_TAWRAT, value: BOOK_TAWRAT },
+];
+
 export {
   API_URL,
+  CURRENT_USER,
   loader,
   notifications,
   dateFormat,
@@ -305,4 +316,5 @@ export {
   SOUND_LANGUAGE,
   COLOR,
   LANGUAGE_CODE_TABLE,
+  BOOK_SELECTORS,
 };

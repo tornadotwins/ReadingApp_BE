@@ -6,6 +6,8 @@ const ChapterSchema = new Schema({
   subBook: { type: Schema.Types.ObjectId, ref: 'SubBook' },
   audio: { type: Object },
   isTranslated: {type: Object},
+  isCompleted: {type: Object},
+  isPublished: {type: Object},
   createdAt: { type: Number, default: Date.now() },
   updatedAt: { type: Number, default: Date.now() },
 });

@@ -7,6 +7,10 @@ const StyledContainer = styled(Box) <{isquranorzabur: string}> (({isquranorzabur
   paddingRight: isquranorzabur == 'true' ? '120px' : '0px',
   boxSizing: 'border-box',
   maxWidth: '650px',
+
+  '@media screen and (max-width: 670px)': {
+    paddingRight: '0px'
+  },
 }));
 
 const StyledOverviewTitleContainer = styled(Box) ({
