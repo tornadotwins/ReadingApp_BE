@@ -573,6 +573,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   const handleSelectedBook = (bookTitle: string) => {
     setSelectedBook(bookTitle);
+    navigate('/admin/bookoverview')
 
     props.dispatch({
       type: actionTypes.SET_BOOK,
