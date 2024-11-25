@@ -732,9 +732,36 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       });
   };
 
+  // handle changing the chapter name (language)
+  const handleCurrentLanguageChapterNameChange = (value: string) => {
+    if (selectedLanguage == 'en') {
+      setInputEnglishChaptername(value);
+    } else if (selectedLanguage == 'ar') {
+      setInputArabicChapterName(value);
+    }
+    setInputCurrentLanguageChapterName(value);
+  }
+
+  // handle changing the Arabic Chapter name
+  const handleArabicChapterNameChange = (value: string) => {
+    if (selectedLanguage == 'ar') {
+      setInputCurrentLanguageChapterName(value);
+    }
+    setInputArabicChapterName(value);
+  }
+
+  // handle changing the English Chapter name
+  const handleEnglishChapterNameChange = (value: string) => {
+    if (selectedLanguage == 'en') {
+      setInputCurrentLanguageChapterName(value);
+    }
+    setInputEnglishChaptername(value);
+  }
+
   // Update Chapter Summary
   const updateChapterSummary = (currentChapterTitle: string, arabicChapterTitle: string, transliteration: string, englishChapterTitle: string) => {
     console.log(currentChapterTitle, arabicChapterTitle, transliteration, englishChapterTitle);
+
   }
 
   // Handle Toggle (Database/Import)
@@ -946,10 +973,10 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
         translateComplete={(value: boolean) => handleTranslateComplete(value)}
         translatePublish={(value: boolean) => handleTranslatePublish(value)}
-        handleCurrentChapterTitleChange={(value: string) => setInputCurrentLanguageChapterName(value)}
-        handleArabicChapterTitleChange={(value: string) => setInputArabicChapterName(value)}
+        handleCurrentChapterTitleChange={(value: string) => handleCurrentLanguageChapterNameChange(value)}
+        handleArabicChapterTitleChange={(value: string) => handleArabicChapterNameChange(value)}
         handleTransliterationChapterTitleChange={(value: string) => setInputTransliteration(value)}
-        handleEnglishChapterTitleChange={(value: string) => setInputEnglishChaptername(value)}
+        handleEnglishChapterTitleChange={(value: string) => handleEnglishChapterNameChange(value)}
         handleUpdateChapterSummary={updateChapterSummary}
       />
     )
