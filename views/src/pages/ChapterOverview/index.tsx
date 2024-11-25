@@ -300,7 +300,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       hideProgressBar: false,
       autoClose: 3000
     });
-  }, [tableRows]);
+  }, [tableRows, tableHeaders]);
 
   // Book Title Effect
   useEffect(() => {

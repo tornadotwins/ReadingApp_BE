@@ -48,6 +48,10 @@ const StyledSelectContainer = styled(Box) ({
   margin: '20px 40px',
   display: 'flex',
   alignItems: 'center',
+
+  '@media screen and (max-width: 800px)': {
+    display: 'block',
+  },
 });
 
 const StyledBackContainer = styled(Box) ({
@@ -65,6 +69,14 @@ const StyledBackContainer = styled(Box) ({
     width: '16px',
     marginRight: '10px',
     fill: '#155D74'
+  },
+
+  '@media screen and (max-width: 1050px)': {
+    marginRight: '100px',
+  },
+
+  '@media screen and (max-width: 900px)': {
+    marginRight: '30px',
   }
 });
 
@@ -80,6 +92,25 @@ const StyledSelectGroupContainer = styled(Box) ({
 
   '& > .MuiFormControl-root': {
     marginRight: '20px'
+  },
+
+  '@media screen and (max-width: 900px)': {
+    '& >.MuiBox-root': {
+      minWidth: '50px',
+      marginRight: '10px',
+    },
+  },
+
+  '@media screen and (max-width: 650px)': {
+    display: 'block',
+
+    '& > .MuiFormControl-root': {
+      alignItems: 'start',
+
+      '& .MuiInputBase-root': {
+        width: '100%'
+      }
+    },
   }
 });
 
