@@ -376,7 +376,10 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       label: chapterInfo.chapterNumber.toString(),
     }));
 
-    if (newChapterOptions) {
+    if (newChapterOptions && locationState.chapterId) {
+      setSelectedChapter(locationState.chapterId);
+      locationState.chapterId = '';
+    } else if (newChapterOptions) {
       setChapterSelectOptions(newChapterOptions);
       setSelectedChapter(newChapterOptions[0].value);
     }
