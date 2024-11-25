@@ -282,6 +282,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     const fileName = `${selectedBook}-${getLabelFromValueInDropdownOptions(selectedSubBook, subBookSelectOptions)}-${getLabelFromValueInDropdownOptions(selectedChapter, chapterSelectOptions)}`;
 
     const worksheet = XLSX.utils.json_to_sheet(tableRows);
+    console.log(tableRows)
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
@@ -299,7 +300,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       hideProgressBar: false,
       autoClose: 3000
     });
-  }, []);
+  }, [tableRows]);
 
   // Book Title Effect
   useEffect(() => {
