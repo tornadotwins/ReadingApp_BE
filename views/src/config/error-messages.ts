@@ -6,6 +6,7 @@ const ERROR_SUBBOOK_TRANSLITERATION_NOT_REQUIRE = "SubBook_Transliteration field
 const ERROR_EMPTY_FILE = "Please select the file to upload.";
 const ERROR_SPECIAL_BOOK_CHAPTER_NUMBER = 'All chapter numbers should be "1" in Qur\'an and Zabur.';
 const ERROR_ONLY_ONE_SUBBOOK = 'A file must have only 1 sub book.';
+const ERROR_SOMETHING_WRONG_FOR_SUBBOOK = 'Something is wrong while updating sub book.';
 
 export {
   ERROR_INVALID_USERNAME,
@@ -16,4 +17,5 @@ export {
   ERROR_EMPTY_FILE,
   ERROR_SPECIAL_BOOK_CHAPTER_NUMBER,
   ERROR_ONLY_ONE_SUBBOOK,
+  ERROR_SOMETHING_WRONG_FOR_SUBBOOK,
 }

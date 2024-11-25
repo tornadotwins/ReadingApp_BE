@@ -828,6 +828,43 @@ exports.updateChapterInfo = async (req, res) => {
   }
 };
 
+/////////////////////////////////////////////////////////////////////////
+/////////////////////// Update SubBook Information //////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.updateSubBookInfo = async (req, res) => {
+  try {
+    const { subBookId, newSubBookInfo } = req.body;
+
+    if (!subBookId || !newSubBookInfo) {
+      return res
+        .status(400)
+        .json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+    }
+
+    const newSubBookInfoWithUpdatedDate = {
+      ...newSubBookInfo,
+      updatedAt: Date.now(),
+    };
+
+    const updatedSubBook = await SubBook.findByIdAndUpdate(
+      subBookId,
+      newSubBookInfoWithUpdatedDate,
+      { new: true, runValidators: true },
+    );
+
+    if (!updatedSubBook)
+      return res
+        .status(400)
+        .json({ message: ERROR_MESSAGES.SUBBOOK_NOT_FOUND });
+
+    return res.status(200).json(updatedSubBook);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.NETWORK_ERROR });
+  }
+};
+
 // Check if the book already exists in DB. If it doesn't exist, save it
 const getSavedBookId = async (languageCode, title) => {
   try {

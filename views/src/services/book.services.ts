@@ -5,8 +5,8 @@ import {
   BookType,
   ChapterInfoType
 } from '@/pages/BookOverview/types';
-import { UpdateChapterRequestType } from './types';
-import { ChapterModelType } from '@/pages/ChapterOverview/types';
+import { UpdateChapterRequestType, UpdateSubBookRequestType } from './types';
+import { ChapterModelType, SubBookModelType } from '@/pages/ChapterOverview/types';
 
 class BookService {
   // Get Book information by en title
@@ -53,6 +53,26 @@ class BookService {
       const url = API_URL + '/books/chapter';
 
       axios 
+        .put(url, data)
+        .then((response) => {
+          if(response.data) {
+            resolve(response.data);
+          } else {
+            reject(response.data.error);
+          }
+        })
+        .catch((error) => {
+          reject(error);
+        })
+    })
+  }
+
+  // Update SubBook Information
+  updateSubBookInfo = (data: UpdateSubBookRequestType): Promise<SubBookModelType> => {
+    return new Promise((resolve, reject) => {
+      const url = API_URL + '/books/subbook';
+
+      axios
         .put(url, data)
         .then((response) => {
           if(response.data) {

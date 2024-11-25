@@ -187,8 +187,6 @@ const BookOverview = (props: BookOverviewPropsType) => {
         (chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId
       ));
 
-    console.log({ chapterId, subBookInfo });
-
     const chapterInfo = subBookInfo?.chapterInfos.find((chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId);
 
     const passData = {

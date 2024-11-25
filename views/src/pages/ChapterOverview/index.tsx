@@ -60,6 +60,7 @@ import {
   ERROR_EMPTY_FILE,
   ERROR_ONLY_ONE_SUBBOOK,
   ERROR_ONLY_ONE_TRANSLITERATION,
+  ERROR_SOMETHING_WRONG_FOR_SUBBOOK,
   ERROR_SPECIAL_BOOK_CHAPTER_NUMBER,
   ERROR_SUBBOOK_TRANSLITERATION_NOT_REQUIRE,
   ERROR_SUBBOOK_TRANSLITERATION_REQUIRE
@@ -77,6 +78,7 @@ import {
   ChapterOverviewPropsType,
   SelectOptionType,
   ParseDataType,
+  SubBookModelType,
 } from "./types";
 import { TableRowType } from "@/components/Base/TablePanel/types";
 import {
@@ -100,6 +102,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [activeBookInfo, setActiveBookInfo] = useState<BookType | null>(null);
+  const [activeSubBook, setActiveSubBook] = useState<SubBookInfoType | null>(null);
   const [activeChapterInfo, setActiveChapterInfo] = useState<ChapterInfoType>(locationState.chapterInfo);
   const [verseInfos, setVerseInfos] = useState<VerseType[]>([]);
   const [file, setFile] = useState<File | null>(null);
@@ -374,6 +377,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   useEffect(() => {
     const bookInfo = props.bookInfos.find(bookInfo => bookInfo.subBooks.find(subBook => subBook.subBookId == selectedSubBook));
     const subBookInfo = bookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
+
+    subBookInfo && setActiveSubBook(subBookInfo);
 
     setInputCurrentLanguageChapterName(subBookInfo?.subBookTitle?.[selectedLanguage] || '');
     setInputArabicChapterName(subBookInfo?.subBookTitle?.ar || '');
@@ -650,6 +655,41 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     })
   };
 
+  const updateReduxBookInfoWithSubBook = (updatedSubBookInfo: SubBookModelType) => {
+    // Update book info with updated Chapter Information
+    const updatedSubBookInfoInSubBookType: SubBookInfoType = {
+      chapterInfos: activeSubBook?.chapterInfos || [],
+      subBookId: activeSubBook?.subBookId || '',
+      subBookNumber: activeSubBook?.subBookNumber || 1,
+      subBookTitle: updatedSubBookInfo.title,
+      noChapter: true,
+    }
+
+    const updatedCurrentBook = {
+      ...activeBookInfo, subBooks: activeBookInfo?.subBooks.map(
+        subBook =>
+          subBook.subBookId == selectedSubBook ?
+            { ...subBook, updatedSubBookInfoInSubBookType } :
+            subBook
+      )
+    };
+
+    const bookInfos = props.bookInfos;
+    const updatedBookInfos = bookInfos.map(
+      bookInfo =>
+        bookInfo.bookId == updatedCurrentBook.bookId ?
+          { ...bookInfo, updatedCurrentBook } :
+          bookInfo
+    )
+
+    props.dispatch({
+      type: actionTypes.SET_BOOKINFOS,
+      payload: {
+        bookInfos: updatedBookInfos
+      }
+    })
+  }
+
   // Update chapter with isCompleted
   const handleTranslateComplete = async (isTranslateCompleted: boolean) => {
     setIsComplete(isTranslateCompleted);
@@ -760,8 +800,59 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   // Update Chapter Summary
   const updateChapterSummary = (currentChapterTitle: string, arabicChapterTitle: string, transliteration: string, englishChapterTitle: string) => {
-    console.log(currentChapterTitle, arabicChapterTitle, transliteration, englishChapterTitle);
+    const subBookTitle = {
+      [`${selectedLanguage}`]: currentChapterTitle,
+      'ar': arabicChapterTitle,
+      'transliteration': transliteration,
+      'en': englishChapterTitle,
+    }
 
+    const updatedSubBookInfo = { ...activeSubBook, subBookTitle };
+
+    const updatedSubBookInfoWithSubBookModelType: SubBookModelType = {
+      title: updatedSubBookInfo.subBookTitle,
+      number: updatedSubBookInfo.subBookNumber || 1,
+      book: activeBookInfo?.bookId || '',
+      noChapter: true
+    };
+
+    if (activeSubBook?.subBookId) {
+      setIsLoading(true);
+      bookService
+        .updateSubBookInfo({ subBookId: activeSubBook?.subBookId, newSubBookInfo: updatedSubBookInfoWithSubBookModelType })
+        .then(result => {
+          updateReduxBookInfoWithSubBook(result);
+
+          setIsLoading(false);
+        })
+        .catch(error => {
+          toast.error(error instanceof Error ? error.message : String(error), {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
+          });
+
+          setIsLoading(false);
+        })
+    } else {
+      toast.error(ERROR_SOMETHING_WRONG_FOR_SUBBOOK, {
+        position: 'top-right',
+        draggable: true,
+        theme: 'colored',
+        transition: Bounce,
+        closeOnClick: true,
+        pauseOnHover: true,
+        hideProgressBar: false,
+        autoClose: 3000
+      });
+    }
+
+    // bookService.updateSubBookInfo({subBookId: activeSubBook?.subBookId })
   }
 
   // Handle Toggle (Database/Import)

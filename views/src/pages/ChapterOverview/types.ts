@@ -43,6 +43,17 @@ type ChapterModelType = {
   };
 }
 
+type SubBookModelType = {
+  number: number,
+  title: {
+    ar: string;
+    en: string;
+    [key: string]: string;
+  },
+  book: string,
+  noChapter: boolean
+}
+
 type SelectOptionType = {
   label: string;
   value: string;
@@ -55,6 +66,7 @@ type ParseDataType = {
 export type {
   ChapterOverviewPropsType,
   ChapterModelType,
+  SubBookModelType,
   SelectOptionType,
   ParseDataType,
 }
