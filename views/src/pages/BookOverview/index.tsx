@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 import { connect } from "react-redux";
 import { Dispatch } from 'redux';
-import { toast, Bounce } from "material-react-toastify";
+import { toast, Bounce, ToastContainer } from "material-react-toastify";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 // Component Imports
@@ -187,6 +187,8 @@ const BookOverview = (props: BookOverviewPropsType) => {
         (chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId
       ));
 
+    console.log({ chapterId, subBookInfo });
+
     const chapterInfo = subBookInfo?.chapterInfos.find((chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId);
 
     const passData = {
@@ -337,7 +339,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
               bookInfo={bookInfo}
               isQuranOrZabur={true}
 
-              onClickSquare={() => { }}
+              onClickSquare={moveToChapterOverview}
             />
             <BookAudioOverview
               bookTitle={selectedBook}
@@ -386,6 +388,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
         {_renderBody()}
       </StyledContainer>
 
+      <ToastContainer />
       {isLoading && <LoadingOverlay />}
     </>
   );

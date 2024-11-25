@@ -1,6 +1,6 @@
 import { StyledContainer, StyledSummaryItemContainer } from "./styles";
 import { SummaryPropsType } from "./types";
-import { Text, Switch, AccordionPanel } from "../Base";
+import { Text, Switch, AccordionPanel, Input } from "../Base";
 import { getLanguageFromLanguageCode } from "@/utils";
 
 function Summary(props: SummaryPropsType) {
@@ -10,6 +10,11 @@ function Summary(props: SummaryPropsType) {
         <StyledContainer>
           <AccordionPanel
             label={`Chapter name (${getLanguageFromLanguageCode(props.currentLanguage)}): `}
+            summaryTitle={props.currentChapterTitle}
+            onChange={
+              (e: React.ChangeEvent<HTMLInputElement>) =>
+                props.handleCurrentChapterTitleChange && props.handleCurrentChapterTitleChange(e.target.value)
+            }
             detail={
               <>
                 <StyledSummaryItemContainer>
@@ -23,15 +28,25 @@ function Summary(props: SummaryPropsType) {
                     Arabic:
                   </Text>
 
-                  <Text
-                    fontFamily="Inter"
-                    fontWeight="500"
-                    fontSize={16}
-                    lineHeight={24}
-                    color="#969696"
-                  >
-                    Arabic Title
-                  </Text>
+                  {
+                    props.currentUser.isAdmin ?
+                      <Input
+                        value={props.arabicChapterTitle}
+                        onChange={
+                          (event: React.ChangeEvent<HTMLInputElement>) =>
+                            props.handleArabicChapterTitleChange && props.handleArabicChapterTitleChange(event.target.value)
+                        }
+                      /> :
+                      <Text
+                        fontFamily="Inter"
+                        fontWeight="500"
+                        fontSize={16}
+                        lineHeight={24}
+                        color="#969696"
+                      >
+                        {props.arabicChapterTitle}
+                      </Text>
+                  }
                 </StyledSummaryItemContainer>
 
                 <StyledSummaryItemContainer>
@@ -45,15 +60,25 @@ function Summary(props: SummaryPropsType) {
                     Transliteration:
                   </Text>
 
-                  <Text
-                    fontFamily="Inter"
-                    fontWeight="500"
-                    fontSize={16}
-                    lineHeight={24}
-                    color="#969696"
-                  >
-                    An-Nisa
-                  </Text>
+                  {
+                    props.currentUser.isAdmin ?
+                      <Input
+                        value={props.transliteration}
+                        onChange={
+                          (event: React.ChangeEvent<HTMLInputElement>) =>
+                            props.handleTransliterationChapterTitleChange && props.handleTransliterationChapterTitleChange(event.target.value)
+                        }
+                      /> :
+                      <Text
+                        fontFamily="Inter"
+                        fontWeight="500"
+                        fontSize={16}
+                        lineHeight={24}
+                        color="#969696"
+                      >
+                        {props.transliteration}
+                      </Text>
+                  }
                 </StyledSummaryItemContainer>
 
                 <StyledSummaryItemContainer>
@@ -67,15 +92,25 @@ function Summary(props: SummaryPropsType) {
                     English:
                   </Text>
 
-                  <Text
-                    fontFamily="Inter"
-                    fontWeight="500"
-                    fontSize={16}
-                    lineHeight={24}
-                    color="#969696"
-                  >
-                    The Woman
-                  </Text>
+                  {
+                    props.currentUser.isAdmin ?
+                      <Input
+                        value={props.englishChapterTitle}
+                        onChange={
+                          (event: React.ChangeEvent<HTMLInputElement>) =>
+                            props.handleEnglishChapterTitleChange && props.handleEnglishChapterTitleChange(event.target.value)
+                        }
+                      /> :
+                      <Text
+                        fontFamily="Inter"
+                        fontWeight="500"
+                        fontSize={16}
+                        lineHeight={24}
+                        color="#969696"
+                      >
+                        {props.englishChapterTitle}
+                      </Text>
+                  }
                 </StyledSummaryItemContainer>
 
                 <StyledSummaryItemContainer>

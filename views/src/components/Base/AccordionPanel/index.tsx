@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
@@ -35,7 +35,14 @@ function AccordionPanel(props: AccordionExpandProps) {
               {props.label}
             </Text>
 
-            <Input value={props.value} label='' onChange={() => { }} />
+            {
+              props.summaryTitle &&
+              <Input
+                value={props.summaryTitle}
+                label=''
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange && props.onChange(event)}
+              />
+            }
           </StyledLabelContainer>
         </AccordionSummary>
         <AccordionDetails>{props.detail}</AccordionDetails>

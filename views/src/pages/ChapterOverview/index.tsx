@@ -5,7 +5,7 @@ import { Dispatch } from "redux";
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import { saveAs } from 'file-saver';
-import { toast, Bounce } from "material-react-toastify";
+import { toast, Bounce, ToastContainer } from "material-react-toastify";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import DownloadIcon from '@mui/icons-material/Download';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -125,6 +125,11 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const [isPublish, setIsPublish] = useState(false);
   const [totalCountVerse, setTotalCountVerse] = useState(0);
   const [languageCountVerse, setLanguageCountVerse] = useState(0);
+
+  const [inputCurrentLanguageChapterName, setInputCurrentLanguageChapterName] = useState('');
+  const [inputArabicChapterName, setInputArabicChapterName] = useState('');
+  const [inputTransliteration, setInputTransliteration] = useState('');
+  const [inputEnglishChaptername, setInputEnglishChaptername] = useState('');
 
   const languages = useMemo(() => location.state.languages, [props.currentUser]);
 
@@ -267,7 +272,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
     setTableHeaders(newHeaders || []);
     setTableRows(newRows || []);
-  }, [activeBookInfo, activeChapterInfo, verseInfos, selectedSubBook, selectedLanguage]);
+  }, [activeBookInfo, activeChapterInfo, verseInfos, selectedSubBook, selectedLanguage, isImport]);
 
   // Export table data to Excel
   const exportTable2Excel = useCallback(() => {
@@ -370,6 +375,11 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     const bookInfo = props.bookInfos.find(bookInfo => bookInfo.subBooks.find(subBook => subBook.subBookId == selectedSubBook));
     const subBookInfo = bookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
 
+    setInputCurrentLanguageChapterName(subBookInfo?.subBookTitle?.[selectedLanguage] || '');
+    setInputArabicChapterName(subBookInfo?.subBookTitle?.ar || '');
+    setInputEnglishChaptername(subBookInfo?.subBookTitle?.en || "");
+    setInputTransliteration(subBookInfo?.subBookTitle?.transliteration || '');
+
     const newChapterOptions = subBookInfo?.chapterInfos?.map(chapterInfo => ({
       value: chapterInfo.chapterId,
       label: chapterInfo.chapterNumber.toString(),
@@ -403,6 +413,11 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   useEffect(() => {
     configureTableData();
   }, [verseInfos, activeChapterInfo, selectedLanguage]);
+
+  useEffect(() => {
+    if (!isImport)
+      configureTableData()
+  }, [isImport]);
 
   useEffect(() => {
     const file = fileInput?.target.files && fileInput?.target.files[0];
@@ -717,6 +732,11 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       });
   };
 
+  // Update Chapter Summary
+  const updateChapterSummary = () => {
+    console.log('update chapter summary');
+  }
+
   // Handle Toggle (Database/Import)
   const handleToggle = (value: boolean) => {
     setIsImport(value);
@@ -919,8 +939,18 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         isPublish={isPublish}
         isSpecialBook={selectedBook == BOOK_QURAN || selectedBook == BOOK_ZABUR}
         currentLanguage={selectedLanguage}
+        arabicChapterTitle={inputArabicChapterName}
+        englishChapterTitle={inputEnglishChaptername}
+        transliteration={inputTransliteration}
+        currentChapterTitle={inputCurrentLanguageChapterName}
+
         translateComplete={(value: boolean) => handleTranslateComplete(value)}
         translatePublish={(value: boolean) => handleTranslatePublish(value)}
+        handleCurrentChapterTitleChange={(value: string) => setInputCurrentLanguageChapterName(value)}
+        handleArabicChapterTitleChange={(value: string) => setInputArabicChapterName(value)}
+        handleTransliterationChapterTitleChange={(value: string) => setInputTransliteration(value)}
+        handleEnglishChapterTitleChange={(value: string) => setInputEnglishChaptername(value)}
+        handleUpdateChapterSummary={() => updateChapterSummary()}
       />
     )
   };
@@ -1046,6 +1076,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         {_renderBody()}
       </StyledContainer>
 
+      <ToastContainer />
       {isLoading && <LoadingOverlay />}
     </>
   )
