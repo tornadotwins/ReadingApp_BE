@@ -96,6 +96,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const locationState = location.state as {
     bookTitle: string,
     chapterId: string,
+    isImport: boolean,
     subBookInfo: SubBookInfoType,
     chapterInfo: ChapterInfoType
   };
@@ -122,7 +123,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const [selectedChapter, setSelectedChapter] = useState<string>(locationState.chapterId);
   const [selectedLanguage, setSelectedLanguage] = useState<string>(props.currentLanguage);
 
-  const [isImport, setIsImport] = useState(false);
+  const [isImport, setIsImport] = useState(locationState.isImport);
 
   const [isComplete, setIsComplete] = useState(false);
   const [isPublish, setIsPublish] = useState(false);

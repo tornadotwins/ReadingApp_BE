@@ -181,7 +181,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
     })
   }
 
-  const moveToChapterOverview = (chapterId: string) => {
+  const moveToChapterOverview = (chapterId: string, isImport: boolean = false) => {
     const subBookInfo = bookInfo?.subBooks.find(
       (subBook: SubBookInfoType) => subBook?.chapterInfos?.find(
         (chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId
@@ -191,6 +191,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
 
     const passData = {
       chapterId,
+      isImport,
       subBookInfo: subBookInfo,
       chapterInfo: chapterInfo,
       languages: languages
@@ -278,7 +279,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
         <Button
           icon={<CloudUploadIcon />}
           label={`Import ${currentBookOverviewType} into ${languageName} ${selectedBook}`}
-          onClick={() => moveToChapterOverview}
+          onClick={() => moveToChapterOverview(bookInfo?.subBooks[0].chapterInfos[0].chapterId || '', true)}
         />
       </StyledUploadButtonContainer>
     )

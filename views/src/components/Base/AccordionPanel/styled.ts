@@ -57,6 +57,10 @@ const StyledLabelContainer= styled(Box) ({
 
   '& .MuiFormControl-root': {
     border: '1px solid #155D74',
+  },
+
+  '@media screen and (max-width: 510px)': {
+    display: 'block',
   }
 })
 
