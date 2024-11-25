@@ -106,8 +106,9 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const [fileInput, setFileInput] = useState<ChangeEvent<HTMLInputElement>>();
   const [tableHeaders, setTableHeaders] = useState<string[]>([]);
   const [tableRows, setTableRows] = useState<TableRowType[]>([]);
+  const [importTableHeaders, setImportTableHeaders] = useState<string[]>([]);
   const [parsedData, setParsedData] = useState<ParseDataType[]>([]);
-  const [necessaryParseData, setNecessaryParsedData] = useState<ParseDataType[]>([]);
+  const [necessaryParsedData, setNecessaryParsedData] = useState<ParseDataType[]>([]);
   const [error, setError] = useState('');
 
   const [subBookSelectOptions, setSubBookSelectOptions] = useState<SelectOptionType[]>([]);
@@ -406,48 +407,54 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   useEffect(() => {
     const file = fileInput?.target.files && fileInput?.target.files[0];
     file && setFile(file);
-  }, [fileInput]);
+  }, [fileInput, isImport]);
 
   //  Effect hook to extract table header and data when parsed data is changed (new file is selcted)
   useEffect(() => {
-    setNecessaryParsedData([]);
-    const firstData = parsedData[0];
+    if (isImport) {
+      setNecessaryParsedData([]);
+      const firstData = parsedData[0];
 
-    const languageLabel = languages.find((languageItem: SelectOptionType) => languageItem.value == selectedLanguage)?.label;
+      const languageLabel = languages.find((languageItem: SelectOptionType) => languageItem.value == selectedLanguage)?.label;
 
-    if (languageLabel != 'English')
-      setTableHeaders(prevHeaders => [...prevHeaders, 'SubBook_English']);
-    firstData && Object.keys(firstData).forEach((key) => {
-      if (key == 'SubBook_Transliteration')
-        setTableHeaders(prevHeaders => [...prevHeaders, key]);
-      if (languageLabel && key.includes(languageLabel))
-        setTableHeaders(prevHeaders => [...prevHeaders, key]);
-    });
-
-    setTableHeaders(prevHeaders => [...prevHeaders, 'Chapter_Number', 'Verse_Number']);
-
-    // Set the necessary parsed data according to the selected language
-    parsedData.forEach((data: ParseDataType) => {
-      const necessaryData: ParseDataType = {};
-      necessaryData['SubBook_English'] = data['SubBook_English'];
-      Object.keys(data).forEach((key) => {
-        // If key contains selected language, it is necessary field to save in DB
-        if (key.includes(languageLabel as string))
-          necessaryData[key] = data[key];
-
-        // If key is "SubBook_Transliteration" and the language is English, it is necessary field to save in DB
-        if (key == 'SubBook_Transliteration' && languageLabel == 'English')
-          necessaryData[key] = data[key];
+      if (languageLabel != 'English')
+        setImportTableHeaders(prevHeaders => [...prevHeaders, 'SubBook_English']);
+      firstData && Object.keys(firstData).forEach((key) => {
+        if (key == 'SubBook_Transliteration')
+          setImportTableHeaders(prevHeaders => [...prevHeaders, key]);
+        if (languageLabel && key.includes(languageLabel))
+          setImportTableHeaders(prevHeaders => [...prevHeaders, key]);
       });
-      necessaryData['Chapter_Number'] = data['Chapter_Number'];
-      necessaryData['Verse_Number'] = data['Verse_Number'];
 
-      setNecessaryParsedData(prevNecessaryParsedData => [
-        ...prevNecessaryParsedData,
-        necessaryData
-      ]);
-    });
-  }, [parsedData, selectedLanguage]);
+      setImportTableHeaders(prevHeaders => [...prevHeaders, 'Chapter_Number', 'Verse_Number']);
+
+      // Set the necessary parsed data according to the selected language
+      parsedData.forEach((data: ParseDataType) => {
+        const necessaryData: ParseDataType = {};
+        necessaryData['SubBook_English'] = data['SubBook_English'];
+        Object.keys(data).forEach((key) => {
+          // If key contains selected language, it is necessary field to save in DB
+          if (key.includes(languageLabel as string))
+            necessaryData[key] = data[key];
+
+          // If key is "SubBook_Transliteration" and the language is English, it is necessary field to save in DB
+          if (key == 'SubBook_Transliteration' && languageLabel == 'English')
+            necessaryData[key] = data[key];
+        });
+        necessaryData['Chapter_Number'] = data['Chapter_Number'];
+        necessaryData['Verse_Number'] = data['Verse_Number'];
+
+        setNecessaryParsedData(prevNecessaryParsedData => [
+          ...prevNecessaryParsedData,
+          necessaryData
+        ]);
+
+        console.log({ necessaryParsedData })
+      });
+
+      console.log(parsedData)
+    }
+  }, [parsedData, selectedLanguage, isImport]);
 
   /**
    * Effect hook to handle file parsing when a new file is selected
@@ -457,84 +464,88 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
    * - Shows error for unsupported file types
   */
   useEffect(() => {
-    setTableHeaders([]);
-    // If no file is selected, exit early
-    if (!file) return;
+    if (isImport) {
+      setImportTableHeaders([]);
+      // If no file is selected, exit early
+      if (!file) return;
 
-    // Extract the file extension from the filename
-    const fileName = file.name;
-    const fileExtension = fileName.substr(fileName.lastIndexOf('.') + 1).toLowerCase();
+      // Extract the file extension from the filename
+      const fileName = file.name;
+      const fileExtension = fileName.substr(fileName.lastIndexOf('.') + 1).toLowerCase();
 
-    // Parse the file based on its extension (CSV or Excel)
-    if (fileExtension === 'csv') {
-      handleCSVParse(file);
-    } else if (['xlsx', 'xls'].includes(fileExtension)) {
-      handleExcelParse(file);
-    } else {
-      console.error('Unsupported file format');
+      // Parse the file based on its extension (CSV or Excel)
+      if (fileExtension === 'csv') {
+        handleCSVParse(file);
+      } else if (['xlsx', 'xls'].includes(fileExtension)) {
+        handleExcelParse(file);
+      } else {
+        console.error('Unsupported file format');
+      }
     }
-  }, [file, selectedLanguage]);
+  }, [file, selectedLanguage, isImport]);
 
   // Effect hook for error handling
   useEffect(() => {
-    const necessaryHeaders: string[] = [
-      'SubBook_English',
-      `SubBook_${getLanguageFromLanguageCode(selectedLanguage)}`,
-      `Chapter_Number`,
-      `Verse_Number`,
-      `Verse_${getLanguageFromLanguageCode(selectedLanguage)}`
-    ].filter((item, index, array) => item && array.indexOf(item) === index);
+    if (isImport) {
+      const necessaryHeaders: string[] = [
+        'SubBook_English',
+        `SubBook_${getLanguageFromLanguageCode(selectedLanguage)}`,
+        `Chapter_Number`,
+        `Verse_Number`,
+        `Verse_${getLanguageFromLanguageCode(selectedLanguage)}`
+      ].filter((item, index, array) => item && array.indexOf(item) === index);
 
-    let errorMsg = '';
+      let errorMsg = '';
 
-    if (parsedData.length > 1) {
-      const fileHeaders = Object.keys(parsedData[0]);
+      if (parsedData.length > 1) {
+        const fileHeaders = Object.keys(parsedData[0]);
 
-      // check necessary fields
-      const missedFields = necessaryHeaders.filter((necessaryHeader) => !fileHeaders.includes(necessaryHeader));
-      missedFields.forEach((missedField: string) => errorMsg += `${missedField}, `);
+        // check necessary fields
+        const missedFields = necessaryHeaders.filter((necessaryHeader) => !fileHeaders.includes(necessaryHeader));
+        missedFields.forEach((missedField: string) => errorMsg += `${missedField}, `);
 
-      if (errorMsg)
-        errorMsg = `You missed the ${missedFields.length >= 2 ? 'fields' : 'field'}: ` + errorMsg;
-      // End checking necessary fields
+        if (errorMsg)
+          errorMsg = `You missed the ${missedFields.length >= 2 ? 'fields' : 'field'}: ` + errorMsg;
+        // End checking necessary fields
 
-      // Check if the file contains only 1 sub book
-      const firstSubBookName = parsedData[0][`SubBook_${getLanguageFromLanguageCode(selectedLanguage)}`];
-      const differentSubBooks = parsedData.find((data) => data[`SubBook_${getLanguageFromLanguageCode(selectedLanguage)}`] != firstSubBookName);
-      if (differentSubBooks)
-        errorMsg = ERROR_ONLY_ONE_SUBBOOK;
+        // Check if the file contains only 1 sub book
+        const firstSubBookName = parsedData[0][`SubBook_${getLanguageFromLanguageCode(selectedLanguage)}`];
+        const differentSubBooks = parsedData.find((data) => data[`SubBook_${getLanguageFromLanguageCode(selectedLanguage)}`] != firstSubBookName);
+        if (differentSubBooks)
+          errorMsg = ERROR_ONLY_ONE_SUBBOOK;
 
-      const firstSubBookTransliteration = parsedData[0]['SubBook_Transliteration'];
-      const differentSubBookTransliterations = parsedData.find((data) => data['SubBook_Transliteration'] != firstSubBookTransliteration);
-      if (differentSubBookTransliterations)
-        errorMsg = ERROR_ONLY_ONE_TRANSLITERATION;
+        const firstSubBookTransliteration = parsedData[0]['SubBook_Transliteration'];
+        const differentSubBookTransliterations = parsedData.find((data) => data['SubBook_Transliteration'] != firstSubBookTransliteration);
+        if (differentSubBookTransliterations)
+          errorMsg = ERROR_ONLY_ONE_TRANSLITERATION;
 
-      // Check the file structure according to book
-      const hasTransliteration = tableHeaders.includes('SubBook_Transliteration');
-      //In Qur'an or Zabur, all chapter numbers should be 1, not the others
-      if (props.currentBook == BOOK_QURAN || props.currentBook == BOOK_ZABUR) {
-        // Check if the file has SubBook_Transliteration field
-        if (!hasTransliteration)
-          errorMsg = ERROR_SUBBOOK_TRANSLITERATION_REQUIRE
+        // Check the file structure according to book
+        const hasTransliteration = tableHeaders.includes('SubBook_Transliteration');
+        //In Qur'an or Zabur, all chapter numbers should be 1, not the others
+        if (props.currentBook == BOOK_QURAN || props.currentBook == BOOK_ZABUR) {
+          // Check if the file has SubBook_Transliteration field
+          if (!hasTransliteration)
+            errorMsg = ERROR_SUBBOOK_TRANSLITERATION_REQUIRE
 
-        // Check Chapter_Number fields
-        const isInValidChapterNumber = parsedData.some((data) => data.Chapter_Number != '1');
-        if (isInValidChapterNumber)
-          errorMsg = ERROR_SPECIAL_BOOK_CHAPTER_NUMBER;
+          // Check Chapter_Number fields
+          const isInValidChapterNumber = parsedData.some((data) => data.Chapter_Number != '1');
+          if (isInValidChapterNumber)
+            errorMsg = ERROR_SPECIAL_BOOK_CHAPTER_NUMBER;
 
-        setError(errorMsg);
-      } else {
-        // Check if the file has SubBook_Transliteration field
-        if (hasTransliteration)
-          errorMsg = ERROR_SUBBOOK_TRANSLITERATION_NOT_REQUIRE
+          setError(errorMsg);
+        } else {
+          // Check if the file has SubBook_Transliteration field
+          if (hasTransliteration)
+            errorMsg = ERROR_SUBBOOK_TRANSLITERATION_NOT_REQUIRE
 
-        setError(errorMsg);
+          setError(errorMsg);
+        }
+        // End checking the file structure according to book
       }
-      // End checking the file structure according to book
 
       // If no file selected
       if (parsedData.length == 0) {
-        errorMsg = ERROR_EMPTY_FILE
+        errorMsg = ERROR_EMPTY_FILE;
         setError(errorMsg)
       }
     }
@@ -791,7 +802,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   // Save book by calling API
   const saveBook = () => {
     translatorService
-      .saveBook({ bookInfos: necessaryParseData, bookTitle: props.currentBook, language: getLanguageFromLanguageCode(selectedLanguage) })
+      .saveBook({ bookInfos: necessaryParsedData, bookTitle: props.currentBook, language: getLanguageFromLanguageCode(selectedLanguage) })
       .then(() => {
         toast.success('Saved successfully!', {
           position: 'top-right',
@@ -993,7 +1004,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
             languages={languages}
             file={file}
             parsedData={parsedData}
-            headers={tableHeaders}
+            headers={importTableHeaders}
             error={error}
 
             onChangeLanguage={(e) => setSelectedLanguage(e.target.value as string)}
