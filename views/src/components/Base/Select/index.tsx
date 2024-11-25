@@ -27,7 +27,7 @@ function SelectBox(props: SelectBoxProps) {
       >
         {props.options.map((option) => (
           <StyledMenuItem
-            key={option.value}
+            key={option.value || ''}
             value={option.value}
             style={{ backgroundColor: props.backgroundColor, color: props.textColor }}
             dividelinecolor={props.textColor || '#17637D'}

@@ -25,6 +25,8 @@ const BookTextOverview = (props: ChapterTextOverviewPropsType) => {
             subBook={subBook}
             languageCode={props.languageCode}
             isQuranOrZabur={props.isQuranOrZabur}
+
+            onChapterClick={props.onClickSquare}
           />
         )
       }
@@ -35,6 +37,8 @@ const BookTextOverview = (props: ChapterTextOverviewPropsType) => {
           book={props.bookInfo}
           languageCode={props.languageCode}
           isQuranOrZabur={props.isQuranOrZabur}
+
+          onChapterClick={props.onClickSquare}
         />
       }
     </StyledContainer>

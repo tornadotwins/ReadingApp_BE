@@ -1,4 +1,4 @@
-import { BookType } from "@/pages/BookOverview/types";
+import {BookType} from "@/pages/BookOverview/types";
 
 type ChapterTextOverviewPropsType = {
   language: string;
@@ -6,6 +6,8 @@ type ChapterTextOverviewPropsType = {
   bookTitle: string;
   bookInfo: BookType;
   isQuranOrZabur?: boolean;
+
+  onClickSquare: (chapterId: string) => void;
 }
 
 export type {

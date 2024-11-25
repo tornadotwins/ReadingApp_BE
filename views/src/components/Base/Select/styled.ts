@@ -23,6 +23,12 @@ const StyledSelect = styled(MuiSelect)<{ style: any }>(({ style }) => ({
     backgroundColor: style.backgroundColor,
   },
 
+  '& .MuiBox-root' : {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+
   '& .MuiSvgIcon-root': {
     pointerEvents: 'none',
     position: 'absolute',

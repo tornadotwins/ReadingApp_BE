@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { Bounce, toast } from 'material-react-toastify';
+import { Bounce, toast, ToastContainer } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
 
 import Header from '@/components/Header';
@@ -13,7 +13,7 @@ import useOrientation from '@/hooks/useOrientation';
 import { StyledLoginContainer, StyledLoginBody } from './styles';
 import LoginBox from '@/components/Login';
 
-import authService from '../../../services/auth.services';
+import authService from '@/services/auth.services';
 import { LoadingOverlay } from '@/components/Base';
 import actionTypes from '@/actions/actionTypes';
 import { UserType } from '../types';
@@ -48,6 +48,8 @@ function Login(props: LoginPropsType) {
           autoClose: 3000
         });
 
+        setIsLoading(false);
+
         if (user.isAdmin)
           navigate('/admin/admin-portal');
         else
@@ -63,8 +65,7 @@ function Login(props: LoginPropsType) {
           pauseOnHover: true,
           autoClose: 3000
         });
-      })
-      .finally(() => {
+
         setIsLoading(false);
       });
   }
@@ -83,6 +84,7 @@ function Login(props: LoginPropsType) {
       </StyledLoginContainer>
 
       {isLoading && <LoadingOverlay />}
+      <ToastContainer />
     </>
   );
 }

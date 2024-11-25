@@ -4,6 +4,9 @@ import { UserType } from "../types";
 type TranslatorPropsType = {
   title: string;
   currentUser: UserType;
+  currentLanguage: string;
+  currentBook: string;
+  
   dispatch: Dispatch;
 }
 

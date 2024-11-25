@@ -1,4 +1,3 @@
-import { TRANSLATION_STATUS_NONE } from "@/config";
 import { Text } from "../Base";
 import ChapterSquare from "../ChapterSquare";
 import {
@@ -24,11 +23,12 @@ function SubBookText(props: SubBookTextPropsType) {
       <StyledSubBookContentContainer>
         <StyledSubBookIntroChapterContainer>
           {
-            props.subBook && !!props.subBook.noChapter && props.subBook.chapterInfos[0].chapterNumber == 0 &&
+            props.subBook && !!props.subBook.noChapter && props.subBook?.chapterInfos[0]?.chapterNumber == 0 &&
             <ChapterSquare
-              chapterNumber={0}
-              onClick={() => { }}
-              translationStatus={TRANSLATION_STATUS_NONE}
+              chapterInfo={props.subBook.chapterInfos[0]}
+              isCompleted={props.subBook.chapterInfos[0]?.chapterIsCompleted?.[props.languageCode]}
+              isPublished={props.subBook.chapterInfos[0]?.chapterIsPublished?.[props.languageCode]}
+              onClick={props.onChapterClick}
             />
           }
         </StyledSubBookIntroChapterContainer>
@@ -40,9 +40,11 @@ function SubBookText(props: SubBookTextPropsType) {
               props.subBook && props.subBook.chapterInfos?.map((chapterInfo: ChapterInfoType, index: number) => (
                 <ChapterSquare
                   key={index}
-                  chapterNumber={chapterInfo.chapterNumber}
-                  translationStatus={chapterInfo.translationStatus || TRANSLATION_STATUS_NONE}
-                  onClick={() => { }}
+                  subBookInfo={props.subBook}
+                  chapterInfo={chapterInfo}
+                  isCompleted={chapterInfo?.chapterIsCompleted?.[props.languageCode] || false}
+                  isPublished={chapterInfo?.chapterIsPublished?.[props.languageCode] || false}
+                  onClick={props.onChapterClick}
                 />
               ))
             }
@@ -56,9 +58,10 @@ function SubBookText(props: SubBookTextPropsType) {
               props.book && props.book.subBooks && props.book.subBooks.map((subBook: SubBookInfoType, index: number) => (
                 <ChapterSquare
                   key={index}
-                  chapterNumber={subBook.subBookNumber}
-                  translationStatus={subBook.chapterInfos[0].translationStatus || TRANSLATION_STATUS_NONE}
-                  onClick={() => { }}
+                  subBookInfo={subBook}
+                  isCompleted={subBook.chapterInfos && subBook.chapterInfos[0]?.chapterIsCompleted?.[props.languageCode] || false}
+                  isPublished={subBook.chapterInfos && subBook.chapterInfos[0]?.chapterIsPublished?.[props.languageCode] || false}
+                  onClick={() => props.onChapterClick(subBook.chapterInfos && subBook?.chapterInfos[0].chapterId)}
                 />
               ))
             }

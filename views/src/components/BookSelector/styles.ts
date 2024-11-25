@@ -2,6 +2,10 @@ import {Box, styled} from '@mui/material';
 
 const StyledBookSelectorContainer = styled(Box) ({
   display: 'flex',
+
+  '@media screen and (max-width: 550px)': {
+    display: 'block'
+  },
 });
 
 const StyledBookSelector = styled(Box)<{ isselected?: string }>(({ isselected }) => ({
@@ -15,7 +19,11 @@ const StyledBookSelector = styled(Box)<{ isselected?: string }>(({ isselected })
   color: isselected == 'true' ? '#fff' : '#000',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center'
+  justifyContent: 'center',
+
+  '@media screen and (max-width: 550px)': {
+    width: '100%'
+  },
 }));
 
 

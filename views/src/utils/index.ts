@@ -1,4 +1,5 @@
 import { LANGUAGE_CODE_TABLE } from "@/config";
+import { SelectOptionType } from "@/pages/ChapterOverview/types";
 
 export const convertNumber2Date = (timestamp: number) => {
   const date = new Date(timestamp);
@@ -34,4 +35,11 @@ export const getLanguageCodeFromLanguage = (language: string) => {
   const languageObj = LANGUAGE_CODE_TABLE.find((languageObj) => languageObj.language == language);
 
   return languageObj?.code || 'en';
+}
+
+export const getLabelFromValueInDropdownOptions = (value: string, options: SelectOptionType[]) => {
+  const matchOption = options.find(option => option.value == value);
+  const label = matchOption?.label;
+
+  return label || '';
 }

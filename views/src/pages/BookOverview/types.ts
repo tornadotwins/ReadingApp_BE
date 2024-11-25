@@ -3,6 +3,9 @@ import { UserType } from "../types"
 
 type BookOverviewPropsType = {
   currentUser: UserType;
+  bookInfos: BookType[];
+  currentLanguage: string;
+  currentBook: string;
   dispatch: Dispatch;
 };
 
@@ -43,7 +46,16 @@ type ChapterInfoType = {
   };
   subBookId?: string;
   verses: VerseType[];
-  translationStatus?: string;
+  chapterIsCompleted: {
+    ar: boolean;
+    en: boolean;
+    [key: string]: boolean;
+  };
+  chapterIsPublished: {
+    ar: boolean;
+    en: boolean;
+    [key: string]: boolean;
+  };
 };
 
 type SubBookInfoType = {
