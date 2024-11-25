@@ -58,8 +58,8 @@ function SubBookAudio(props: SubBookAudioPropsType) {
               props.book && props.book.subBooks && props.book.subBooks.map((subBook: SubBookInfoType, index: number) => (
                 <ChapterAudioSquare
                   key={index}
-                  chapterNumber={subBook.subBookNumber}
-                  audioStatus={subBook.chapterInfos[0]?.chapterAudio?.[props.languageCode] || TRANSLATION_STATUS_NONE}
+                  chapterNumber={subBook?.subBookNumber}
+                  audioStatus={(subBook.chapterInfos && subBook.chapterInfos[0]?.chapterAudio?.[props.languageCode]) || TRANSLATION_STATUS_NONE}
                   onClick={() => { }}
                 />
               ))

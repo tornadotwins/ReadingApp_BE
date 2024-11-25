@@ -14,7 +14,7 @@ import {
 import { SubBookInfoType } from '@/pages/BookOverview/types';
 
 export const initialState = {
-  book: '',
+  book: 'Qur\'an',
   bookInfos: [],
   subBookInfos: [],
   chapterInfos: [],
@@ -98,6 +98,7 @@ const addChapterInfo = (state: BookStateType, action: ChapterActionType) => {
     chapterInfos: [...state.chapterInfos, chapterInfo],
   };
 };
+
 //////////////////////////////////////////////////////////////////
 ////////////////////// Set Current Language //////////////////////
 //////////////////////////////////////////////////////////////////

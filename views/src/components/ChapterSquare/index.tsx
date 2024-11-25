@@ -16,8 +16,8 @@ const ChapterSquare = (props: ChapterSquarePropsType) => {
       <Text fontFamily='Inter' fontSize={16} fontWeight='500'>
         {
           props.chapterInfo ?
-            props.chapterInfo.chapterNumber == 0 ? 'Intr' : props.chapterInfo.chapterNumber.toString() :
-            props.subBookInfo?.subBookNumber == 0 ? 'Intr' : props.subBookInfo?.subBookNumber.toString()
+            props.chapterInfo.chapterNumber == 0 ? 'Intr' : props.chapterInfo.chapterNumber?.toString() :
+            props.subBookInfo?.subBookNumber == 0 ? 'Intr' : props.subBookInfo?.subBookNumber?.toString()
         }
       </Text>
     </StyledChapterSquare>

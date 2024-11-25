@@ -209,7 +209,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
         setIsLoading(false);
       });
-  }, []);
+  }, [selectedBook]);
 
   // Fetch Chapter info by chapterId
   const fetchChapterInfoByChapterId = useCallback((chapterId: string) => {
@@ -243,11 +243,11 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         });
         setIsLoading(false);
       })
-  }, []);
+  }, [selectedChapter]);
 
   // Set cell data for table
   const configureTableData = useCallback(() => {
-    const currentSubBook = activeBookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
+    const currentSubBook = activeBookInfo?.subBooks?.find(subBook => subBook.subBookId == selectedSubBook);
     let newHeaders: string[] = [];
     let newRows: TableRowType[] = [];
 
@@ -300,20 +300,6 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       autoClose: 3000
     });
   }, []);
-
-  // Set the default values when render the page first
-  useEffect(() => {
-    setLanguageCountVerse(0);
-    const isCompleted = activeChapterInfo?.chapterIsCompleted?.[selectedLanguage] || false;
-    const isPublished = activeChapterInfo?.chapterIsPublished?.[selectedLanguage] || false;
-    setTotalCountVerse(activeChapterInfo?.verses?.length || 0);
-    activeChapterInfo.verses?.map(verse =>
-      setLanguageCountVerse((prevLanguageCountVerse) => (verse?.verseText?.[selectedLanguage] ? prevLanguageCountVerse + 1 : prevLanguageCountVerse))
-    );
-
-    setIsComplete(isCompleted);
-    setIsPublish(isPublished);
-  }, [selectedBook, selectedSubBook, selectedChapter, selectedLanguage]);
 
   // Book Title Effect
   useEffect(() => {
@@ -415,9 +401,22 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     configureTableData();
   }, [selectedChapter]);
 
+  // Set the default values when render the page first
   useEffect(() => {
     configureTableData();
-  }, [verseInfos, activeChapterInfo, selectedLanguage]);
+
+
+    setLanguageCountVerse(0);
+    const isCompleted = activeChapterInfo?.chapterIsCompleted?.[selectedLanguage] || false;
+    const isPublished = activeChapterInfo?.chapterIsPublished?.[selectedLanguage] || false;
+    setTotalCountVerse(activeChapterInfo?.verses?.length || 0);
+    activeChapterInfo.verses?.map(verse =>
+      setLanguageCountVerse((prevLanguageCountVerse) => (verse?.verseText?.[selectedLanguage] ? prevLanguageCountVerse + 1 : prevLanguageCountVerse))
+    );
+
+    setIsComplete(isCompleted);
+    setIsPublish(isPublished);
+  }, [verseInfos, activeBookInfo, activeSubBook, activeChapterInfo, selectedLanguage]);
 
   useEffect(() => {
     if (!isImport)
@@ -468,11 +467,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           ...prevNecessaryParsedData,
           necessaryData
         ]);
-
-        console.log({ necessaryParsedData })
       });
-
-      console.log(parsedData)
     }
   }, [parsedData, selectedLanguage, isImport]);
 
@@ -609,46 +604,29 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   };
 
   const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
-    // Update book info with updated Chapter Information
-    const updatedChapterInfoInChapterType: ChapterInfoType = {
-      chapterId: selectedChapter,
+    const newChapterInfo = {
+      audio: updatedChapterInfo.audio,
+      chapterId: updatedChapterInfo._id,
       chapterNumber: updatedChapterInfo.chapterNumber,
-      chapterTranslated: updatedChapterInfo.isTranslated,
-      chapterAudio: updatedChapterInfo.audio,
-      subBookId: selectedSubBook,
-      verses: activeChapterInfo.verses,
+      isTranslated: updatedChapterInfo.isTranslated,
       chapterIsCompleted: updatedChapterInfo.isCompleted,
-      chapterIsPublished: updatedChapterInfo.isPublished
-    };
+      chapterIsPublished: updatedChapterInfo.isPublished,
+    }
 
-    // Find the sub book
-    const currentSubBook = activeBookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
-    const updatedCurrentSubBook = currentSubBook?.chapterInfos.map(
-      chapterInfo =>
-        chapterInfo.chapterId == selectedChapter ?
-          { ...chapterInfo, chapterInfo: updatedChapterInfoInChapterType } :
-          chapterInfo
-    );
-
-    const updatedCurrentBook = {
-      ...activeBookInfo, subBooks: activeBookInfo?.subBooks.map(
-        subBook =>
-          subBook.subBookId == selectedSubBook ?
-            { ...subBook, updatedCurrentSubBook } :
-            subBook
-      )
-    };
-
-    const bookInfos = props.bookInfos;
-    const updatedBookInfos = bookInfos.map(
-      bookInfo =>
-        bookInfo.bookId == updatedCurrentBook.bookId ?
-          { ...bookInfo, updatedCurrentBook } :
-          bookInfo
-    )
+    const updatedBookInfos = props.bookInfos.map((book) => ({
+      ...book,
+      subBooks: book.subBooks.map((subBook) => ({
+        ...subBook,
+        chapterInfos: subBook.chapterInfos.map((chapter) =>
+          chapter.chapterId === selectedChapter
+            ? { ...chapter, ...newChapterInfo }
+            : chapter
+        ),
+      })),
+    }));
 
     props.dispatch({
-      type: actionTypes.SET_BOOKINFOS,
+      type: actionTypes.SET_BOOK,
       payload: {
         bookInfos: updatedBookInfos
       }
@@ -665,22 +643,14 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       noChapter: true,
     }
 
-    const updatedCurrentBook = {
-      ...activeBookInfo, subBooks: activeBookInfo?.subBooks.map(
-        subBook =>
-          subBook.subBookId == selectedSubBook ?
-            { ...subBook, updatedSubBookInfoInSubBookType } :
-            subBook
-      )
-    };
-
-    const bookInfos = props.bookInfos;
-    const updatedBookInfos = bookInfos.map(
-      bookInfo =>
-        bookInfo.bookId == updatedCurrentBook.bookId ?
-          { ...bookInfo, updatedCurrentBook } :
-          bookInfo
-    )
+    const updatedBookInfos = props.bookInfos.map((book) => ({
+      ...book,
+      subBooks: book.subBooks.map((subBook => (
+        subBook.subBookId == selectedSubBook
+          ? { ...subBook, ...updatedSubBookInfoInSubBookType }
+          : subBook
+      )))
+    }));
 
     props.dispatch({
       type: actionTypes.SET_BOOKINFOS,
@@ -688,7 +658,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         bookInfos: updatedBookInfos
       }
     })
-  }
+  };
 
   // Update chapter with isCompleted
   const handleTranslateComplete = async (isTranslateCompleted: boolean) => {
@@ -780,7 +750,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       setInputArabicChapterName(value);
     }
     setInputCurrentLanguageChapterName(value);
-  }
+  };
 
   // handle changing the Arabic Chapter name
   const handleArabicChapterNameChange = (value: string) => {
@@ -788,7 +758,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       setInputCurrentLanguageChapterName(value);
     }
     setInputArabicChapterName(value);
-  }
+  };
 
   // handle changing the English Chapter name
   const handleEnglishChapterNameChange = (value: string) => {
@@ -796,10 +766,10 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       setInputCurrentLanguageChapterName(value);
     }
     setInputEnglishChaptername(value);
-  }
+  };
 
   // Update Chapter Summary
-  const updateChapterSummary = (currentChapterTitle: string, arabicChapterTitle: string, transliteration: string, englishChapterTitle: string) => {
+  const updateSummaryTitleInfos = (currentChapterTitle: string, arabicChapterTitle: string, transliteration: string, englishChapterTitle: string) => {
     const subBookTitle = {
       [`${selectedLanguage}`]: currentChapterTitle,
       'ar': arabicChapterTitle,
@@ -851,9 +821,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         autoClose: 3000
       });
     }
-
-    // bookService.updateSubBookInfo({subBookId: activeSubBook?.subBookId })
-  }
+  };
 
   // Handle Toggle (Database/Import)
   const handleToggle = (value: boolean) => {
@@ -1068,7 +1036,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         handleArabicChapterTitleChange={(value: string) => handleArabicChapterNameChange(value)}
         handleTransliterationChapterTitleChange={(value: string) => setInputTransliteration(value)}
         handleEnglishChapterTitleChange={(value: string) => handleEnglishChapterNameChange(value)}
-        handleUpdateChapterSummary={updateChapterSummary}
+        handleUpdateChapterSummary={updateSummaryTitleInfos}
       />
     )
   };

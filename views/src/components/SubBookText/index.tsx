@@ -59,9 +59,9 @@ function SubBookText(props: SubBookTextPropsType) {
                 <ChapterSquare
                   key={index}
                   subBookInfo={subBook}
-                  isCompleted={subBook?.chapterInfos[0]?.chapterIsCompleted?.[props.languageCode] || false}
-                  isPublished={subBook?.chapterInfos[0]?.chapterIsPublished?.[props.languageCode] || false}
-                  onClick={() => props.onChapterClick(subBook?.chapterInfos[0].chapterId)}
+                  isCompleted={subBook.chapterInfos && subBook.chapterInfos[0]?.chapterIsCompleted?.[props.languageCode] || false}
+                  isPublished={subBook.chapterInfos && subBook.chapterInfos[0]?.chapterIsPublished?.[props.languageCode] || false}
+                  onClick={() => props.onChapterClick(subBook.chapterInfos && subBook?.chapterInfos[0].chapterId)}
                 />
               ))
             }
