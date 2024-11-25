@@ -7,6 +7,7 @@ type AccordionExpandProps = {
   outArrow?: boolean;
 
   onChange?: (value: React.ChangeEvent<HTMLInputElement>) => void;
+  onCurrentChapterTitleEnterPressed?: (value: string) => void;
 };
 
 export type { AccordionExpandProps };

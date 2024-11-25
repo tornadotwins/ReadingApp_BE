@@ -15,6 +15,14 @@ function Summary(props: SummaryPropsType) {
               (e: React.ChangeEvent<HTMLInputElement>) =>
                 props.handleCurrentChapterTitleChange && props.handleCurrentChapterTitleChange(e.target.value)
             }
+            onCurrentChapterTitleEnterPressed={() =>
+              props.handleUpdateChapterSummary &&
+              props.currentChapterTitle &&
+              props.arabicChapterTitle &&
+              props.transliteration &&
+              props.englishChapterTitle &&
+              props.handleUpdateChapterSummary(props.currentChapterTitle, props.arabicChapterTitle, props.transliteration, props.englishChapterTitle)
+            }
             detail={
               <>
                 <StyledSummaryItemContainer>
@@ -35,6 +43,17 @@ function Summary(props: SummaryPropsType) {
                         onChange={
                           (event: React.ChangeEvent<HTMLInputElement>) =>
                             props.handleArabicChapterTitleChange && props.handleArabicChapterTitleChange(event.target.value)
+                        }
+                        onKeyDown={
+                          (event: React.KeyboardEvent<HTMLInputElement>) => {
+                            event.key == 'Enter' &&
+                              props.handleUpdateChapterSummary &&
+                              props.currentChapterTitle &&
+                              props.arabicChapterTitle &&
+                              props.transliteration &&
+                              props.englishChapterTitle &&
+                              props.handleUpdateChapterSummary(props.currentChapterTitle, props.arabicChapterTitle, props.transliteration, props.englishChapterTitle)
+                          }
                         }
                       /> :
                       <Text
@@ -68,6 +87,17 @@ function Summary(props: SummaryPropsType) {
                           (event: React.ChangeEvent<HTMLInputElement>) =>
                             props.handleTransliterationChapterTitleChange && props.handleTransliterationChapterTitleChange(event.target.value)
                         }
+                        onKeyDown={
+                          (event: React.KeyboardEvent<HTMLInputElement>) => {
+                            event.key == 'Enter' &&
+                              props.handleUpdateChapterSummary &&
+                              props.currentChapterTitle &&
+                              props.arabicChapterTitle &&
+                              props.transliteration &&
+                              props.englishChapterTitle &&
+                              props.handleUpdateChapterSummary(props.currentChapterTitle, props.arabicChapterTitle, props.transliteration, props.englishChapterTitle)
+                          }
+                        }
                       /> :
                       <Text
                         fontFamily="Inter"
@@ -99,6 +129,17 @@ function Summary(props: SummaryPropsType) {
                         onChange={
                           (event: React.ChangeEvent<HTMLInputElement>) =>
                             props.handleEnglishChapterTitleChange && props.handleEnglishChapterTitleChange(event.target.value)
+                        }
+                        onKeyDown={
+                          (event: React.KeyboardEvent<HTMLInputElement>) => {
+                            event.key == 'Enter' &&
+                              props.handleUpdateChapterSummary &&
+                              props.currentChapterTitle &&
+                              props.arabicChapterTitle &&
+                              props.transliteration &&
+                              props.englishChapterTitle &&
+                              props.handleUpdateChapterSummary(props.currentChapterTitle, props.arabicChapterTitle, props.transliteration, props.englishChapterTitle)
+                          }
                         }
                       /> :
                       <Text

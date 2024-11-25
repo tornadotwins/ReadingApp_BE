@@ -41,6 +41,14 @@ function AccordionPanel(props: AccordionExpandProps) {
                 value={props.summaryTitle}
                 label=''
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange && props.onChange(event)}
+                onKeyDown={
+                  (event: React.KeyboardEvent<HTMLInputElement>) => {
+                    event.key == 'Enter' &&
+                      props.onCurrentChapterTitleEnterPressed &&
+                      props.summaryTitle &&
+                      props.onCurrentChapterTitleEnterPressed(props.summaryTitle)
+                  }
+                }
               />
             }
           </StyledLabelContainer>

@@ -733,8 +733,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   };
 
   // Update Chapter Summary
-  const updateChapterSummary = () => {
-    console.log('update chapter summary');
+  const updateChapterSummary = (currentChapterTitle: string, arabicChapterTitle: string, transliteration: string, englishChapterTitle: string) => {
+    console.log(currentChapterTitle, arabicChapterTitle, transliteration, englishChapterTitle);
   }
 
   // Handle Toggle (Database/Import)
@@ -950,7 +950,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         handleArabicChapterTitleChange={(value: string) => setInputArabicChapterName(value)}
         handleTransliterationChapterTitleChange={(value: string) => setInputTransliteration(value)}
         handleEnglishChapterTitleChange={(value: string) => setInputEnglishChaptername(value)}
-        handleUpdateChapterSummary={() => updateChapterSummary()}
+        handleUpdateChapterSummary={updateChapterSummary}
       />
     )
   };
