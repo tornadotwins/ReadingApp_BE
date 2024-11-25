@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import * as XLSX from 'xlsx';
+import Papa from 'papaparse';
 import { saveAs } from 'file-saver';
 import { toast, Bounce } from "material-react-toastify";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
@@ -14,6 +15,7 @@ import { AppStateType } from "@/reducers/types";
 import useOrientation from "@/hooks/useOrientation";
 import actionTypes from "@/actions/actionTypes";
 import bookService from "@/services/book.services";
+import translatorService from "@/services/translator.services";
 
 import {
   Button,
@@ -35,11 +37,15 @@ import {
   StyledExportButtonContainer,
   StyledToggleContainer,
   StyledToggleItemContainer,
+  StyledTranslatorPortalContainer,
+  StyledTranslatorContainer,
 } from "./styles";
 
 import Header from "@/components/Header";
 import Tools from "@/components/Tools";
 import BookSelector from "@/components/BookSelector";
+import Uploader from "@/components/Uploader";
+import Summary from "@/components/Summary";
 
 import {
   ACCESS_TOKEN,
@@ -48,6 +54,14 @@ import {
   BOOK_ZABUR,
 } from "@/config";
 import { DOWNLOAD_SUCCESS } from '@/config/messages';
+import {
+  ERROR_EMPTY_FILE,
+  ERROR_ONLY_ONE_SUBBOOK,
+  ERROR_ONLY_ONE_TRANSLITERATION,
+  ERROR_SPECIAL_BOOK_CHAPTER_NUMBER,
+  ERROR_SUBBOOK_TRANSLITERATION_NOT_REQUIRE,
+  ERROR_SUBBOOK_TRANSLITERATION_REQUIRE
+} from "@/config/error-messages";
 
 import {
   BookType,
@@ -59,11 +73,14 @@ import {
 import {
   ChapterModelType,
   ChapterOverviewPropsType,
-  SelectOptionType
+  SelectOptionType,
+  ParseDataType,
 } from "./types";
 import { TableRowType } from "@/components/Base/TablePanel/types";
-import { getLabelFromValueInDropdownOptions, getLanguageFromLanguageCode } from "@/utils";
-import Summary from "@/components/Summary";
+import {
+  getLabelFromValueInDropdownOptions,
+  getLanguageFromLanguageCode
+} from "@/utils";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -83,8 +100,13 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const [activeBookInfo, setActiveBookInfo] = useState<BookType | null>(null);
   const [activeChapterInfo, setActiveChapterInfo] = useState<ChapterInfoType>(locationState.chapterInfo);
   const [verseInfos, setVerseInfos] = useState<VerseType[]>([]);
+  const [file, setFile] = useState<File | null>(null);
+  const [fileInput, setFileInput] = useState<ChangeEvent<HTMLInputElement>>();
   const [tableHeaders, setTableHeaders] = useState<string[]>([]);
   const [tableRows, setTableRows] = useState<TableRowType[]>([]);
+  const [parsedData, setParsedData] = useState<ParseDataType[]>([]);
+  const [necessaryParseData, setNecessaryParsedData] = useState<ParseDataType[]>([]);
+  const [error, setError] = useState('');
 
   const [subBookSelectOptions, setSubBookSelectOptions] = useState<SelectOptionType[]>([]);
   const [chapterSelectOptions, setChapterSelectOptions] = useState<SelectOptionType[]>([]);
@@ -259,6 +281,9 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   // Book Title Effect
   useEffect(() => {
+    setTableHeaders([]);
+    setTableRows([]);
+
     // Check if the selected book is existing in redux store
     const existingBook = props.bookInfos.find((bookInfo: BookType) => bookInfo.bookTitle.en == selectedBook);
     if (existingBook) {
@@ -300,6 +325,9 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   // Sub Book Effect
   useEffect(() => {
+    setTableHeaders([]);
+    setTableRows([]);
+
     const bookInfo = props.bookInfos.find(bookInfo => bookInfo.subBooks.find(subBook => subBook.subBookId == selectedSubBook));
     const subBookInfo = bookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
 
@@ -315,6 +343,9 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   // Chapter Effect
   useEffect(() => {
+    setTableHeaders([]);
+    setTableRows([]);
+
     // Check if the chapter is existing in Redux store
     const existingChapterInfo = props.chapterInfos.find(chapterInfo => chapterInfo.chapterId == selectedChapter);
     if (existingChapterInfo) {
@@ -329,6 +360,9 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   // Language Effect
   useEffect(() => {
+    setTableHeaders([]);
+    setTableRows([]);
+
     const newLanguageSubBookOptions = activeBookInfo?.subBooks.map(subBook => ({
       value: subBook.subBookId,
       label: subBook.subBookTitle?.[selectedLanguage] || subBook.subBookTitle.en
@@ -339,6 +373,145 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     configureTableData();
   }, [selectedLanguage]);
 
+  useEffect(() => {
+    const file = fileInput?.target.files && fileInput?.target.files[0];
+    file && setFile(file);
+  }, [fileInput]);
+
+  //  Effect hook to extract table header and data when parsed data is changed (new file is selcted)
+  useEffect(() => {
+    setNecessaryParsedData([]);
+    const firstData = parsedData[0];
+
+    const languageLabel = languages.find((languageItem: SelectOptionType) => languageItem.value == selectedLanguage)?.label;
+
+    if (languageLabel != 'English')
+      setTableHeaders(prevHeaders => [...prevHeaders, 'SubBook_English']);
+    firstData && Object.keys(firstData).forEach((key) => {
+      if (key == 'SubBook_Transliteration')
+        setTableHeaders(prevHeaders => [...prevHeaders, key]);
+      if (languageLabel && key.includes(languageLabel))
+        setTableHeaders(prevHeaders => [...prevHeaders, key]);
+    });
+
+    setTableHeaders(prevHeaders => [...prevHeaders, 'Chapter_Number', 'Verse_Number']);
+
+    // Set the necessary parsed data according to the selected language
+    parsedData.forEach((data: ParseDataType) => {
+      const necessaryData: ParseDataType = {};
+      necessaryData['SubBook_English'] = data['SubBook_English'];
+      Object.keys(data).forEach((key) => {
+        // If key contains selected language, it is necessary field to save in DB
+        if (key.includes(languageLabel as string))
+          necessaryData[key] = data[key];
+
+        // If key is "SubBook_Transliteration" and the language is English, it is necessary field to save in DB
+        if (key == 'SubBook_Transliteration' && languageLabel == 'English')
+          necessaryData[key] = data[key];
+      });
+      necessaryData['Chapter_Number'] = data['Chapter_Number'];
+      necessaryData['Verse_Number'] = data['Verse_Number'];
+
+      setNecessaryParsedData(prevNecessaryParsedData => [
+        ...prevNecessaryParsedData,
+        necessaryData
+      ]);
+    });
+  }, [parsedData, selectedLanguage]);
+
+  /**
+   * Effect hook to handle file parsing when a new file is selected
+   * - Checks if a file exists
+   * - Determines the file type by its extension
+   * - Calls appropriate parser (CSV or Excel)
+   * - Shows error for unsupported file types
+  */
+  useEffect(() => {
+    setTableHeaders([]);
+    // If no file is selected, exit early
+    if (!file) return;
+
+    // Extract the file extension from the filename
+    const fileName = file.name;
+    const fileExtension = fileName.substr(fileName.lastIndexOf('.') + 1).toLowerCase();
+
+    // Parse the file based on its extension (CSV or Excel)
+    if (fileExtension === 'csv') {
+      handleCSVParse(file);
+    } else if (['xlsx', 'xls'].includes(fileExtension)) {
+      handleExcelParse(file);
+    } else {
+      console.error('Unsupported file format');
+    }
+  }, [file, selectedLanguage]);
+
+  /**
+   * Effect hook for error handling
+  */
+  useEffect(() => {
+    const necessaryHeaders: string[] = [
+      'SubBook_English',
+      `SubBook_${getLanguageFromLanguageCode(selectedLanguage)}`,
+      `Chapter_Number`,
+      `Verse_Number`,
+      `Verse_${getLanguageFromLanguageCode(selectedLanguage)}`
+    ].filter((item, index, array) => item && array.indexOf(item) === index);
+
+    let errorMsg = '';
+
+    if (parsedData.length > 1) {
+      const fileHeaders = Object.keys(parsedData[0]);
+
+      // check necessary fields
+      const missedFields = necessaryHeaders.filter((necessaryHeader) => !fileHeaders.includes(necessaryHeader));
+      missedFields.forEach((missedField: string) => errorMsg += `${missedField}, `);
+
+      if (errorMsg)
+        errorMsg = `You missed the ${missedFields.length >= 2 ? 'fields' : 'field'}: ` + errorMsg;
+      // End checking necessary fields
+
+      // Check if the file contains only 1 sub book
+      const firstSubBookName = parsedData[0][`SubBook_${getLanguageFromLanguageCode(selectedLanguage)}`];
+      const differentSubBooks = parsedData.find((data) => data[`SubBook_${getLanguageFromLanguageCode(selectedLanguage)}`] != firstSubBookName);
+      if (differentSubBooks)
+        errorMsg = ERROR_ONLY_ONE_SUBBOOK;
+
+      const firstSubBookTransliteration = parsedData[0]['SubBook_Transliteration'];
+      const differentSubBookTransliterations = parsedData.find((data) => data['SubBook_Transliteration'] != firstSubBookTransliteration);
+      if (differentSubBookTransliterations)
+        errorMsg = ERROR_ONLY_ONE_TRANSLITERATION;
+
+      // Check the file structure according to book
+      const hasTransliteration = tableHeaders.includes('SubBook_Transliteration');
+      //In Qur'an or Zabur, all chapter numbers should be 1, not the others
+      if (props.currentBook == BOOK_QURAN || props.currentBook == BOOK_ZABUR) {
+        // Check if the file has SubBook_Transliteration field
+        if (!hasTransliteration)
+          errorMsg = ERROR_SUBBOOK_TRANSLITERATION_REQUIRE
+
+        // Check Chapter_Number fields
+        const isInValidChapterNumber = parsedData.some((data) => data.Chapter_Number != '1');
+        if (isInValidChapterNumber)
+          errorMsg = ERROR_SPECIAL_BOOK_CHAPTER_NUMBER;
+
+        setError(errorMsg);
+      } else {
+        // Check if the file has SubBook_Transliteration field
+        if (hasTransliteration)
+          errorMsg = ERROR_SUBBOOK_TRANSLITERATION_NOT_REQUIRE
+
+        setError(errorMsg);
+      }
+      // End checking the file structure according to book
+
+      // If no file selected
+      if (parsedData.length == 0) {
+        errorMsg = ERROR_EMPTY_FILE
+        setError(errorMsg)
+      }
+    }
+  }, [tableHeaders, selectedLanguage, parsedData, isImport]);
+
   const handleSelectedBook = (bookTitle: string) => {
     setSelectedBook(bookTitle);
 
@@ -348,17 +521,17 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         bookTitle
       }
     })
-  }
+  };
 
   const handleSelectSubBookChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const value = event.target.value as string;
     setSelectedSubBook(value);
-  }
+  };
 
   const handleSelectChapterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const value = event.target.value as string;
     setSelectedChapter(value);
-  }
+  };
 
   const handleSelectLanguageChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const value = event.target.value as string;
@@ -417,9 +590,9 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         bookInfos: updatedBookInfos
       }
     })
-  }
+  };
 
-  // Update chapter in backend with isCompleted
+  // Update chapter with isCompleted
   const handleTranslateComplete = async (isTranslateCompleted: boolean) => {
     setIsComplete(isTranslateCompleted);
     setIsLoading(true);
@@ -459,9 +632,9 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
         setIsLoading(false);
       });
-  }
+  };
 
-  // Update chapter in backend with isPublished
+  // Update chapter with isPublished
   const handleTranslatePublish = async (isTranslatePublished: boolean) => {
     setIsPublish(isTranslatePublished);
 
@@ -499,8 +672,121 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
         setIsLoading(false);
       });
-  }
+  };
 
+  // Handle Toggle (Database/Import)
+  const handleToggle = (value: boolean) => {
+    setIsImport(value);
+    setTableHeaders([]);
+    setTableRows([]);
+  };
+
+  // Parse picked CSV file to JSON format
+  const handleCSVParse = (file: File) => {
+    try {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const csvData = e.target?.result;
+        if (!csvData) {
+          console.error('Failed to read file');
+          return;
+        }
+
+        Papa.parse(csvData as string, {
+          complete: (results) => {
+            if (results.errors.length > 0) {
+              console.error('CSV parsing errors:', results.errors);
+              return;
+            }
+
+            const jsonData = results.data as ParseDataType[];
+            setParsedData(jsonData);
+          },
+          header: true, // This automatically converts to array of objects using headers
+          skipEmptyLines: true,
+          transformHeader: (header) => {
+            // Transform header names
+            return header.trim();
+          },
+          transform: (value) => {
+            // Transform cell values
+            return value.trim();
+          }
+        });
+      };
+
+      reader.onerror = (error) => {
+        console.error('Error reading file:', error);
+      };
+
+      reader.readAsText(file); // Use readAsText for CSV files
+    } catch (err) {
+      console.error('Error parsing CSV file:', err);
+    }
+  };
+
+  //  Parse picked file to JSON format
+  const handleExcelParse = async (file: File) => {
+    try {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const data = e.target?.result;
+        if (!data) {
+          console.error('Failed to read file');
+          return;
+        }
+
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet) as ParseDataType[];
+
+        setParsedData(jsonData);
+      };
+
+      reader.onerror = (error) => {
+        console.error('Error reading file:', error);
+      };
+
+      reader.readAsArrayBuffer(file);
+    } catch (err) {
+      console.error('Error parsing Excel file:', err);
+    }
+  };
+
+  // Save book by calling API
+  const saveBook = () => {
+    translatorService
+      .saveBook({ bookInfos: necessaryParseData, bookTitle: props.currentBook, language: getLanguageFromLanguageCode(selectedLanguage) })
+      .then(() => {
+        toast.success('Saved successfully!', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+      })
+      .catch(error => {
+        toast.success(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+      });
+  };
+
+  // Log out
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
     props.dispatch({ type: actionTypes.RESET_USER });
@@ -517,7 +803,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         onLogOut={onLogout}
       />
     )
-  }
+  };
 
   const _renderBookSelector = () => {
     return (
@@ -596,7 +882,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       <StyledToggleContainer>
         <StyledToggleItemContainer
           active={!isImport ? 'true' : 'false'}
-          onClick={() => setIsImport(false)}
+          onClick={() => handleToggle(false)}
         >
           <CloudDownloadIcon />
           <Text fontFamily="'Baloo Da 2'">
@@ -606,7 +892,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
         <StyledToggleItemContainer
           active={isImport ? 'true' : 'false'}
-          onClick={() => setIsImport(true)}
+          onClick={() => handleToggle(true)}
         >
           <CloudUploadIcon />
           <Text fontFamily="'Baloo Da 2'">
@@ -619,6 +905,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   const _renderTableInfo = () => {
     return (
+      !isImport &&
       <StyledTableInfoContainer>
         <Text fontFamily="Inter" color="#155D74" fontWeight="500">
           {`${selectedBook} - ${getLabelFromValueInDropdownOptions(selectedSubBook, subBookSelectOptions)} ${getLabelFromValueInDropdownOptions(selectedChapter, chapterSelectOptions)}`}
@@ -637,6 +924,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   const _renderTable = () => {
     return (
+      !isImport &&
       <StyledTableContainer>
         <TablePanel
           headers={tableHeaders}
@@ -644,6 +932,36 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         />
       </StyledTableContainer>
     )
+  };
+
+  const _renderImporter = () => {
+    return (
+      isImport &&
+      <StyledTranslatorContainer flexDirection={isPortrait ? 'column' : 'row'}>
+        <Header
+          isAdmin={!!props.currentUser.isAdmin}
+          username={props.currentUser.username}
+          isLoggedIn
+          onLogOut={onLogout}
+        />
+
+        <StyledTranslatorPortalContainer>
+          <Uploader
+            language={selectedLanguage}
+            languageLabel={getLanguageFromLanguageCode(selectedLanguage)}
+            languages={languages}
+            file={file}
+            parsedData={parsedData}
+            headers={tableHeaders}
+            error={error}
+
+            onChangeLanguage={(e) => setSelectedLanguage(e.target.value as string)}
+            onChangeFile={(e: ChangeEvent<HTMLInputElement>) => setFileInput(e)}
+            onUpload={saveBook}
+          />
+        </StyledTranslatorPortalContainer>
+      </StyledTranslatorContainer>
+    );
   };
 
   const _renderBody = () => {
@@ -662,6 +980,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         {_renderTableInfo()}
 
         {_renderTable()}
+
+        {_renderImporter()}
       </StyledChapterOverviewContainer>
     )
   };

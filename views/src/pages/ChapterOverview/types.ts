@@ -48,8 +48,13 @@ type SelectOptionType = {
   value: string;
 }
 
+type ParseDataType = {
+  [key: string]: string,
+}
+
 export type {
   ChapterOverviewPropsType,
   ChapterModelType,
   SelectOptionType,
+  ParseDataType,
 }
