@@ -49,8 +49,10 @@ import Summary from "@/components/Summary";
 
 import {
   ACCESS_TOKEN,
+  BOOK_INJIL,
   BOOK_QURAN,
   BOOK_SELECTORS,
+  BOOK_TAWRAT,
   BOOK_ZABUR,
 } from "@/config";
 import { DOWNLOAD_SUCCESS } from '@/config/messages';
@@ -136,6 +138,13 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       .then((result: BookType) => {
         setActiveBookInfo(result);
 
+        props.dispatch({
+          type: actionTypes.ADD_BOOKINFO,
+          payload: {
+            bookInfo: result,
+          }
+        })
+
         // Deduplicate sub-books
         const uniqueSubBooks = Array.from(
           new Set(result.subBooks.map(sb => sb.subBookId))
@@ -148,7 +157,24 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
         setSubBookSelectOptions(newSubBookOptions);
 
-        setSelectedSubBook(newSubBookOptions.length ? newSubBookOptions[0].value : '');
+        setSelectedSubBook(
+          newSubBookOptions.some(newSubBookOption => newSubBookOption.value == selectedSubBook) ?
+            selectedSubBook :
+            newSubBookOptions.length ?
+              newSubBookOptions[0].value :
+              ''
+        );
+
+        // Set first sub-book if no selection exists
+        if (newSubBookOptions.length > 0 && !selectedSubBook) {
+          setSelectedSubBook(newSubBookOptions[0].value);
+        }
+
+        const newChapterOptions = result?.subBooks[0]?.chapterInfos?.map(chapterInfo => ({
+          label: chapterInfo?.chapterNumber?.toString(),
+          value: chapterInfo?.chapterId
+        }));
+        setChapterSelectOptions(newChapterOptions);
 
         // Set first sub-book if no selection exists
         if (newSubBookOptions.length > 0 && !selectedSubBook) {
@@ -156,8 +182,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         }
 
         // Set first chapter if no selection exists
-        if (chapterSelectOptions.length > 0 && !selectedChapter)
-          setSelectedChapter(chapterSelectOptions[0].value);
+        if (chapterSelectOptions.length > 0)
+          setSelectedChapter(result?.subBooks[0]?.chapterInfos[0].chapterId);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -191,7 +217,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           payload: {
             chapterInfo: result
           }
-        })
+        });
 
         setIsLoading(false);
       })
@@ -213,33 +239,34 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   // Set cell data for table
   const configureTableData = useCallback(() => {
     const currentSubBook = activeBookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
+    let newHeaders: string[] = [];
+    let newRows: TableRowType[] = [];
+
     if (selectedLanguage == 'en') {
-      setTableHeaders(['SubBook_English', 'Chapter_Number', 'Verse_Number', 'Verse_English']);
+      newHeaders = ['SubBook_English', 'Chapter_Number', 'Verse_Number', 'Verse_English'];
 
-      const rows = verseInfos.map(verseInfo => ({
-        SubBook_English: currentSubBook?.subBookTitle.en || '',
-        Chapter_Number: activeChapterInfo?.chapterNumber.toString() || '1',
-        Verse_Number: verseInfo.verseNumber.toString() || '1',
-        Verse_English: verseInfo.verseText.en || '',
+      newRows = verseInfos.map(verseInfo => ({
+        SubBook_English: currentSubBook?.subBookTitle?.en || '',
+        Chapter_Number: activeChapterInfo?.chapterNumber?.toString() || '1',
+        Verse_Number: verseInfo?.verseNumber?.toString() || '1',
+        Verse_English: verseInfo?.verseText?.en || '',
       }));
-
-      rows ? setTableRows(rows) : setTableRows([]);
-    }
-    else {
+    } else {
       const language = getLanguageFromLanguageCode(selectedLanguage);
-      setTableHeaders(['SubBook_English', `SubBook_${language}`, 'Chapter_Number', 'Verse_Number', `Verse_${language}`]);
+      newHeaders = ['SubBook_English', `SubBook_${language}`, 'Chapter_Number', 'Verse_Number', `Verse_${language}`];
 
-      const rows = verseInfos.map(verseInfo => ({
-        SubBook_English: currentSubBook?.subBookTitle.en || '',
-        [`SubBook_${language}`]: currentSubBook?.subBookTitle?.[selectedLanguage] || currentSubBook?.subBookTitle.en || '',
-        Chapter_Number: activeChapterInfo?.chapterNumber.toString() || '1',
-        Verse_Number: verseInfo.verseNumber.toString() || '1',
-        [`Verse_${language}`]: verseInfo.verseText?.[selectedLanguage] || verseInfo.verseText.en || '',
+      newRows = verseInfos.map(verseInfo => ({
+        SubBook_English: currentSubBook?.subBookTitle?.en || '',
+        [`SubBook_${language}`]: currentSubBook?.subBookTitle?.[selectedLanguage] || currentSubBook?.subBookTitle?.en || '',
+        Chapter_Number: activeChapterInfo?.chapterNumber?.toString() || '1',
+        Verse_Number: verseInfo?.verseNumber?.toString() || '1',
+        [`Verse_${language}`]: verseInfo?.verseText?.[selectedLanguage] || verseInfo?.verseText?.en || '',
       }));
-
-      rows ? setTableRows(rows) : setTableRows([]);
     }
-  }, []);
+
+    setTableHeaders(newHeaders || []);
+    setTableRows(newRows || []);
+  }, [activeBookInfo, activeChapterInfo, verseInfos, selectedSubBook, selectedLanguage]);
 
   // Export table data to Excel
   const exportTable2Excel = useCallback(() => {
@@ -281,53 +308,64 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   // Book Title Effect
   useEffect(() => {
-    setTableHeaders([]);
-    setTableRows([]);
+    const loadBookAndConfigureTable = async () => {
+      setIsLoading(true);
+      try {
+        // Check if book exists in Redux store
+        const existingBook = props.bookInfos.find((bookInfo: BookType) => bookInfo.bookTitle.en == selectedBook);
 
-    // Check if the selected book is existing in redux store
-    const existingBook = props.bookInfos.find((bookInfo: BookType) => bookInfo.bookTitle.en == selectedBook);
-    if (existingBook) {
-      setActiveBookInfo(existingBook);
+        if (existingBook) {
+          setActiveBookInfo(existingBook);
 
-      // Deduplicate sub-books
-      const uniqueSubBooks = Array.from(
-        new Set(existingBook.subBooks.map(sb => sb.subBookId))
-      ).map(id => existingBook.subBooks.find(sb => sb.subBookId === id)!);
+          // Update subbook options
+          const uniqueSubBooks = Array.from(
+            new Set(existingBook.subBooks.map(sb => sb.subBookId))
+          ).map(id => existingBook.subBooks.find(sb => sb.subBookId === id)!);
 
-      const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
-        label: subBook.subBookTitle?.[selectedLanguage],
-        value: subBook.subBookId
-      }));
+          const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
+            label: subBook.subBookTitle?.[selectedLanguage],
+            value: subBook.subBookId
+          }));
 
-      setSubBookSelectOptions(newSubBookOptions);
+          setSubBookSelectOptions(newSubBookOptions);
 
-      setSelectedSubBook(
-        newSubBookOptions.some(newSubBookOption => newSubBookOption.value == selectedSubBook) ?
-          selectedSubBook :
-          newSubBookOptions.length ?
-            newSubBookOptions[0].value :
-            ''
-      );
+          // Update selected subbook if needed
+          if (!newSubBookOptions.some(opt => opt.value === selectedSubBook)) {
+            setSelectedSubBook(newSubBookOptions[0]?.value || '');
+          }
 
-      // Set first sub-book if no selection exists
-      if (newSubBookOptions.length > 0 && !selectedSubBook) {
-        setSelectedSubBook(newSubBookOptions[0].value);
+        } else {
+          await fetchBookInfoByTitle(selectedBook);
+        }
+
+        // Load chapter info if we have a selected chapter
+        if (selectedChapter) {
+          const existingChapterInfo = props.chapterInfos.find(
+            chapterInfo => chapterInfo.chapterId == selectedChapter
+          );
+
+          if (existingChapterInfo) {
+            setActiveChapterInfo(existingChapterInfo);
+            setVerseInfos(existingChapterInfo.verses);
+          } else {
+            await fetchChapterInfoByChapterId(selectedChapter);
+          }
+        }
+
+        configureTableData();
+      } catch (error) {
+        console.error('Error loading data:', error);
+        toast.error(error instanceof Error ? error.message : String(error));
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      // Set first chapter if no selection exists
-      if (chapterSelectOptions.length > 0 && !selectedChapter)
-        setSelectedChapter(chapterSelectOptions[0].value);
-    } else { // If the book is not existing in redux store, fetch from database
-      fetchBookInfoByTitle(selectedBook);
-    }
-    configureTableData();
+    loadBookAndConfigureTable();
   }, [selectedBook]);
 
   // Sub Book Effect
   useEffect(() => {
-    setTableHeaders([]);
-    setTableRows([]);
-
     const bookInfo = props.bookInfos.find(bookInfo => bookInfo.subBooks.find(subBook => subBook.subBookId == selectedSubBook));
     const subBookInfo = bookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
 
@@ -336,7 +374,10 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       label: chapterInfo.chapterNumber.toString(),
     }));
 
-    newChapterOptions ? setChapterSelectOptions(newChapterOptions) : setChapterSelectOptions([]);
+    if (newChapterOptions) {
+      setChapterSelectOptions(newChapterOptions);
+      setSelectedChapter(newChapterOptions[0].value);
+    }
 
     configureTableData();
   }, [selectedSubBook]);
@@ -358,20 +399,9 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     configureTableData();
   }, [selectedChapter]);
 
-  // Language Effect
   useEffect(() => {
-    setTableHeaders([]);
-    setTableRows([]);
-
-    const newLanguageSubBookOptions = activeBookInfo?.subBooks.map(subBook => ({
-      value: subBook.subBookId,
-      label: subBook.subBookTitle?.[selectedLanguage] || subBook.subBookTitle.en
-    }));
-
-    newLanguageSubBookOptions ? setSubBookSelectOptions(newLanguageSubBookOptions) : [];
-
     configureTableData();
-  }, [selectedLanguage]);
+  }, [verseInfos, activeChapterInfo, selectedLanguage]);
 
   useEffect(() => {
     const file = fileInput?.target.files && fileInput?.target.files[0];
@@ -445,9 +475,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     }
   }, [file, selectedLanguage]);
 
-  /**
-   * Effect hook for error handling
-  */
+  // Effect hook for error handling
   useEffect(() => {
     const necessaryHeaders: string[] = [
       'SubBook_English',
@@ -536,6 +564,10 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const handleSelectLanguageChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const value = event.target.value as string;
     setSelectedLanguage(value);
+
+    // Reset table data to force re-render
+    setTableHeaders([]);
+    setTableRows([]);
 
     props.dispatch({
       type: actionTypes.SET_CURRENT_LANGUAGE,
@@ -828,7 +860,9 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         </StyledBackContainer>
 
         <StyledSelectGroupContainer>
-          <Text fontFamily="Inter" color="#155D74" fontWeight="500">Go to:</Text>
+          <Text fontFamily="Inter" color="#155D74" fontWeight="500">
+            {(selectedBook == BOOK_INJIL || selectedBook == BOOK_TAWRAT) ? 'Go to: ' : 'Go to Surah: '}
+          </Text>
           <SelectBox
             label=""
             options={subBookSelectOptions}
@@ -838,14 +872,17 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
             onChange={handleSelectSubBookChange}
           />
 
-          <SelectBox
-            label=""
-            options={chapterSelectOptions}
-            value={chapterSelectOptions.find(option => option.value === selectedChapter) ? selectedChapter : ''}
-            backgroundColor="#fff"
-            textColor="#155D74"
-            onChange={handleSelectChapterChange}
-          />
+          {
+            (selectedBook == BOOK_INJIL || selectedBook == BOOK_TAWRAT) &&
+            <SelectBox
+              label=""
+              options={chapterSelectOptions}
+              value={chapterSelectOptions.find(option => option.value === selectedChapter) ? selectedChapter : ''}
+              backgroundColor="#fff"
+              textColor="#155D74"
+              onChange={handleSelectChapterChange}
+            />
+          }
 
           <SelectBox
             label=""
@@ -908,7 +945,11 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       !isImport &&
       <StyledTableInfoContainer>
         <Text fontFamily="Inter" color="#155D74" fontWeight="500">
-          {`${selectedBook} - ${getLabelFromValueInDropdownOptions(selectedSubBook, subBookSelectOptions)} ${getLabelFromValueInDropdownOptions(selectedChapter, chapterSelectOptions)}`}
+          {
+            `${selectedBook} - 
+            ${getLabelFromValueInDropdownOptions(selectedSubBook, subBookSelectOptions)} 
+            ${(selectedBook == BOOK_INJIL || selectedBook == BOOK_TAWRAT) ? getLabelFromValueInDropdownOptions(selectedChapter, chapterSelectOptions) : ''}`
+          }
         </Text>
 
         <StyledExportButtonContainer>

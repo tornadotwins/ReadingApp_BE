@@ -43,7 +43,7 @@ function SubBookAudio(props: SubBookAudioPropsType) {
                 <ChapterAudioSquare
                   key={index}
                   chapterNumber={chapterInfo.chapterNumber}
-                  audioStatus={chapterInfo.chapterAudio?.[props.languageCode] || TRANSLATION_STATUS_NONE}
+                  audioStatus={chapterInfo?.chapterAudio?.[props.languageCode] || TRANSLATION_STATUS_NONE}
                   onClick={() => { }}
                 />
               ))
@@ -59,7 +59,7 @@ function SubBookAudio(props: SubBookAudioPropsType) {
                 <ChapterAudioSquare
                   key={index}
                   chapterNumber={subBook.subBookNumber}
-                  audioStatus={subBook.chapterInfos[0].chapterAudio?.[props.languageCode] || TRANSLATION_STATUS_NONE}
+                  audioStatus={subBook.chapterInfos[0]?.chapterAudio?.[props.languageCode] || TRANSLATION_STATUS_NONE}
                   onClick={() => { }}
                 />
               ))

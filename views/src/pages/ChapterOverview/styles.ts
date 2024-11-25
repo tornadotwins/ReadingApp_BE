@@ -55,6 +55,11 @@ const StyledBackContainer = styled(Box) ({
   alignItems: 'center',
   cursor: 'pointer',
   marginRight: '250px',
+  transitionDuration: '.25s',
+
+  '&:hover': {
+    transform: 'scale(1.1)',
+  },
 
   '& .MuiSvgIcon-root' : {
     width: '16px',
@@ -69,7 +74,7 @@ const StyledSelectGroupContainer = styled(Box) ({
   alignItems: 'center',
 
   '& >.MuiBox-root': {
-    minWidth: '50px',
+    minWidth: '100px',
     marginRight: '20px'
   },
 

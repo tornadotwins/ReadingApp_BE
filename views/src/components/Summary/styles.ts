@@ -9,6 +9,10 @@ const StyledContainer = styled(Box) ({
 
   '& .MuiAccordionDetails-root': {
     paddingLeft: '25px !important',
+  },
+
+  '& .MuiAccordionSummary-content > .MuiBox-root :nth-of-type(2)': {
+    padding: '0px !important',
   }
 });
 

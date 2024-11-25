@@ -23,11 +23,11 @@ function SubBookText(props: SubBookTextPropsType) {
       <StyledSubBookContentContainer>
         <StyledSubBookIntroChapterContainer>
           {
-            props.subBook && !!props.subBook.noChapter && props.subBook.chapterInfos[0].chapterNumber == 0 &&
+            props.subBook && !!props.subBook.noChapter && props.subBook?.chapterInfos[0]?.chapterNumber == 0 &&
             <ChapterSquare
               chapterInfo={props.subBook.chapterInfos[0]}
-              isCompleted={props.subBook.chapterInfos[0].chapterIsCompleted?.[props.languageCode]}
-              isPublished={props.subBook.chapterInfos[0].chapterIsPublished?.[props.languageCode]}
+              isCompleted={props.subBook.chapterInfos[0]?.chapterIsCompleted?.[props.languageCode]}
+              isPublished={props.subBook.chapterInfos[0]?.chapterIsPublished?.[props.languageCode]}
               onClick={props.onChapterClick}
             />
           }
@@ -42,8 +42,8 @@ function SubBookText(props: SubBookTextPropsType) {
                   key={index}
                   subBookInfo={props.subBook}
                   chapterInfo={chapterInfo}
-                  isCompleted={chapterInfo.chapterIsCompleted?.[props.languageCode]}
-                  isPublished={chapterInfo.chapterIsPublished?.[props.languageCode]}
+                  isCompleted={chapterInfo?.chapterIsCompleted?.[props.languageCode] || false}
+                  isPublished={chapterInfo?.chapterIsPublished?.[props.languageCode] || false}
                   onClick={props.onChapterClick}
                 />
               ))
@@ -59,8 +59,8 @@ function SubBookText(props: SubBookTextPropsType) {
                 <ChapterSquare
                   key={index}
                   subBookInfo={subBook}
-                  isCompleted={subBook.chapterInfos[0].chapterIsCompleted?.[props.languageCode]}
-                  isPublished={subBook.chapterInfos[0].chapterIsPublished?.[props.languageCode]}
+                  isCompleted={subBook?.chapterInfos[0]?.chapterIsCompleted?.[props.languageCode] || false}
+                  isPublished={subBook?.chapterInfos[0]?.chapterIsPublished?.[props.languageCode] || false}
                   onClick={() => { }}
                 />
               ))
