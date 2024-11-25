@@ -31,7 +31,7 @@ function AccordionPanel(props: AccordionExpandProps) {
           }
         >
           <StyledLabelContainer>
-            <Text color="#1B7695" fontWeight="700">
+            <Text color="#1B7695" fontWeight="700" fontFamily='Inter'>
               {props.label}
             </Text>
 
