@@ -122,8 +122,6 @@ const BookOverview = (props: BookOverviewPropsType) => {
           setBookInfo(existingBookInfo);
         } else {
           const result = await bookService.getBookInfoByTitle(selectedBook);
-
-          console.log({ result })
           const resultInBookType: BookType = {
             bookId: result.bookId,
             bookImage: result.bookImage,

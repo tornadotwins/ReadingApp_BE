@@ -100,6 +100,24 @@ const addChapterInfo = (state: BookStateType, action: ChapterActionType) => {
 };
 
 //////////////////////////////////////////////////////////////////
+/////////////////// Update Chapter Information ///////////////////
+//////////////////////////////////////////////////////////////////
+const updateChapterInfo = (state: BookStateType, action: ChapterActionType) => {
+  const {chapterInfo} = action.payload;
+  const updatedChapterInfos = state.chapterInfos.map(
+    chapter => 
+      chapter.chapterId == chapterInfo.chapterId ?
+        chapterInfo:
+        chapter
+  );
+  
+  return {
+    ...state,
+    chapterInfos: updatedChapterInfos
+  }
+}
+
+//////////////////////////////////////////////////////////////////
 ////////////////////// Set Current Language //////////////////////
 //////////////////////////////////////////////////////////////////
 const setCurrentLanguage = (state: BookStateType, action: LanguageActionType) => {
@@ -127,6 +145,7 @@ const actionHandler = {
   [Types.ADD_SUBBOOKINFO]: addSubBookInfo,
   [Types.REMOVE_SUBBOOKINFO]: removeSubBookInfo,
   [Types.ADD_CHAPTERINFO]: addChapterInfo,
+  [Types.UPDATE_CHAPTERINFOS]: updateChapterInfo,
   
   [Types.SET_CURRENT_LANGUAGE]: setCurrentLanguage,
 

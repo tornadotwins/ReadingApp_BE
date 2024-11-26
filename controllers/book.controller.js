@@ -747,7 +747,7 @@ exports.getBookInfomationByTitle = async (req, res) => {
     const subBooksWithChapters = await Promise.all(
       subBooks.map(async (subBook) => {
         const chapters = await Chapter.find({ subBook: subBook._id })
-          .select('chapterNumber audio isTranslated')
+          .select('chapterNumber audio isTranslated isCompleted isPublished')
           .lean()
           .exec();
         return {

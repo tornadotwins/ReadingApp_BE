@@ -11,7 +11,6 @@ import { SubBookTextPropsType } from "./types";
 import { ChapterInfoType, SubBookInfoType } from "@/pages/BookOverview/types";
 
 function SubBookText(props: SubBookTextPropsType) {
-  console.log(props.subBook)
   return (
     <StyledSubBookContainer>
       {!props.isQuranOrZabur && props.subBook &&

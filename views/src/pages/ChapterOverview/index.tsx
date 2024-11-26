@@ -400,7 +400,6 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
     if (newChapterOptions && locationState.chapterId) {
       setSelectedChapter(locationState.chapterId);
-      locationState.chapterId = '';
     } else if (newChapterOptions) {
       setChapterSelectOptions(newChapterOptions);
       setSelectedChapter(newChapterOptions[0].value);
@@ -423,6 +422,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       fetchChapterInfoByChapterId(selectedChapter);
     }
 
+    locationState.chapterId = ''
+    
     configureTableData();
   }, [selectedChapter]);
 
@@ -640,6 +641,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       chapterTranslated: updatedChapterInfo.isTranslated,
       chapterIsCompleted: updatedChapterInfo.isCompleted,
       chapterIsPublished: updatedChapterInfo.isPublished,
+      subBookId: updatedChapterInfo.subBook,
       verses: activeChapterInfo.verses,
     }
 
@@ -659,6 +661,13 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       type: actionTypes.SET_BOOKINFOS,
       payload: {
         bookInfos: updatedBookInfos
+      }
+    });
+
+    props.dispatch({
+      type: actionTypes.UPDATE_CHAPTERINFOS,
+      payload: {
+        chapterInfo: newChapterInfo,
       }
     })
   };
