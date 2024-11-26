@@ -113,6 +113,10 @@ const BookOverview = (props: BookOverviewPropsType) => {
 
   // Book information effect
   useEffect(() => {
+    if (selectedBook == 'App Text') {
+      moveToAppTextoverview();
+      return;
+    }
     const fetchBookInfo = async () => {
       setIsLoading(true);
       try {
@@ -204,6 +208,10 @@ const BookOverview = (props: BookOverviewPropsType) => {
     };
 
     navigate('/admin/chapteroverview', { state: passData });
+  }
+
+  const moveToAppTextoverview = () => {
+    navigate('/admin/apptext');
   }
 
   const onLogout = () => {

@@ -9,6 +9,7 @@ enum Pages {
   Translator,
   BookOverview,
   ChapterOverview,
+  AppTextOverview,
   Page2,
   Page3,
   Page4,

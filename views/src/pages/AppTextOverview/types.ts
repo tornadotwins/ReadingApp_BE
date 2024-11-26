@@ -3,6 +3,7 @@ import { UserType } from "../types"
 
 type AppTextOverviewPropsType = {
   currentUser: UserType;
+  currentLanguage: string;
   
   dispatch: Dispatch;
 }
