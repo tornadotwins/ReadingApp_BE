@@ -747,7 +747,7 @@ exports.getBookInfomationByTitle = async (req, res) => {
     const subBooksWithChapters = await Promise.all(
       subBooks.map(async (subBook) => {
         const chapters = await Chapter.find({ subBook: subBook._id })
-          .select('chapterNumber audio isTranslated')
+          .select('chapterNumber audio isTranslated isCompleted isPublished')
           .lean()
           .exec();
         return {
@@ -759,10 +759,10 @@ exports.getBookInfomationByTitle = async (req, res) => {
             .map((chapter) => ({
               chapterId: chapter._id,
               chapterNumber: chapter.chapterNumber,
-              audio: chapter.audio,
-              isTranslated: chapter.isTranslated,
-              isCompleted: chapter.isCompleted,
-              isPublished: chapter.isPublished,
+              chapterAudio: chapter.audio,
+              chapterIsTranslated: chapter.isTranslated,
+              chapterIsCompleted: chapter.isCompleted,
+              chapterIsPublished: chapter.isPublished,
             }))
             .sort((a, b) => a.chapterNumber - b.chapterNumber),
         };
