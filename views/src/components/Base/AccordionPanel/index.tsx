@@ -3,10 +3,20 @@ import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 
-import { StyledAccordionPanel, StyledLabelContainer } from './styled';
+import {
+  StyledAccordionPanel,
+  StyledLabelContainer,
+  StyledLabel,
+  StyledSummaryIcon,
+  StyledSwitchContainer,
+} from './styled';
 import Text from '../Text';
 import { AccordionExpandProps } from './types';
 import Input from '../Input';
+import Switch from '../Switch';
+
+import { getLanguageFromLanguageCode } from '@/utils';
+import Images from '@/config/images';
 
 function AccordionPanel(props: AccordionExpandProps) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -31,9 +41,15 @@ function AccordionPanel(props: AccordionExpandProps) {
           }
         >
           <StyledLabelContainer>
-            <Text color="#1B7695" fontWeight="700" fontFamily='Inter'>
-              {props.label}
-            </Text>
+            <StyledLabel>
+              {
+                props.summaryIcon &&
+                <StyledSummaryIcon src={Images.icon_mobile} />
+              }
+              <Text color="#1B7695" fontWeight="700" fontFamily='Inter'>
+                {props.label}
+              </Text>
+            </StyledLabel>
 
             {
               props.summaryTitle &&
@@ -50,6 +66,41 @@ function AccordionPanel(props: AccordionExpandProps) {
                   }
                 }
               />
+            }
+
+            {
+              props.hasSwitches &&
+              <StyledSwitchContainer>
+                <Switch
+                  label="Complete: "
+                  value={props.isPublish || false}
+                  disable={
+                    (props.currentUser?.isAdmin ||
+                      props.currentUser?.roles.some(
+                        role => role.language == getLanguageFromLanguageCode(props.currentLanguage || 'en') &&
+                          role.role.toLowerCase() == "translator".toLowerCase()
+                      )) ?
+                      false :
+                      true
+                  }
+                  onChange={() => { }}
+                />
+
+                <Switch
+                  label="Publish: "
+                  value={props.isPublish || false}
+                  disable={
+                    (props.currentUser?.isAdmin ||
+                      props.currentUser?.roles.some(
+                        role => role.language == getLanguageFromLanguageCode(props.currentLanguage || 'en') &&
+                          role.role.toLowerCase() == "publisher".toLowerCase()
+                      )) ?
+                      false :
+                      true
+                  }
+                  onChange={() => { }}
+                />
+              </StyledSwitchContainer>
             }
           </StyledLabelContainer>
         </AccordionSummary>

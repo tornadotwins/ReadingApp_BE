@@ -27,7 +27,7 @@ import { AppTextOverviewPropsType } from "./types";
 import { LanguageType } from "../types";
 
 // Utils
-import { getLanguageCodeFromLanguage } from "@/utils";
+import { getLanguageCodeFromLanguage, getLanguageFromLanguageCode } from "@/utils";
 
 // Constatns
 import {
@@ -36,6 +36,7 @@ import {
   BOOK_APP_TEXT,
 } from "@/config";
 import actionTypes from "@/actions/actionTypes";
+import PageTerms from "@/components/PageTerms";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -74,6 +75,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
       />
     )
   };
+
   const handleSelectedBook = (bookTitle: string) => {
     setSelectedBook(bookTitle);
 
@@ -100,8 +102,6 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
       </StyledBookSelectorContainer>
     )
   };
-
-
 
   // Memoized language processing
   const processLanguages = useCallback(() => {
@@ -171,7 +171,33 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
         />
       </StyledLanguageSelectorContainer>
     )
-  }
+  };
+
+  const _renderTermEdit = () => {
+    return (
+      <PageTerms
+        pageName="Welcome Page"
+        languageCode={currentLanguage}
+        languageLabel={getLanguageFromLanguageCode(currentLanguage)}
+        languages={languages}
+        currentLanguage={getLanguageFromLanguageCode(props.currentLanguage)}
+        currentUser={props.currentUser}
+
+        terms={[
+          {
+            variable: 'Welcome',
+            defaultTerm: 'Welcome default',
+            currentTerm: 'Welcome Edit',
+          },
+          {
+            variable: 'LogIn',
+            defaultTerm: 'Log In',
+            currentTerm: 'Log In Edit',
+          }
+        ]}
+      />
+    )
+  };
 
   const _renderBody = () => {
     return (
@@ -181,9 +207,11 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
         {_renderBookSelector()}
 
         {_renderLanguageSelector()}
+
+        {_renderTermEdit()}
       </StyledBodyContainer>
     )
-  }
+  };
 
   return (
     <StyledContainer>
