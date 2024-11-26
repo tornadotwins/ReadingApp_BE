@@ -64,6 +64,16 @@ const StyledLabelContainer= styled(Box) ({
   }
 });
 
+const StyledInputContainer = styled(Box) ({
+  display: 'block',
+  padding: '0px',
+  margin: '0px',
+
+  '& .MuiBox-root': {
+    padding: '0px'
+  }
+});
+
 const StyledLabel = styled(Box) ({
   display: 'flex',
   alignItems: 'center',
@@ -75,15 +85,23 @@ const StyledSummaryIcon = styled('img') ({
   marginRight: '5px'
 });
 
-const StyledSwitchContainer = styled(Box) ({
+const StyledSwitchGroupContainer = styled(Box) ({
   display: "flex",
   alignItems: 'center',
 });
 
+const StyledSwitchContainer = styled(Box) ({
+  display: 'flex',
+  padding: '0px',
+  margin: '0px',
+})
+
 export {
   StyledAccordionPanel,
   StyledLabelContainer,
+  StyledInputContainer,
   StyledLabel,
   StyledSummaryIcon,
-  StyledSwitchContainer
+  StyledSwitchGroupContainer,
+  StyledSwitchContainer,
 }

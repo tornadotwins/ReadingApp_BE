@@ -115,51 +115,52 @@ const BookOverview = (props: BookOverviewPropsType) => {
   useEffect(() => {
     if (selectedBook == 'App Text') {
       moveToAppTextoverview();
-      return;
-    }
-    const fetchBookInfo = async () => {
-      setIsLoading(true);
-      try {
-        const existingBookInfo = props.bookInfos.find((book: BookType) => book.bookTitle.en === selectedBook);
+    } else {
+      const fetchBookInfo = async () => {
+        setIsLoading(true);
+        try {
+          const existingBookInfo = props.bookInfos.find((book: BookType) => book.bookTitle.en === selectedBook);
 
-        if (existingBookInfo) {
-          setBookInfo(existingBookInfo);
-        } else {
-          const result = await bookService.getBookInfoByTitle(selectedBook);
-          const resultInBookType: BookType = {
-            bookId: result.bookId,
-            bookImage: result.bookImage,
-            bookTitle: result.bookTitle,
-            subBooks: result.subBooks,
-          }
-          setBookInfo(result);
-
-          props.dispatch({
-            type: actionTypes.ADD_BOOKINFO,
-            payload: {
-              bookInfo: resultInBookType
+          if (existingBookInfo) {
+            setBookInfo(existingBookInfo);
+          } else {
+            const result = await bookService.getBookInfoByTitle(selectedBook);
+            const resultInBookType: BookType = {
+              bookId: result.bookId,
+              bookImage: result.bookImage,
+              bookTitle: result.bookTitle,
+              subBooks: result.subBooks,
             }
+            setBookInfo(result);
+
+            props.dispatch({
+              type: actionTypes.ADD_BOOKINFO,
+              payload: {
+                bookInfo: resultInBookType
+              }
+            });
+          }
+
+
+          setIsLoading(false);
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : String(error), {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
           });
+
+          setIsLoading(false);
         }
+      };
 
-        setIsLoading(false);
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : String(error), {
-          position: 'top-right',
-          draggable: true,
-          theme: 'colored',
-          transition: Bounce,
-          closeOnClick: true,
-          pauseOnHover: true,
-          hideProgressBar: false,
-          autoClose: 3000
-        });
-
-        setIsLoading(false);
-      }
-    };
-
-    fetchBookInfo();
+      fetchBookInfo();
+    }
   }, [selectedBook, props.bookInfos]);
 
   // Event Handlers

@@ -8,6 +8,8 @@ import {
   StyledLabelContainer,
   StyledLabel,
   StyledSummaryIcon,
+  StyledInputContainer,
+  StyledSwitchGroupContainer,
   StyledSwitchContainer,
 } from './styled';
 import Text from '../Text';
@@ -53,54 +55,60 @@ function AccordionPanel(props: AccordionExpandProps) {
 
             {
               props.summaryTitle &&
-              <Input
-                value={props.summaryTitle}
-                label=''
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange && props.onChange(event)}
-                onKeyDown={
-                  (event: React.KeyboardEvent<HTMLInputElement>) => {
-                    event.key == 'Enter' &&
-                      props.onCurrentChapterTitleEnterPressed &&
-                      props.summaryTitle &&
-                      props.onCurrentChapterTitleEnterPressed(props.summaryTitle)
+              <StyledInputContainer onClick={(e => e.stopPropagation())}>
+                <Input
+                  value={props.summaryTitle}
+                  label=''
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange && props.onChange(event)}
+                  onKeyDown={
+                    (event: React.KeyboardEvent<HTMLInputElement>) => {
+                      event.key == 'Enter' &&
+                        props.onCurrentChapterTitleEnterPressed &&
+                        props.summaryTitle &&
+                        props.onCurrentChapterTitleEnterPressed(props.summaryTitle)
+                    }
                   }
-                }
-              />
+                />
+              </StyledInputContainer>
             }
 
             {
               props.hasSwitches &&
-              <StyledSwitchContainer>
-                <Switch
-                  label="Complete: "
-                  value={props.isComplete || false}
-                  disable={
-                    (props.currentUser?.isAdmin ||
-                      props.currentUser?.roles.some(
-                        role => role.language == getLanguageFromLanguageCode(props.currentLanguage || 'en') &&
-                          role.role.toLowerCase() == "translator".toLowerCase()
-                      )) ?
-                      false :
-                      true
-                  }
-                  onChange={(value: boolean) => props.onCompleteChange && props.onCompleteChange(value)}
-                />
+              <StyledSwitchGroupContainer onClick={(e => e.stopPropagation())}>
+                <StyledSwitchContainer>
+                  <Switch
+                    label="Complete: "
+                    value={props.isComplete || false}
+                    disable={
+                      (props.currentUser?.isAdmin ||
+                        props.currentUser?.roles.some(
+                          role => role.language == getLanguageFromLanguageCode(props.currentLanguage || 'en') &&
+                            role.role.toLowerCase() == "translator".toLowerCase()
+                        )) ?
+                        false :
+                        true
+                    }
+                    onChange={(value: boolean) => props.onCompleteChange && props.onCompleteChange(value)}
+                  />
+                </StyledSwitchContainer>
 
-                <Switch
-                  label="Publish: "
-                  value={props.isPublish || false}
-                  disable={
-                    (props.currentUser?.isAdmin ||
-                      props.currentUser?.roles.some(
-                        role => role.language == getLanguageFromLanguageCode(props.currentLanguage || 'en') &&
-                          role.role.toLowerCase() == "publisher".toLowerCase()
-                      )) ?
-                      false :
-                      true
-                  }
-                  onChange={(value: boolean) => props.onPublishChange && props.onPublishChange(value)}
-                />
-              </StyledSwitchContainer>
+                <StyledSwitchContainer onClick={(e => e.stopPropagation())}>
+                  <Switch
+                    label="Publish: "
+                    value={props.isPublish || false}
+                    disable={
+                      (props.currentUser?.isAdmin ||
+                        props.currentUser?.roles.some(
+                          role => role.language == getLanguageFromLanguageCode(props.currentLanguage || 'en') &&
+                            role.role.toLowerCase() == "publisher".toLowerCase()
+                        )) ?
+                        false :
+                        true
+                    }
+                    onChange={(value: boolean) => props.onPublishChange && props.onPublishChange(value)}
+                  />
+                </StyledSwitchContainer>
+              </StyledSwitchGroupContainer>
             }
           </StyledLabelContainer>
         </AccordionSummary>
