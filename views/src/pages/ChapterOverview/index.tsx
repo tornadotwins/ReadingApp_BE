@@ -37,8 +37,7 @@ import {
   StyledExportButtonContainer,
   StyledToggleContainer,
   StyledToggleItemContainer,
-  StyledTranslatorPortalContainer,
-  StyledTranslatorContainer,
+  StyledTranslatorPortalContainer
 } from "./styles";
 
 import Header from "@/components/Header";
@@ -251,27 +250,49 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     const currentSubBook = activeBookInfo?.subBooks?.find(subBook => subBook.subBookId == selectedSubBook);
     let newHeaders: string[] = [];
     let newRows: TableRowType[] = [];
+    const isSpecialBook = activeBookInfo?.bookTitle?.en == 'Qur\'an' || activeBookInfo?.bookTitle?.en == 'Zabur';
 
     if (selectedLanguage == 'en') {
-      newHeaders = ['SubBook_English', 'Chapter_Number', 'Verse_Number', 'Verse_English'];
-
-      newRows = verseInfos.map(verseInfo => ({
-        SubBook_English: currentSubBook?.subBookTitle?.en || '',
-        Chapter_Number: activeChapterInfo?.chapterNumber?.toString() || '1',
-        Verse_Number: verseInfo?.verseNumber?.toString() || '1',
-        Verse_English: verseInfo?.verseText?.en || '',
-      }));
+      if (isSpecialBook) {
+        newHeaders = ['SubBook_English', 'SubBook_Transliteration', 'Chapter_Number', 'Verse_Number', 'Verse_English'];
+        newRows = verseInfos?.map(verseInfo => ({
+          SubBook_English: currentSubBook?.subBookTitle?.en || '',
+          SubBook_Transliteration: currentSubBook?.subBookTitle?.transliteration || '',
+          Chapter_Number: activeChapterInfo?.chapterNumber?.toString() || '1',
+          Verse_Number: verseInfo?.verseNumber?.toString() || '1',
+          Verse_English: verseInfo?.verseText?.en || '',
+        }));
+      } else {
+        newHeaders = ['SubBook_English', 'Chapter_Number', 'Verse_Number', 'Verse_English'];
+        newRows = verseInfos?.map(verseInfo => ({
+          SubBook_English: currentSubBook?.subBookTitle?.en || '',
+          Chapter_Number: activeChapterInfo?.chapterNumber?.toString() || '1',
+          Verse_Number: verseInfo?.verseNumber?.toString() || '1',
+          Verse_English: verseInfo?.verseText?.en || '',
+        }));
+      }
     } else {
       const language = getLanguageFromLanguageCode(selectedLanguage);
-      newHeaders = ['SubBook_English', `SubBook_${language}`, 'Chapter_Number', 'Verse_Number', `Verse_${language}`];
-
-      newRows = verseInfos.map(verseInfo => ({
-        SubBook_English: currentSubBook?.subBookTitle?.en || '',
-        [`SubBook_${language}`]: currentSubBook?.subBookTitle?.[selectedLanguage] || currentSubBook?.subBookTitle?.en || '',
-        Chapter_Number: activeChapterInfo?.chapterNumber?.toString() || '1',
-        Verse_Number: verseInfo?.verseNumber?.toString() || '1',
-        [`Verse_${language}`]: verseInfo?.verseText?.[selectedLanguage] || verseInfo?.verseText?.en || '',
-      }));
+      if (isSpecialBook) {
+        newHeaders = ['SubBook_English', `SubBook_${language}`, 'SubBook_Transliteration', 'Chapter_Number', 'Verse_Number', `Verse_${language}`];
+        newRows = verseInfos?.map(verseInfo => ({
+          SubBook_English: currentSubBook?.subBookTitle?.en || '',
+          [`SubBook_${language}`]: currentSubBook?.subBookTitle?.[selectedLanguage] || currentSubBook?.subBookTitle?.en || '',
+          SubBook_Transliteration: isSpecialBook && currentSubBook?.subBookTitle?.transliteration || '',
+          Chapter_Number: activeChapterInfo?.chapterNumber?.toString() || '1',
+          Verse_Number: verseInfo?.verseNumber?.toString() || '1',
+          [`Verse_${language}`]: verseInfo?.verseText?.[selectedLanguage] || verseInfo?.verseText?.en || '',
+        }));
+      } else {
+        newHeaders = ['SubBook_English', `SubBook_${language}`, 'Chapter_Number', 'Verse_Number', `Verse_${language}`];
+        newRows = verseInfos?.map(verseInfo => ({
+          SubBook_English: currentSubBook?.subBookTitle?.en || '',
+          [`SubBook_${language}`]: currentSubBook?.subBookTitle?.[selectedLanguage] || currentSubBook?.subBookTitle?.en || '',
+          Chapter_Number: activeChapterInfo?.chapterNumber?.toString() || '1',
+          Verse_Number: verseInfo?.verseNumber?.toString() || '1',
+          [`Verse_${language}`]: verseInfo?.verseText?.[selectedLanguage] || verseInfo?.verseText?.en || '',
+        }));
+      }
     }
 
     setTableHeaders(newHeaders || []);
@@ -283,7 +304,6 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     const fileName = `${selectedBook}-${getLabelFromValueInDropdownOptions(selectedSubBook, subBookSelectOptions)}-${getLabelFromValueInDropdownOptions(selectedChapter, chapterSelectOptions)}`;
 
     const worksheet = XLSX.utils.json_to_sheet(tableRows);
-    console.log(tableRows)
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
@@ -536,11 +556,13 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
         const firstSubBookTransliteration = parsedData[0]['SubBook_Transliteration'];
         const differentSubBookTransliterations = parsedData.find((data) => data['SubBook_Transliteration'] != firstSubBookTransliteration);
+
         if (differentSubBookTransliterations)
           errorMsg = ERROR_ONLY_ONE_TRANSLITERATION;
 
         // Check the file structure according to book
-        const hasTransliteration = tableHeaders.includes('SubBook_Transliteration');
+        const hasTransliteration = importTableHeaders.includes('SubBook_Transliteration');
+
         //In Qur'an or Zabur, all chapter numbers should be 1, not the others
         if (props.currentBook == BOOK_QURAN || props.currentBook == BOOK_ZABUR) {
           // Check if the file has SubBook_Transliteration field
@@ -569,7 +591,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         setError(errorMsg)
       }
     }
-  }, [tableHeaders, selectedLanguage, parsedData, isImport]);
+  }, [tableRows, importTableHeaders, isImport, selectedLanguage, parsedData, necessaryParsedData]);
 
   const handleSelectedBook = (bookTitle: string) => {
     setSelectedBook(bookTitle);
@@ -882,7 +904,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   };
 
   //  Parse picked file to JSON format
-  const handleExcelParse = async (file: File) => {
+  const handleExcelParse = useCallback(async (file: File) => {
     try {
       const reader = new FileReader();
 
@@ -909,7 +931,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     } catch (err) {
       console.error('Error parsing Excel file:', err);
     }
-  };
+  }, [file]);
 
   // Save book by calling API
   const saveBook = () => {
@@ -1111,30 +1133,21 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const _renderImporter = () => {
     return (
       isImport &&
-      <StyledTranslatorContainer flexDirection={isPortrait ? 'column' : 'row'}>
-        <Header
-          isAdmin={!!props.currentUser.isAdmin}
-          username={props.currentUser.username}
-          isLoggedIn
-          onLogOut={onLogout}
+      <StyledTranslatorPortalContainer>
+        <Uploader
+          language={selectedLanguage}
+          languageLabel={getLanguageFromLanguageCode(selectedLanguage)}
+          languages={languages}
+          file={file}
+          parsedData={parsedData}
+          headers={importTableHeaders}
+          error={error}
+
+          onChangeLanguage={(e) => setSelectedLanguage(e.target.value as string)}
+          onChangeFile={(e: ChangeEvent<HTMLInputElement>) => setFileInput(e)}
+          onUpload={saveBook}
         />
-
-        <StyledTranslatorPortalContainer>
-          <Uploader
-            language={selectedLanguage}
-            languageLabel={getLanguageFromLanguageCode(selectedLanguage)}
-            languages={languages}
-            file={file}
-            parsedData={parsedData}
-            headers={importTableHeaders}
-            error={error}
-
-            onChangeLanguage={(e) => setSelectedLanguage(e.target.value as string)}
-            onChangeFile={(e: ChangeEvent<HTMLInputElement>) => setFileInput(e)}
-            onUpload={saveBook}
-          />
-        </StyledTranslatorPortalContainer>
-      </StyledTranslatorContainer>
+      </StyledTranslatorPortalContainer>
     );
   };
 
