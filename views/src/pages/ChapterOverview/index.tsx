@@ -430,7 +430,6 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   useEffect(() => {
     configureTableData();
 
-
     setLanguageCountVerse(0);
     const isCompleted = activeChapterInfo?.chapterIsCompleted?.[selectedLanguage] || false;
     const isPublished = activeChapterInfo?.chapterIsPublished?.[selectedLanguage] || false;
@@ -632,13 +631,14 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   };
 
   const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
-    const newChapterInfo = {
-      audio: updatedChapterInfo.audio,
+    const newChapterInfo: ChapterInfoType = {
+      chapterAudio: updatedChapterInfo.audio,
       chapterId: updatedChapterInfo._id,
       chapterNumber: updatedChapterInfo.chapterNumber,
-      isTranslated: updatedChapterInfo.isTranslated,
+      chapterTranslated: updatedChapterInfo.isTranslated,
       chapterIsCompleted: updatedChapterInfo.isCompleted,
       chapterIsPublished: updatedChapterInfo.isPublished,
+      verses: activeChapterInfo.verses,
     }
 
     const updatedBookInfos = props.bookInfos.map((book) => ({
@@ -652,9 +652,9 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         ),
       })),
     }));
-
+    
     props.dispatch({
-      type: actionTypes.SET_BOOK,
+      type: actionTypes.SET_BOOKINFOS,
       payload: {
         bookInfos: updatedBookInfos
       }

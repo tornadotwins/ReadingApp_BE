@@ -759,10 +759,10 @@ exports.getBookInfomationByTitle = async (req, res) => {
             .map((chapter) => ({
               chapterId: chapter._id,
               chapterNumber: chapter.chapterNumber,
-              audio: chapter.audio,
-              isTranslated: chapter.isTranslated,
-              isCompleted: chapter.isCompleted,
-              isPublished: chapter.isPublished,
+              chapterAudio: chapter.audio,
+              chapterIsTranslated: chapter.isTranslated,
+              chapterIsCompleted: chapter.isCompleted,
+              chapterIsPublished: chapter.isPublished,
             }))
             .sort((a, b) => a.chapterNumber - b.chapterNumber),
         };

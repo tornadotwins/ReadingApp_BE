@@ -122,12 +122,19 @@ const BookOverview = (props: BookOverviewPropsType) => {
           setBookInfo(existingBookInfo);
         } else {
           const result = await bookService.getBookInfoByTitle(selectedBook);
+          const resultInBookType: BookType = {
+            bookId: result.bookId,
+            bookImage: result.bookImage,
+            bookTitle: result.bookTitle,
+            subBooks: result.subBooks,
+          }
+          console.log('result book in type: ', resultInBookType)
           setBookInfo(result);
 
           props.dispatch({
             type: actionTypes.ADD_BOOKINFO,
             payload: {
-              bookInfo: result
+              bookInfo: resultInBookType
             }
           });
         }
