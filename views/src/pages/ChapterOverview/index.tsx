@@ -438,6 +438,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       setLanguageCountVerse((prevLanguageCountVerse) => (verse?.verseText?.[selectedLanguage] ? prevLanguageCountVerse + 1 : prevLanguageCountVerse))
     );
 
+    setInputCurrentLanguageChapterName(activeSubBook?.subBookTitle?.[selectedLanguage] || '')
+
     setIsComplete(isCompleted);
     setIsPublish(isPublished);
   }, [verseInfos, activeBookInfo, activeSubBook, activeChapterInfo, selectedLanguage]);
@@ -652,7 +654,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         ),
       })),
     }));
-    
+
     props.dispatch({
       type: actionTypes.SET_BOOKINFOS,
       payload: {
