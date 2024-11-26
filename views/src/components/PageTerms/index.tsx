@@ -21,6 +21,7 @@ function PageTerms(props: PageTermsPropsType) {
               languages={props.languages}
               language={props.languageCode}
               currentLanguage={props.currentLanguage}
+              disable={props.disable}
               onSave={() => { }}
             />
 

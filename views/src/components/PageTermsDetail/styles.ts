@@ -58,6 +58,10 @@ const StyledPreviewImg = styled('img') ({
   width: '20px',
   height: '20px',
   marginRight: '10px',
+
+  '&:hover': {
+    cursor: 'pointer',
+  }
 });
 
 

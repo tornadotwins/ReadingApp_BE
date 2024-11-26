@@ -13,7 +13,8 @@ type PageTermsPropsType = {
   currentLanguage: string;
   currentUser: UserType;
   languages: LanguageType[];
-  terms: TermType[]
+  terms: TermType[];
+  disable: boolean;
 };
 
 export type {

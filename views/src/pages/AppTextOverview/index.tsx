@@ -182,6 +182,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
         languages={languages}
         currentLanguage={getLanguageFromLanguageCode(props.currentLanguage)}
         currentUser={props.currentUser}
+        disable
 
         terms={[
           {

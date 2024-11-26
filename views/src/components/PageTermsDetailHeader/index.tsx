@@ -22,12 +22,13 @@ function PageTermsDetailHeader(props: PageTermsDetailHeaderPropsType) {
         />
       </StyledLanguageSelectContainer>
 
-      <StyledTermDetailHeaderButtonContainer>
+      <StyledTermDetailHeaderButtonContainer isdisable={props.disable ? 'true' : 'false'}>
         <Text fontFamily="'Baloo Da 2'" fontWeight="700" color="#155D74">{props.currentLanguage}</Text>
 
         <Button
           label="Save Changes"
-          onClick={() => { }}
+          disabled={props.disable}
+          onClick={() => {console.log('clicked')}}
         />
       </StyledTermDetailHeaderButtonContainer>
     </StyledTermDetailHeaderContainer>

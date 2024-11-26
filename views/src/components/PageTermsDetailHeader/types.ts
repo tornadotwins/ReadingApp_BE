@@ -4,6 +4,7 @@ type PageTermsDetailHeaderPropsType = {
   language: string;
   languages: LanguageType[];
   currentLanguage: string;
+  disable: boolean;
 
   onSave: () => void;
 }
