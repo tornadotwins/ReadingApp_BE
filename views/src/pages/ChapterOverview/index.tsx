@@ -399,6 +399,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     }));
 
     if (newChapterOptions && locationState.chapterId) {
+      setChapterSelectOptions(newChapterOptions);
       setSelectedChapter(locationState.chapterId);
     } else if (newChapterOptions) {
       setChapterSelectOptions(newChapterOptions);
