@@ -73,7 +73,7 @@ function AccordionPanel(props: AccordionExpandProps) {
               <StyledSwitchContainer>
                 <Switch
                   label="Complete: "
-                  value={props.isPublish || false}
+                  value={props.isComplete || false}
                   disable={
                     (props.currentUser?.isAdmin ||
                       props.currentUser?.roles.some(
@@ -83,7 +83,7 @@ function AccordionPanel(props: AccordionExpandProps) {
                       false :
                       true
                   }
-                  onChange={() => { }}
+                  onChange={(value: boolean) => props.onCompleteChange && props.onCompleteChange(value)}
                 />
 
                 <Switch
@@ -98,7 +98,7 @@ function AccordionPanel(props: AccordionExpandProps) {
                       false :
                       true
                   }
-                  onChange={() => { }}
+                  onChange={(value: boolean) => props.onPublishChange && props.onPublishChange(value)}
                 />
               </StyledSwitchContainer>
             }

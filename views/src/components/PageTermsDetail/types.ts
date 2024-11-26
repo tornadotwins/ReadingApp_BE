@@ -1,7 +1,7 @@
 import { TermType } from "../PageTerms/types";
 
 type PageTermsDetailPropsType = {
-  terms: TermType[]
+  terms: TermType[];
 }
 
 export type {

@@ -14,7 +14,11 @@ type PageTermsPropsType = {
   currentUser: UserType;
   languages: LanguageType[];
   terms: TermType[];
-  disable: boolean;
+  disable?: boolean;
+  isComplete?: boolean;
+  isPublish?: boolean;
+
+  onChangeStatus: (isCompleted: boolean, isPublished: boolean) => void;
 };
 
 export type {

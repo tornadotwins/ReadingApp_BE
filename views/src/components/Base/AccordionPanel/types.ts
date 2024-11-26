@@ -5,7 +5,7 @@ type AccordionExpandProps = {
   detail: any;
   value?: string;
   summaryTitle?: string;
-  isComplet?: boolean;
+  isComplete?: boolean;
   isPublish?: boolean;
   summaryIcon?: boolean;
   hasSwitches?: boolean;
@@ -16,6 +16,8 @@ type AccordionExpandProps = {
 
   onChange?: (value: React.ChangeEvent<HTMLInputElement>) => void;
   onCurrentChapterTitleEnterPressed?: (value: string) => void;
+  onCompleteChange?: (value: boolean) => void;
+  onPublishChange?: (value: boolean) => void;
 };
 
 export type { AccordionExpandProps };

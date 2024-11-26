@@ -14,7 +14,10 @@ function PageTerms(props: PageTermsPropsType) {
         hasSwitches
         summaryIcon
         currentUser={props.currentUser}
-        onChange={() => { }}
+        isComplete={props.isComplete}
+        isPublish={props.isPublish}
+        onCompleteChange={(value: boolean) => props.onChangeStatus(value, props.isPublish || false)}
+        onPublishChange={(value: boolean) => props.onChangeStatus(props.isComplete || false, value)}
         detail={
           <>
             <PageTermsDetailHeader

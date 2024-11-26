@@ -48,6 +48,10 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
   const [languages, setLanguages] = useState<LanguageType[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState('');
 
+  // page complete/publish
+  const [isWelcomeComplete, setIsWelcomeComplete] = useState(false);
+  const [isWelcomePublish, setIsWelcomePublish] = useState(false);
+
   const navigate = useNavigate();
 
   const onLogout = () => {
@@ -173,6 +177,11 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
     )
   };
 
+  const handleWelcomeStatus = (isCompleted: boolean, isPublished: boolean) => {
+    setIsWelcomeComplete(isCompleted);
+    setIsWelcomePublish(isPublished);
+  }
+
   const _renderTermEdit = () => {
     return (
       <PageTerms
@@ -183,6 +192,8 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
         currentLanguage={getLanguageFromLanguageCode(props.currentLanguage)}
         currentUser={props.currentUser}
         disable
+        isComplete={isWelcomeComplete}
+        isPublish={isWelcomePublish}
 
         terms={[
           {
@@ -196,6 +207,8 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
             currentTerm: 'Log In Edit',
           }
         ]}
+
+        onChangeStatus={(complete: boolean, publish: boolean) => handleWelcomeStatus(complete, publish)}
       />
     )
   };
