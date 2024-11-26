@@ -2,8 +2,8 @@ import isMobile from '@/utils/is-mobile';
 
 import type { Notifications } from './types';
 
-// const API_URL = 'http://localhost:5000';
-const API_URL = 'https://readingapp-d5944320053c.herokuapp.com';
+const API_URL = 'http://localhost:5000';
+// const API_URL = 'https://readingapp-d5944320053c.herokuapp.com';
 
 const ACCESS_TOKEN = 'accessToken';
 const CURRENT_USER = 'currentUser';
@@ -60,6 +60,7 @@ const giphy404 = 'https://giphy.com/embed/xTiN0L7EW5trfOvEk0';
 
 const BOOK_INFO = "bookInfo";
 
+const BOOK_APP_TEXT = 'App Text';
 const BOOK_QURAN = 'Qur\'an';
 const BOOK_INJIL = 'Injil';
 const BOOK_ZABUR = 'Zabur';
@@ -291,6 +292,7 @@ export {
   ACCESS_TOKEN,
   BOOK_INFO,
 
+  BOOK_APP_TEXT,
   BOOK_QURAN,
   BOOK_INJIL,
   BOOK_ZABUR,

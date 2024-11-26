@@ -46,7 +46,7 @@ const StyledLabelContainer= styled(Box) ({
   width:"100%",
   justifyContent: 'left',
 
-  '& .MuiBox-root:first-of-type': {
+  '& >.MuiBox-root:first-of-type': {
     minWidth: '200px',
     marginRight: '20px'
   },
@@ -62,6 +62,46 @@ const StyledLabelContainer= styled(Box) ({
   '@media screen and (max-width: 510px)': {
     display: 'block',
   }
+});
+
+const StyledInputContainer = styled(Box) ({
+  display: 'block',
+  padding: '0px',
+  margin: '0px',
+
+  '& .MuiBox-root': {
+    padding: '0px'
+  }
+});
+
+const StyledLabel = styled(Box) ({
+  display: 'flex',
+  alignItems: 'center',
 })
 
-export { StyledAccordionPanel, StyledLabelContainer, }
+const StyledSummaryIcon = styled('img') ({
+  width: '20px',
+  height: '20px',
+  marginRight: '5px'
+});
+
+const StyledSwitchGroupContainer = styled(Box) ({
+  display: "flex",
+  alignItems: 'center',
+});
+
+const StyledSwitchContainer = styled(Box) ({
+  display: 'flex',
+  padding: '0px',
+  margin: '0px',
+})
+
+export {
+  StyledAccordionPanel,
+  StyledLabelContainer,
+  StyledInputContainer,
+  StyledLabel,
+  StyledSummaryIcon,
+  StyledSwitchGroupContainer,
+  StyledSwitchContainer,
+}
