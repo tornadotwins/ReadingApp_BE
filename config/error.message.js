@@ -32,4 +32,10 @@ module.exports = {
   USER_NOT_PERMITTED: "You don't have permission to do this action.",
   USER_NOT_FOUND: "Could't find the user",
   UNAUTHORIZED_USER: 'You are not permitted for the action.',
+
+  // Translator
+  FAIL_CREATE_PAGE: 'Failed to create a page',
+  FAIL_CREATE_APP_TEXT: 'Failed to create an app text',
+  FAIL_UPDATE_PAGE: 'Failed to update a page',
+  FAIL_UPDATE_APP_TEXT: 'Failed to update an app text',
 };
