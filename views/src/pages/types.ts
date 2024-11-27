@@ -59,6 +59,11 @@ type AppTextPageStatusType = {
   },
 }
 
+type AppTextPageChangedType = {
+  pageId: string;
+  isChanged: boolean;
+}
+
 export type {
   RoleType,
   UserType,
@@ -66,4 +71,5 @@ export type {
   AppTextType,
   AppTextPageType,
   AppTextPageStatusType,
+  AppTextPageChangedType
 };

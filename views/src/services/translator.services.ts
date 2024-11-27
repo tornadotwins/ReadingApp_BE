@@ -23,7 +23,7 @@ class TranslatorService {
     })
   }
 
-  getAllAppTexts = (): Promise<AppTextPageType> => {
+  getAllAppTexts = (): Promise<AppTextPageType[]> => {
     return new Promise((resolve, reject) => {
       const url = API_URL + '/translator/appTexts';
       axios

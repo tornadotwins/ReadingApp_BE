@@ -2,7 +2,7 @@ import {
   AppTextType,
   LanguageType,
   UserType,
-  AppTextPageStatusType
+  AppTextPageStatusType,
 } from "@/pages/types";
 
 type TermType = {
@@ -31,6 +31,7 @@ type PageTermsPropsType = {
     ar: boolean,
     [key: string]: boolean,
   };
+  hasChangedText: boolean;
   
   onChangeDefaultLanguage: (languageCode: string) => void;
   onChangeInput: (id: string, changedVal: string) => void;

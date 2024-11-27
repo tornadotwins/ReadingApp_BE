@@ -28,7 +28,7 @@ import {
 // Types
 import { AppStateType } from '@/reducers/types';
 import { AppTextOverviewPropsType } from "./types";
-import { AppTextPageStatusType, AppTextPageType, LanguageType } from "../types";
+import { AppTextPageChangedType, AppTextPageStatusType, AppTextPageType, LanguageType } from "../types";
 
 // Utils
 import {
@@ -57,6 +57,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
   const [currentLanguage, setCurrentLanguage] = useState(props.currentLanguage);
   const [defaultLanguage, setDefaultLanguage] = useState('en');
   const [updatedTerms, setUpdatedTerms] = useState<AppTextPageType[]>(props.appTextPages);
+  const [textChangedPageStatus, setTextChangedPageStatus] = useState<AppTextPageChangedType[]>([]);
   // const [appTextPageStatus, setAppTextPageStatus] = useState<AppTextPageStatusType[]>([]);
 
   const navigate = useNavigate();
@@ -207,6 +208,17 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
             }
           });
 
+          result.map(page =>
+            setTextChangedPageStatus(prevTextChangedPageStatus =>
+              [
+                ...prevTextChangedPageStatus,
+                {
+                  pageId: page.pageId,
+                  isChanged: false
+                }
+              ]
+            ))
+
           setIsLoading(false);
         })
         .catch((error) => {
@@ -226,6 +238,10 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
     }
   }, []);
 
+  useEffect(() => {
+    setUpdatedTerms(props.appTextPages)
+  }, [props.appTextPages]);
+
   // Handle changes in Input values
   const handleTermChange = (id: string, changedVal: string) => {
     setUpdatedTerms(prevTerms =>
@@ -244,6 +260,19 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
         ),
       }))
     );
+
+    const changedPageId = updatedTerms.find(updatedTerm => updatedTerm.texts.find(text => text._id == id))?.pageId;
+
+    setTextChangedPageStatus(prevTextChangePageStatuses =>
+      prevTextChangePageStatuses.map(textChangedPageStatus =>
+        textChangedPageStatus.pageId == changedPageId ?
+          {
+            ...textChangedPageStatus,
+            isChanged: true
+          } :
+          textChangedPageStatus
+      )
+    )
   };
 
   // Handle changes in complete/publish switches
@@ -274,7 +303,6 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
     translatorService
       .updateAppTextPage(data)
       .then(result => {
-        console.log(result);
         toast.success("Successfully updated!", {
           position: 'top-right',
           draggable: true,
@@ -320,39 +348,35 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
       })
   };
 
-  // Set the complete/publish status of the AppTextPage
-  // useEffect(() => {
-  //   setAppTextPageStatus(
-  //     updatedTerms.map((updatedTerm: AppTextPageType) => ({
-  //       pageId: updatedTerm.pageId,
-  //       isCompleted: updatedTerm.isCompleted,
-  //       isPublished: updatedTerm.isPublished,
-  //     }))
-  //   );
-  // }, []);
-
   const handleSave = (id: string) => {
-    console.log(id);
     // Get the changed texts
     const changedAppTextPage = updatedTerms.find(updatedTerm => updatedTerm.pageId == id);
     const data = {
       texts: changedAppTextPage?.texts || []
     };
 
-    console.log(data)
-
     setIsLoading(true);
 
     translatorService
       .updateAppTexts(data)
       .then(result => {
-        console.log(result)
         props.dispatch({
           type: actionTypes.SET_APP_TEXT_PAGES,
           payload: {
             appTextPages: updatedTerms
           }
         });
+
+        setTextChangedPageStatus(prevTextChangePageStatuses =>
+          prevTextChangePageStatuses.map(textChangedPageStatus =>
+            textChangedPageStatus.pageId == id ?
+              {
+                ...textChangedPageStatus,
+                isChanged: false
+              } :
+              textChangedPageStatus
+          )
+        )
 
         toast.success("Successfully updated!", {
           position: 'top-right',
@@ -398,6 +422,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
           terms={appTextPage.texts}
           isComplete={appTextPage.isCompleted}
           isPublish={appTextPage.isPublished}
+          hasChangedText={textChangedPageStatus.find(changedStatus => changedStatus.pageId == appTextPage.pageId)?.isChanged || false}
 
           onChangeDefaultLanguage={(languageCode: string) => setDefaultLanguage(languageCode)}
           onChangeInput={(id: string, changedVal: string) => handleTermChange(id, changedVal)}
