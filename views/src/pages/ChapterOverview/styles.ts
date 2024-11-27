@@ -53,6 +53,7 @@ const StyledSelectContainer = styled(Box) ({
 });
 
 const StyledBackContainer = styled(Box) ({
+  height: '40px',
   display: 'flex',
   alignItems: 'center',
   cursor: 'pointer',
@@ -134,7 +135,7 @@ const StyledSummaryItemContainer = styled(Box) ({
 const StyledToggleContainer = styled(Box) ({
   display: 'flex',
   alignItems: 'center',
-  margin: '20px 40px',
+  margin: '50px 40px 20px 40px',
 });
 
 const StyledToggleItemContainer = styled(Box)<{active: string}>(({active}) => ({
