@@ -27,10 +27,11 @@ function PageTerms(props: PageTermsPropsType) {
               currentLanguage={props.currentLanguage}
               currentLanguageLabel={props.currentLanguageLabel}
               defaultLanguage={props.defaultLanguage}
+              pageId={props.pageId}
               disable={props.disable}
 
               onChangeDefaultLanguage={props.onChangeDefaultLanguage}
-              onSave={() => { }}
+              onSave={props.onSave}
             />
 
             <PageTermsDetail

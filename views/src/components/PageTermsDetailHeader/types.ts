@@ -6,10 +6,11 @@ type PageTermsDetailHeaderPropsType = {
   currentLanguage: string;
   currentLanguageLabel: string;
   defaultLanguage: string;
+  pageId: string;
   disable?: boolean;
 
   onChangeDefaultLanguage: (languageCode: string) => void;
-  onSave: () => void;
+  onSave: (id: string) => void;
 }
 
 export type {

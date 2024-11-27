@@ -54,10 +54,10 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedBook, setSelectedBook] = useState(BOOK_APP_TEXT);
   const [languages, setLanguages] = useState<LanguageType[]>([]);
-  const [currentLanguage, setCurrentLanguage] = useState('');
-  const [defaultLanguage, setDefaultLanguage] = useState('');
+  const [currentLanguage, setCurrentLanguage] = useState(props.currentLanguage);
+  const [defaultLanguage, setDefaultLanguage] = useState('en');
   const [updatedTerms, setUpdatedTerms] = useState<AppTextPageType[]>(props.appTextPages);
-  const [appTextPageStatus, setAppTextPageStatus] = useState<AppTextPageStatusType[]>([]);
+  // const [appTextPageStatus, setAppTextPageStatus] = useState<AppTextPageStatusType[]>([]);
 
   const navigate = useNavigate();
   const isPortrait = useOrientation();
@@ -321,20 +321,67 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
   };
 
   // Set the complete/publish status of the AppTextPage
-  useEffect(() => {
-    setAppTextPageStatus(
-      updatedTerms.map((updatedTerm: AppTextPageType) => ({
-        pageId: updatedTerm.pageId,
-        isCompleted: updatedTerm.isCompleted,
-        isPublished: updatedTerm.isPublished,
-      }))
-    );
-  }, []);
+  // useEffect(() => {
+  //   setAppTextPageStatus(
+  //     updatedTerms.map((updatedTerm: AppTextPageType) => ({
+  //       pageId: updatedTerm.pageId,
+  //       isCompleted: updatedTerm.isCompleted,
+  //       isPublished: updatedTerm.isPublished,
+  //     }))
+  //   );
+  // }, []);
 
+  const handleSave = (id: string) => {
+    console.log(id);
+    // Get the changed texts
+    const changedAppTextPage = updatedTerms.find(updatedTerm => updatedTerm.pageId == id);
+    const data = {
+      texts: changedAppTextPage?.texts || []
+    };
 
-  useEffect(() => {
-    console.log(appTextPageStatus);
-  }, [appTextPageStatus])
+    console.log(data)
+
+    setIsLoading(true);
+
+    translatorService
+      .updateAppTexts(data)
+      .then(result => {
+        console.log(result)
+        props.dispatch({
+          type: actionTypes.SET_APP_TEXT_PAGES,
+          payload: {
+            appTextPages: updatedTerms
+          }
+        });
+
+        toast.success("Successfully updated!", {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        toast.error(error instanceof Error ? error.message : String(error), {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      })
+  }
 
   const _renderTermEdit = () => {
     return (
@@ -355,6 +402,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
           onChangeDefaultLanguage={(languageCode: string) => setDefaultLanguage(languageCode)}
           onChangeInput={(id: string, changedVal: string) => handleTermChange(id, changedVal)}
           onChangeAppTextPageStatus={(status: AppTextPageStatusType) => handlePageStatus(status)}
+          onSave={(id: string) => handleSave(id)}
         />
       ))
     )

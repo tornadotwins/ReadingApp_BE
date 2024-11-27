@@ -28,7 +28,7 @@ function PageTermsDetailHeader(props: PageTermsDetailHeaderPropsType) {
         <Button
           label="Save Changes"
           disabled={props.disable}
-          onClick={() => { console.log('clicked') }}
+          onClick={() => props.onSave(props.pageId)}
         />
       </StyledTermDetailHeaderButtonContainer>
     </StyledTermDetailHeaderContainer>

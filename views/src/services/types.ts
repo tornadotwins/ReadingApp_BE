@@ -1,5 +1,6 @@
 import { SubBookModelType } from "@/pages/ChapterOverview/types";
 import { ParseDataType } from "@/pages/Translator/types";
+import { AppTextType } from "@/pages/types";
 
 type UserRequestType = {
   id?: string;
@@ -33,6 +34,10 @@ type UpdateChapterRequestType = {
   newChapterInfo: ChapterRequestType,
 }
 
+type UpdateAppTextRequestType = {
+  texts: AppTextType[]
+}
+
 type UpdateSubBookRequestType = {
   subBookId: string,
   newSubBookInfo: SubBookModelType,
@@ -43,5 +48,6 @@ export type {
   TranslatorRequestType,
   UpdateAppTextPageRequestType,
   UpdateChapterRequestType,
+  UpdateAppTextRequestType,
   UpdateSubBookRequestType,
 }

@@ -98,10 +98,10 @@ exports.updateAppTexts = async (req, res) => {
     }
 
     const updatePromises = texts.map(async (text) => {
-      const { id, text: nestedUpdates } = text;
+      const { _id, text: nestedUpdates } = text;
 
       if (
-        !id ||
+        !_id ||
         !nestedUpdates ||
         typeof nestedUpdates !== 'object'
       ) {
@@ -111,12 +111,12 @@ exports.updateAppTexts = async (req, res) => {
         });
       }
 
-      const existingText = await AppText.findById(id);
+      const existingText = await AppText.findById(_id);
 
       if (!existingText) {
         return Promise.reject({
           status: 400,
-          message: `App text with id ${id} not found.`,
+          message: `App text with id ${_id} not found.`,
         });
       }
 
@@ -127,7 +127,7 @@ exports.updateAppTexts = async (req, res) => {
       }
 
       return AppText.findByIdAndUpdate(
-        id,
+        _id,
         { $set: { ...updateFields, updatedAt: Date.now() } },
         { new: true },
       );
