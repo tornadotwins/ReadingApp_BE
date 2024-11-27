@@ -33,13 +33,9 @@ type AppTextPageType = {
   pageNumber: number;
   pageTitle: string;
   isCompleted: {
-    en: boolean;
-    ar: boolean;
     [key: string]: boolean;
   },
   isPublished: {
-    en: boolean;
-    ar: boolean;
     [key: string]: boolean;
   },
   texts: AppTextType[];
@@ -48,13 +44,9 @@ type AppTextPageType = {
 type AppTextPageStatusType = {
   pageId: string;
   isCompleted: {
-    en: boolean;
-    ar: boolean;
     [key: string]: boolean;
   },
   isPublished: {
-    en: boolean;
-    ar: boolean;
     [key: string]: boolean;
   },
 }

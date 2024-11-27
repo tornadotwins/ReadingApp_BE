@@ -22,13 +22,9 @@ type PageTermsPropsType = {
   terms: AppTextType[];
   disable?: boolean;
   isComplete?: {
-    en: boolean,
-    ar: boolean,
     [key: string]: boolean,
   };
   isPublish?: {
-    en: boolean,
-    ar: boolean,
     [key: string]: boolean,
   };
   hasChangedText: boolean;

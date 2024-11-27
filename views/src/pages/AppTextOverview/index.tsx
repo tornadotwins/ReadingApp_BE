@@ -272,7 +272,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
           } :
           textChangedPageStatus
       )
-    )
+    );
   };
 
   // Handle changes in complete/publish switches
@@ -289,7 +289,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
       )
     );
 
-    // Change the status of redux store
+    // Change the status
     const data = {
       pageId: newStatus.pageId,
       updates: {

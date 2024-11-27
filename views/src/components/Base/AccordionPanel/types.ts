@@ -10,13 +10,9 @@ type AccordionExpandProps = {
   summaryTitle?: string;
   pageId?: string;
   isComplete?: {
-    en: boolean,
-    ar: boolean,
     [key: string]: boolean,
   };
   isPublish?: {
-    en: boolean,
-    ar: boolean,
     [key: string]: boolean,
   };
   summaryIcon?: boolean;
@@ -30,7 +26,7 @@ type AccordionExpandProps = {
   onCurrentChapterTitleEnterPressed?: (value: string) => void;
   onCompleteChange?: (value: boolean) => void;
   onPublishChange?: (value: boolean) => void;
-  onChangeAppTextPageStatus: (status: AppTextPageStatusType) => void;
+  onChangeAppTextPageStatus?: (status: AppTextPageStatusType) => void;
 };
 
 export type { AccordionExpandProps };

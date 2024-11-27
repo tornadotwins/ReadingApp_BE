@@ -6,9 +6,13 @@ import {
   StateType
 } from './types';
 
-export const initialState = {
-  appTextPages: [],
-}
+export const initialState: StateType = {
+  currentUser: null, // Default user
+  bookInfos: [], // Empty array for book info
+  chapterInfos: [], // Empty array for chapter info
+  language: '', // Default language is an empty string
+  appTextPages: [], // Empty array for app text pages
+};
 
 //////////////////////////////////////////////////////////////////
 //////////////////// Set Current AppTextPage ///////////////////

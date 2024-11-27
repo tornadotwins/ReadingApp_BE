@@ -89,13 +89,18 @@ function AccordionPanel(props: AccordionExpandProps) {
                         true
                     }
 
-                    onChange={
-                      (value: boolean) =>
-                        props.onChangeAppTextPageStatus({
-                          pageId: props.pageId || '',
-                          isCompleted: { ...props.isComplete, [props.currentLanguage || '']: value },
-                          isPublished: props.isPublish,
-                        })}
+                    onChange={(value: boolean) =>
+                      props.onChangeAppTextPageStatus &&
+                      props.onChangeAppTextPageStatus({
+                        pageId: props.pageId || '',
+                        isCompleted: {
+                          ...props.isComplete,
+                          [props.currentLanguage || '']: value,
+                        },
+                        isPublished: props.isPublish || { en: false, ar: false },
+                      })
+                    }
+
                   />
                 </StyledSwitchContainer>
 
@@ -112,13 +117,18 @@ function AccordionPanel(props: AccordionExpandProps) {
                         false :
                         true
                     }
-                    onChange={
-                      (value: boolean) =>
-                        props.onChangeAppTextPageStatus({
-                          pageId: props.pageId || '',
-                          isCompleted: props.isComplete,
-                          isPublished: { ...props.isPublish, [props.currentLanguage || '']: value },
-                        })}
+                    onChange={(value: boolean) =>
+                      props.onChangeAppTextPageStatus &&
+                      props.onChangeAppTextPageStatus({
+                        pageId: props.pageId || '',
+                        isCompleted: props.isComplete || { en: false, ar: false },
+                        isPublished: {
+                          ...props.isPublish,
+                          [props.currentLanguage || '']: value,
+                        },
+                      })
+                    }
+
                   />
                 </StyledSwitchContainer>
               </StyledSwitchGroupContainer>
