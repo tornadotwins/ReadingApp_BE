@@ -10,6 +10,7 @@ import {
 } from "./styles";
 import { PageTermsDetailPropsType } from "./types";
 import { AppTextType } from "@/pages/types";
+import { API_URL } from "@/config";
 
 function PageTermsDetail(props: PageTermsDetailPropsType) {
   return (
@@ -25,6 +26,7 @@ function PageTermsDetail(props: PageTermsDetailPropsType) {
               <StyledDefaultTermContainer>
                 <StyledPreviewImg
                   src={Images.icon_preview}
+                  onClick={() => window.open(API_URL + '/' + term.image)}
                 />
 
                 <Text fontFamily="'Baloo Da 2'" fontWeight="400" fontSize={16} lineHeight={24} color="#155D74">
