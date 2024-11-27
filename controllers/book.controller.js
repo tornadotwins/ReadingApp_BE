@@ -724,11 +724,12 @@ exports.saveBookByFile = async (req, res) => {
 /////////////////////////////////////////////////////////////////////////
 ////////////////// Get Book information from book title /////////////////
 /////////////////////////////////////////////////////////////////////////
-exports.getBookInfomationByTitle = async (req, res) => {
+exports.getBookInformationByTitle = async (req, res) => {
   try {
     const { bookTitle } = req.params;
+    console.log(bookTitle);
 
-    // Step 1: Find the book by bookId
+    // Step 1: Find the book by title
     const book = await Book.findOne({ 'title.en': bookTitle }).exec();
     if (!book) {
       return res
@@ -747,24 +748,36 @@ exports.getBookInfomationByTitle = async (req, res) => {
     const subBooksWithChapters = await Promise.all(
       subBooks.map(async (subBook) => {
         const chapters = await Chapter.find({ subBook: subBook._id })
-          .select('chapterNumber audio isTranslated isCompleted isPublished')
+          .select(
+            'chapterNumber audio isTranslated isCompleted isPublished',
+          )
           .lean()
           .exec();
-        return {
-          subBookId: subBook._id,
-          subBookTitle: subBook.title,
-          subBookNumber: subBook.number,
-          noChapter: subBook.noChapter,
-          chapterInfos: chapters
-            .map((chapter) => ({
+
+        // Resolve verses for each chapter
+        const chapterInfos = await Promise.all(
+          chapters.map(async (chapter) => {
+            const verses = await Verse.find({ chapter: chapter._id });
+            return {
               chapterId: chapter._id,
               chapterNumber: chapter.chapterNumber,
               chapterAudio: chapter.audio,
               chapterIsTranslated: chapter.isTranslated,
               chapterIsCompleted: chapter.isCompleted,
               chapterIsPublished: chapter.isPublished,
-            }))
-            .sort((a, b) => a.chapterNumber - b.chapterNumber),
+              verses,
+            };
+          }),
+        );
+
+        return {
+          subBookId: subBook._id,
+          subBookTitle: subBook.title,
+          subBookNumber: subBook.number,
+          noChapter: subBook.noChapter,
+          chapterInfos: chapterInfos.sort(
+            (a, b) => a.chapterNumber - b.chapterNumber,
+          ),
         };
       }),
     );
@@ -784,7 +797,7 @@ exports.getBookInfomationByTitle = async (req, res) => {
     // Step 5: Return the result
     return res.status(200).json(result);
   } catch (error) {
-    console.error('Error in getBookInformation:', error);
+    console.error('Error in getBookInformationByTitle:', error);
     return res
       .status(500)
       .json({ message: ERROR_MESSAGES.SERVER_ERROR });
@@ -1127,10 +1140,6 @@ const deleteVersesByLanguage = async (subBookId, languageCode) => {
         { $unset: { [`text.${languageCode}`]: '' } },
       );
     }
-
-    console.log(
-      `Verses in language '${languageCode}' deleted for subBook: ${subBookId}`,
-    );
   } catch (error) {
     console.error(
       `Error deleting verses for language '${languageCode}':`,

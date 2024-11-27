@@ -29,6 +29,7 @@ import {
   StyledContainer,
   StyledChapterOverviewContainer,
   StyledBookSelectorContainer,
+  StyledHintContainer,
   StyledTableContainer,
   StyledBackContainer,
   StyledSelectGroupContainer,
@@ -424,7 +425,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     }
 
     locationState.chapterId = ''
-    
+
     configureTableData();
   }, [selectedChapter]);
 
@@ -1008,8 +1009,24 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     )
   };
 
+  const _renderImportHint = () => {
+    return (
+      isImport &&
+      <StyledHintContainer>
+        <Text color="red" fontFamily="'Baloo Da 2'" fontWeight="bold">
+          {
+            (selectedBook == BOOK_QURAN || selectedBook == BOOK_ZABUR) ?
+              `For ${selectedBook} you can upload only one chapter at once` :
+              `For ${selectedBook} you can upload multiple chapters of the same sub-book at once`
+          }
+        </Text>
+      </StyledHintContainer>
+    )
+  }
+
   const _renderDetailSelector = () => {
     return (
+      !isImport &&
       <StyledSelectContainer>
         <StyledBackContainer onClick={() => navigate('/admin/bookoverview')}>
           <KeyboardBackspaceIcon />
@@ -1056,6 +1073,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   const _renderSummary = () => {
     return (
+      !isImport &&
       <Summary
         currentUser={props.currentUser}
         currentBook={props.currentBook}
@@ -1169,6 +1187,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         <Tools tools={TOOLS} />
 
         {_renderBookSelector()}
+
+        {_renderImportHint()}
 
         {_renderDetailSelector()}
 

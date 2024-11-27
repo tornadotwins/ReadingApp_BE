@@ -32,7 +32,7 @@ router.post('/saveBookByFile', BookController.saveBookByFile);
 
 router.get(
   '/:bookTitle/bookInfoByTitle',
-  BookController.getBookInfomationByTitle,
+  BookController.getBookInformationByTitle,
 );
 
 router.put('/chapter', BookController.updateChapterInfo);

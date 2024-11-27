@@ -28,6 +28,13 @@ const StyledBookSelectorContainer = styled(Box) ({
   margin: "20px 40px",
 });
 
+const StyledHintContainer = styled(Box) ({
+  backgroundColor: '#F0F5FB',
+  margin: '20px 40px',
+  padding: '20px',
+  boxSiaing: 'border-box',
+})
+
 const StyledTableContainer = styled(Box) ({
   margin: '20px 40px',
   display: 'flex',
@@ -191,6 +198,7 @@ export {
   StyledContainer,
   StyledChapterOverviewContainer,
   StyledBookSelectorContainer,
+  StyledHintContainer,
   StyledTableContainer,
   StyledSelectContainer,
   StyledBackContainer,

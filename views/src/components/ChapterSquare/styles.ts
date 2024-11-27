@@ -1,4 +1,4 @@
-import { TRANSLATION_STATUS_COMPLETE, TRANSLATION_STATUS_PUBLISH } from '@/config';
+import { CHAPTER_HAS_CONTENT, TRANSLATION_STATUS_COMPLETE, TRANSLATION_STATUS_PUBLISH } from '@/config';
 import {Box, styled} from '@mui/material';
 
 const StyledChapterSquareContainer = styled(Box) ({
@@ -20,7 +20,9 @@ const StyledChapterSquare = styled(Box) <{status: string}> (({status}) => ({
                     '#FFAA5D' : 
                     status == TRANSLATION_STATUS_COMPLETE ? 
                       '#155D74' : 
-                      '#fff',
+                      status == CHAPTER_HAS_CONTENT ?
+                        '#d1f9fc':
+                        '#fff',
 
   color: status == TRANSLATION_STATUS_PUBLISH ? 
           '#155D74' : 

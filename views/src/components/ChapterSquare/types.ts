@@ -5,6 +5,7 @@ type ChapterSquarePropsType = {
   chapterInfo?: ChapterInfoType;
   isCompleted?: boolean;
   isPublished: boolean;
+  isSpecialBook?: boolean;
 
   onClick: (chapterId: string) => void;
 }
