@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 import {API_URL} from '../config'
-import { TranslatorRequestType } from './types';
+import { 
+  TranslatorRequestType,
+  UpdateAppTextPageRequestType
+} from './types';
 import { AppTextPageType } from '@/pages/types';
 
 class TranslatorService {
@@ -29,6 +32,20 @@ class TranslatorService {
         })
         .catch(error => {
           reject(error);
+        })
+    })
+  }
+
+  updateAppTextPage = (data: UpdateAppTextPageRequestType): Promise<AppTextPageType> => {
+    return new Promise((resolve, reject) => {
+      const url = API_URL + '/translator/appTextPage';
+      axios
+        .put(url, data)
+        .then(result => {
+          resolve(result.data);
+        })
+        .catch(error => {
+          reject(error)
         })
     })
   }

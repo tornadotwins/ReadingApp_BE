@@ -23,6 +23,11 @@ type TranslatorRequestType = {
   language: string,
 }
 
+type UpdateAppTextPageRequestType = {
+  pageId: string,
+  updates: any
+}
+
 type UpdateChapterRequestType = {
   chapterId: string,
   newChapterInfo: ChapterRequestType,
@@ -36,6 +41,7 @@ type UpdateSubBookRequestType = {
 export type {
   UserRequestType,
   TranslatorRequestType,
+  UpdateAppTextPageRequestType,
   UpdateChapterRequestType,
   UpdateSubBookRequestType,
 }

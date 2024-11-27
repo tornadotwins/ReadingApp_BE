@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from 'redux';
 import { useNavigate } from 'react-router-dom';
+import useOrientation from "@/hooks/useOrientation";
 import { toast, Bounce, ToastContainer } from "material-react-toastify";
 
 // Components
@@ -30,7 +31,10 @@ import { AppTextOverviewPropsType } from "./types";
 import { AppTextPageStatusType, AppTextPageType, LanguageType } from "../types";
 
 // Utils
-import { getLanguageCodeFromLanguage, getLanguageFromLanguageCode } from "@/utils";
+import {
+  getLanguageCodeFromLanguage,
+  getLanguageFromLanguageCode
+} from "@/utils";
 
 // Constatns
 import {
@@ -53,8 +57,10 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
   const [currentLanguage, setCurrentLanguage] = useState('');
   const [defaultLanguage, setDefaultLanguage] = useState('');
   const [updatedTerms, setUpdatedTerms] = useState<AppTextPageType[]>(props.appTextPages);
+  const [appTextPageStatus, setAppTextPageStatus] = useState<AppTextPageStatusType[]>([]);
 
   const navigate = useNavigate();
+  const isPortrait = useOrientation();
 
   const onLogout = () => {
 
@@ -253,9 +259,82 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
           : term
       )
     );
+
+    // Change the status of redux store
+    const data = {
+      pageId: newStatus.pageId,
+      updates: {
+        isCompleted: newStatus.isCompleted,
+        isPublished: newStatus.isPublished
+      }
+    }
+
+    setIsLoading(true);
+
+    translatorService
+      .updateAppTextPage(data)
+      .then(result => {
+        console.log(result);
+        toast.success("Successfully updated!", {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        const updatedAppTextPages = props.appTextPages.map(appTextPage =>
+          appTextPage.pageId == newStatus.pageId ?
+            {
+              ...appTextPage,
+              isCompleted: newStatus.isCompleted,
+              isPublished: newStatus.isPublished,
+            } :
+            appTextPage
+        );
+
+        props.dispatch({
+          type: actionTypes.SET_APP_TEXT_PAGES,
+          payload: {
+            appTextPages: updatedAppTextPages
+          }
+        })
+
+        setIsLoading(false);
+      })
+      .catch(error => {
+        toast.error(error instanceof Error ? error.message : String(error), {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+        setIsLoading(false);
+      })
   };
 
+  // Set the complete/publish status of the AppTextPage
+  useEffect(() => {
+    setAppTextPageStatus(
+      updatedTerms.map((updatedTerm: AppTextPageType) => ({
+        pageId: updatedTerm.pageId,
+        isCompleted: updatedTerm.isCompleted,
+        isPublished: updatedTerm.isPublished,
+      }))
+    );
+  }, []);
 
+
+  useEffect(() => {
+    console.log(appTextPageStatus);
+  }, [appTextPageStatus])
 
   const _renderTermEdit = () => {
     return (
@@ -296,7 +375,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
   };
 
   return (
-    <StyledContainer>
+    <StyledContainer flexDirection={isPortrait ? 'column' : 'row'}>
       {_renderHeader()}
 
       {_renderBody()}
