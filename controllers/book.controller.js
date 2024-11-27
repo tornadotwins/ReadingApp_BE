@@ -486,7 +486,9 @@ exports.getBookInformation = async (req, res) => {
     const subBooksWithChapters = await Promise.all(
       subBooks.map(async (subBook) => {
         const chapters = await Chapter.find({ subBook: subBook._id })
-          .select('chapterNumber audio isTranslated')
+          .select(
+            'chapterNumber audio isTranslated isCompleted isPublished',
+          )
           .lean()
           .exec();
         return {
@@ -494,14 +496,16 @@ exports.getBookInformation = async (req, res) => {
           subBookTitle: subBook.title,
           subBookNumber: subBook.number,
           noChapter: subBook.noChapter,
-          chapterInfos: chapters.map((chapter) => ({
-            chapterId: chapter._id,
-            chapterNumber: chapter.chapterNumber,
-            audio: chapter.audio,
-            isTranslated: chapter.isTranslated,
-            isCompleted: chapter.isCompleted,
-            isPublished: chapter.isPublished,
-          })),
+          chapterInfos: chapters
+            .map((chapter) => ({
+              chapterId: chapter._id,
+              chapterNumber: chapter.chapterNumber,
+              audio: chapter.audio,
+              isTranslated: chapter.isTranslated,
+              isCompleted: chapter.isCompleted,
+              isPublished: chapter.isPublished,
+            }))
+            .sort((a, b) => a.chapterNumber - b.chapterNumber),
         };
       }),
     );
@@ -727,7 +731,6 @@ exports.saveBookByFile = async (req, res) => {
 exports.getBookInformationByTitle = async (req, res) => {
   try {
     const { bookTitle } = req.params;
-    console.log(bookTitle);
 
     // Step 1: Find the book by title
     const book = await Book.findOne({ 'title.en': bookTitle }).exec();

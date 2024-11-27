@@ -21,7 +21,7 @@ const StyledChapterSquare = styled(Box) <{status: string}> (({status}) => ({
                     status == TRANSLATION_STATUS_COMPLETE ? 
                       '#155D74' : 
                       status == CHAPTER_HAS_CONTENT ?
-                        '#d1f9fc':
+                        '#F0F5FB':
                         '#fff',
 
   color: status == TRANSLATION_STATUS_PUBLISH ? 
