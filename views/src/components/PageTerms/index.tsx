@@ -29,6 +29,8 @@ function PageTerms(props: PageTermsPropsType) {
             />
 
             <PageTermsDetail
+              currentLanguage={props.currentLanguage}
+              language={props.languageCode}
               terms={props.terms}
             />
           </>

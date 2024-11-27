@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from 'redux';
 import { useNavigate } from 'react-router-dom';
+import { toast, Bounce, ToastContainer } from "material-react-toastify";
 
 // Components
 import Header from "@/components/Header";
@@ -10,7 +11,8 @@ import Tools from "@/components/Tools";
 import BookSelector from "@/components/BookSelector";
 import {
   Text,
-  SelectBox
+  SelectBox,
+  LoadingOverlay
 } from "@/components/Base";
 
 // Styles
@@ -24,7 +26,7 @@ import {
 // Types
 import { AppStateType } from '@/reducers/types';
 import { AppTextOverviewPropsType } from "./types";
-import { LanguageType } from "../types";
+import { AppTextPageType, LanguageType } from "../types";
 
 // Utils
 import { getLanguageCodeFromLanguage, getLanguageFromLanguageCode } from "@/utils";
@@ -37,6 +39,7 @@ import {
 } from "@/config";
 import actionTypes from "@/actions/actionTypes";
 import PageTerms from "@/components/PageTerms";
+import translatorService from "@/services/translator.services";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -44,6 +47,7 @@ const TOOLS = [
 ];
 
 function AppTextOverview(props: AppTextOverviewPropsType) {
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedBook, setSelectedBook] = useState(BOOK_APP_TEXT);
   const [languages, setLanguages] = useState<LanguageType[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState('');
@@ -64,7 +68,11 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
 
     props.dispatch({
       type: actionTypes.RESET_BOOK
-    })
+    });
+
+    props.dispatch({
+      type: actionTypes.RESET_APP_TEXT_PAGES
+    });
 
     navigate('/admin');
   };
@@ -177,39 +185,66 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
     )
   };
 
+  // Fetch all terms and save it to redux store
+  useEffect(() => {
+    // Fetch all terms
+    const fetchAppTexts = async () => {
+      return await translatorService.getAllAppTexts();
+    };
+
+    if (props.appTextPages && props.appTextPages.length == 0) {
+      setIsLoading(true);
+      fetchAppTexts()
+        .then(result => {
+          props.dispatch({
+            type: actionTypes.SET_APP_TEXT_PAGES,
+            payload: {
+              appTextPages: result
+            }
+          });
+
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          toast.error(error instanceof Error ? error.message : String(error), {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
+          });
+
+          setIsLoading(false);
+        })
+    }
+  }, []);
+
   const handleWelcomeStatus = (isCompleted: boolean, isPublished: boolean) => {
     setIsWelcomeComplete(isCompleted);
     setIsWelcomePublish(isPublished);
-  }
+  };
 
   const _renderTermEdit = () => {
     return (
-      <PageTerms
-        pageName="Welcome Page"
-        languageCode={currentLanguage}
-        languageLabel={getLanguageFromLanguageCode(currentLanguage)}
-        languages={languages}
-        currentLanguage={getLanguageFromLanguageCode(props.currentLanguage)}
-        currentUser={props.currentUser}
-        disable
-        isComplete={isWelcomeComplete}
-        isPublish={isWelcomePublish}
+      props.appTextPages.map((appTextPage: AppTextPageType, index: number) => (
+        <PageTerms
+          key={index}
+          pageName={appTextPage.pageTitle}
+          languageCode={currentLanguage}
+          languageLabel={getLanguageFromLanguageCode(currentLanguage)}
+          languages={languages}
+          currentLanguage={getLanguageFromLanguageCode(props.currentLanguage)}
+          currentUser={props.currentUser}
+          isComplete={isWelcomeComplete}
+          isPublish={isWelcomePublish}
+          terms={appTextPage.texts}
 
-        terms={[
-          {
-            variable: 'Welcome',
-            defaultTerm: 'Welcome default',
-            currentTerm: 'Welcome Edit',
-          },
-          {
-            variable: 'LogIn',
-            defaultTerm: 'Log In',
-            currentTerm: 'Log In Edit',
-          }
-        ]}
-
-        onChangeStatus={(complete: boolean, publish: boolean) => handleWelcomeStatus(complete, publish)}
-      />
+          onChangeStatus={(complete: boolean, publish: boolean) => handleWelcomeStatus(complete, publish)}
+        />
+      ))
     )
   };
 
@@ -232,6 +267,10 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
       {_renderHeader()}
 
       {_renderBody()}
+
+      {isLoading && <LoadingOverlay />}
+
+      <ToastContainer />
     </StyledContainer>
   )
 }
@@ -246,6 +285,7 @@ function mapStateToProps(state: AppStateType) {
     bookInfos: state.book.bookInfos,
     currentLanguage: state.book.language,
     currentBook: state.book.book,
+    appTextPages: state.translator.appTextPages,
   };
 }
 

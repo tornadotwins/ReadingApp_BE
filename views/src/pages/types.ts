@@ -15,10 +15,40 @@ type UserType = {
 type LanguageType = {
   value: string;
   label: string;
+};
+
+type AppTextType = {
+  _id: string;
+  variable: string;
+  page: string;
+  text: {
+    en: string;
+    ar: string;
+    [key: string]: string;
+  }
+};
+
+type AppTextPageType = {
+  pageId: string;
+  pageNumber: number;
+  pageTitle: string;
+  isCompleted: {
+    en: string;
+    ar: string;
+    [key: string]: string;
+  },
+  isPublished: {
+    en: string;
+    ar: string;
+    [key: string]: string;
+  },
+  texts: AppTextType[];
 }
 
 export type {
   RoleType,
   UserType,
   LanguageType,
+  AppTextType,
+  AppTextPageType,
 };

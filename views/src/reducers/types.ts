@@ -1,12 +1,13 @@
 import { BookType, ChapterInfoType, SubBookInfoType } from "@/pages/BookOverview/types";
 import { ChapterType } from "@/pages/Translator/types";
-import { UserType } from "@/pages/types";
+import { AppTextPageType, UserType } from "@/pages/types";
 
 type StateType = {
   currentUser: UserType | null;
   bookInfos: BookType[] | [];
   chapterInfos: ChapterInfoType[] | [];
   language: string | '';
+  appTextPages: AppTextPageType[] | [];
 }
 
 type BookStateType = {
@@ -85,6 +86,20 @@ type LanguageActionType = {
   }
 }
 
+type AppTextPagesActionType = {
+  type: string,
+  payload: {
+    appTextPages: AppTextPageType[]
+  }
+}
+
+type AppTextPageActionType = {
+  type: string,
+  payload: {
+    appTextPage: AppTextPageType
+  }
+}
+
 type AppStateType = {
   user: {
     currentUser: UserType | null;
@@ -94,8 +109,11 @@ type AppStateType = {
     chapterInfos: ChapterType[] | [];
     book: string;
     language: string,
+  },
+  translator: {
+    appTextPages: AppTextPageType[];
   }
-}
+};
 
 export type {
   StateType,
@@ -110,5 +128,7 @@ export type {
   ChapterActionType,
   ChapterUpdateActionType,
   LanguageActionType,
+  AppTextPagesActionType,
+  AppTextPageActionType,
   AppStateType,
 }

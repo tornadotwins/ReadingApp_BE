@@ -1,4 +1,4 @@
-import { LanguageType, UserType } from "@/pages/types";
+import { AppTextType, LanguageType, UserType } from "@/pages/types";
 
 type TermType = {
   variable: string;
@@ -13,7 +13,7 @@ type PageTermsPropsType = {
   currentLanguage: string;
   currentUser: UserType;
   languages: LanguageType[];
-  terms: TermType[];
+  terms: AppTextType[];
   disable?: boolean;
   isComplete?: boolean;
   isPublish?: boolean;

@@ -48,7 +48,8 @@ const StyledCurrentTermContainer = styled(Box) ({
       border: '1px solid #155D74',
       
       '& input': {
-        fontFamily: '"Baloo Da 2" !important'
+        fontFamily: '"Baloo Da 2" !important',
+        color: '#155D74'
       }
     }
   }

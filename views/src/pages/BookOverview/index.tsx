@@ -141,7 +141,6 @@ const BookOverview = (props: BookOverviewPropsType) => {
             });
           }
 
-
           setIsLoading(false);
         } catch (error) {
           toast.error(error instanceof Error ? error.message : String(error), {
@@ -224,7 +223,11 @@ const BookOverview = (props: BookOverviewPropsType) => {
 
     props.dispatch({
       type: actionTypes.RESET_BOOK
-    })
+    });
+
+    props.dispatch({
+      type: actionTypes.RESET_APP_TEXT_PAGES
+    });
 
     navigate('/admin');
   };
