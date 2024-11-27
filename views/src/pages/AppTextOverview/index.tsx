@@ -44,6 +44,7 @@ import {
 } from "@/config";
 import actionTypes from "@/actions/actionTypes";
 import translatorService from "@/services/translator.services";
+import ImageDialog from "@/components/Base/ImageDialog";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -58,7 +59,8 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
   const [defaultLanguage, setDefaultLanguage] = useState('en');
   const [updatedTerms, setUpdatedTerms] = useState<AppTextPageType[]>(props.appTextPages);
   const [textChangedPageStatus, setTextChangedPageStatus] = useState<AppTextPageChangedType[]>([]);
-  // const [appTextPageStatus, setAppTextPageStatus] = useState<AppTextPageStatusType[]>([]);
+  const [image, setImage] = useState('');
+  const [isOpenImageDialog, setIsOpenImageDialog] = useState(false);
 
   const navigate = useNavigate();
   const isPortrait = useOrientation();
@@ -405,6 +407,11 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
 
         setIsLoading(false);
       })
+  };
+
+  const handleImageClick = (image: string) => {
+    setImage(image);
+    setIsOpenImageDialog(true);
   }
 
   const _renderTermEdit = () => {
@@ -427,7 +434,9 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
           onChangeDefaultLanguage={(languageCode: string) => setDefaultLanguage(languageCode)}
           onChangeInput={(id: string, changedVal: string) => handleTermChange(id, changedVal)}
           onChangeAppTextPageStatus={(status: AppTextPageStatusType) => handlePageStatus(status)}
-          onSave={(id: string) => handleSave(id)}
+          onClickImage={(image: string) => handleImageClick(image)}
+          onSave={(id: string) => handleSave(id)
+          }
         />
       ))
     )
@@ -453,8 +462,16 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
 
       {_renderBody()}
 
-      {isLoading && <LoadingOverlay />}
+      {
+        isOpenImageDialog &&
+        <ImageDialog
+          image={image}
+          isOpen={isOpenImageDialog}
+          onCancel={() => setIsOpenImageDialog(false)}
+        />
+      }
 
+      {isLoading && <LoadingOverlay />}
       <ToastContainer />
     </StyledContainer>
   )
