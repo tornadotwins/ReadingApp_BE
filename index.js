@@ -10,6 +10,7 @@ const bookRoute = require('./routes/book.route');
 const bookmarkRoute = require('./routes/bookmark.route');
 
 const adminAuthRoute = require('./routes/adminAuth.route');
+const translatorRoute = require('./routes/translate.route');
 
 const dbConfig = require('./config/db.config');
 const path = require('path');
@@ -57,6 +58,7 @@ app.use('/books', bookRoute);
 app.use('/bookmarks', bookmarkRoute);
 
 app.use('/admin/auth', adminAuthRoute);
+app.use('/translator', translatorRoute);
 
 app.get('/admin/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'index.html'));
