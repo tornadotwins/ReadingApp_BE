@@ -15,20 +15,20 @@ function PageTermsDetailHeader(props: PageTermsDetailHeaderPropsType) {
         <SelectBox
           label=""
           options={props.languages}
-          value={props.language}
+          value={props.defaultLanguage}
           backgroundColor="#fff"
           textColor="#155D74"
-          onChange={() => { }}
+          onChange={(e: React.ChangeEvent<{ value: unknown }>) => props.onChangeDefaultLanguage(e.target.value as string)}
         />
       </StyledLanguageSelectContainer>
 
       <StyledTermDetailHeaderButtonContainer isdisable={props.disable ? 'true' : 'false'}>
-        <Text fontFamily="'Baloo Da 2'" fontWeight="700" color="#155D74">{props.currentLanguage}</Text>
+        <Text fontFamily="'Baloo Da 2'" fontWeight="700" color="#155D74">{props.currentLanguageLabel}</Text>
 
         <Button
           label="Save Changes"
           disabled={props.disable}
-          onClick={() => {console.log('clicked')}}
+          onClick={() => props.onSave(props.pageId)}
         />
       </StyledTermDetailHeaderButtonContainer>
     </StyledTermDetailHeaderContainer>

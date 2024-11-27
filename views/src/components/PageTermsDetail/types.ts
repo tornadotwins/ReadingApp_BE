@@ -1,7 +1,11 @@
-import { TermType } from "../PageTerms/types";
+import { AppTextType } from "@/pages/types";
 
 type PageTermsDetailPropsType = {
-  terms: TermType[];
+  terms: AppTextType[];
+  currentLanguage: string;
+  defaultLanguage: string;
+
+  onInputChange: (id: string, changedVal: string) => void;
 }
 
 export type {

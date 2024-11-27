@@ -20,8 +20,9 @@ const StyledTermContainer = styled(Box) ({
   display: 'flex',
   alignItems: 'center',
 
-  '& >.MuiBox-root: first-of-type': {
+  '& > .MuiBox-root: first-of-type': {
     minWidth: '200px',
+    width: '200px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -48,7 +49,8 @@ const StyledCurrentTermContainer = styled(Box) ({
       border: '1px solid #155D74',
       
       '& input': {
-        fontFamily: '"Baloo Da 2" !important'
+        fontFamily: '"Baloo Da 2" !important',
+        color: '#155D74'
       }
     }
   }

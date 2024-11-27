@@ -6,7 +6,8 @@ export const initialState: StateType = {
   currentUser: null,
   bookInfos: [],
   chapterInfos: [],
-  language: ''
+  language: '',
+  appTextPages: [],
 };
 
 //////////////////////////////////////////////////////////////////

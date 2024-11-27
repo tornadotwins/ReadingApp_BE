@@ -3,6 +3,8 @@ import { useState, useCallback, useEffect } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from 'redux';
 import { useNavigate } from 'react-router-dom';
+import useOrientation from "@/hooks/useOrientation";
+import { toast, Bounce, ToastContainer } from "material-react-toastify";
 
 // Components
 import Header from "@/components/Header";
@@ -10,8 +12,10 @@ import Tools from "@/components/Tools";
 import BookSelector from "@/components/BookSelector";
 import {
   Text,
-  SelectBox
+  SelectBox,
+  LoadingOverlay
 } from "@/components/Base";
+import PageTerms from "@/components/PageTerms";
 
 // Styles
 import {
@@ -24,10 +28,13 @@ import {
 // Types
 import { AppStateType } from '@/reducers/types';
 import { AppTextOverviewPropsType } from "./types";
-import { LanguageType } from "../types";
+import { AppTextPageChangedType, AppTextPageStatusType, AppTextPageType, LanguageType } from "../types";
 
 // Utils
-import { getLanguageCodeFromLanguage, getLanguageFromLanguageCode } from "@/utils";
+import {
+  getLanguageCodeFromLanguage,
+  getLanguageFromLanguageCode
+} from "@/utils";
 
 // Constatns
 import {
@@ -36,7 +43,7 @@ import {
   BOOK_APP_TEXT,
 } from "@/config";
 import actionTypes from "@/actions/actionTypes";
-import PageTerms from "@/components/PageTerms";
+import translatorService from "@/services/translator.services";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -44,15 +51,17 @@ const TOOLS = [
 ];
 
 function AppTextOverview(props: AppTextOverviewPropsType) {
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedBook, setSelectedBook] = useState(BOOK_APP_TEXT);
   const [languages, setLanguages] = useState<LanguageType[]>([]);
-  const [currentLanguage, setCurrentLanguage] = useState('');
-
-  // page complete/publish
-  const [isWelcomeComplete, setIsWelcomeComplete] = useState(false);
-  const [isWelcomePublish, setIsWelcomePublish] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState(props.currentLanguage);
+  const [defaultLanguage, setDefaultLanguage] = useState('en');
+  const [updatedTerms, setUpdatedTerms] = useState<AppTextPageType[]>(props.appTextPages);
+  const [textChangedPageStatus, setTextChangedPageStatus] = useState<AppTextPageChangedType[]>([]);
+  // const [appTextPageStatus, setAppTextPageStatus] = useState<AppTextPageStatusType[]>([]);
 
   const navigate = useNavigate();
+  const isPortrait = useOrientation();
 
   const onLogout = () => {
 
@@ -64,7 +73,11 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
 
     props.dispatch({
       type: actionTypes.RESET_BOOK
-    })
+    });
+
+    props.dispatch({
+      type: actionTypes.RESET_APP_TEXT_PAGES
+    });
 
     navigate('/admin');
   };
@@ -177,39 +190,246 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
     )
   };
 
-  const handleWelcomeStatus = (isCompleted: boolean, isPublished: boolean) => {
-    setIsWelcomeComplete(isCompleted);
-    setIsWelcomePublish(isPublished);
+  // Fetch all terms and save it to redux store
+  useEffect(() => {
+    // Fetch all terms
+    const fetchAppTexts = async () => {
+      return await translatorService.getAllAppTexts();
+    };
+
+    if (props.appTextPages && props.appTextPages.length == 0) {
+      setIsLoading(true);
+      fetchAppTexts()
+        .then(result => {
+          props.dispatch({
+            type: actionTypes.SET_APP_TEXT_PAGES,
+            payload: {
+              appTextPages: result
+            }
+          });
+
+          result.map(page =>
+            setTextChangedPageStatus(prevTextChangedPageStatus =>
+              [
+                ...prevTextChangedPageStatus,
+                {
+                  pageId: page.pageId,
+                  isChanged: false
+                }
+              ]
+            ))
+
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          toast.error(error instanceof Error ? error.message : String(error), {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
+          });
+
+          setIsLoading(false);
+        })
+    }
+  }, []);
+
+  useEffect(() => {
+    setUpdatedTerms(props.appTextPages)
+  }, [props.appTextPages]);
+
+  // Handle changes in Input values
+  const handleTermChange = (id: string, changedVal: string) => {
+    setUpdatedTerms(prevTerms =>
+      prevTerms.map(term => ({
+        ...term, // Spread to keep other properties of `AppTextPageType`
+        texts: term.texts.map(text =>
+          text._id === id
+            ? {
+              ...text, // Spread to keep other properties of `AppTextType`
+              text: {
+                ...text.text, // Spread to keep other language texts
+                [currentLanguage]: changedVal, // Update only the current language
+              },
+            }
+            : text // If not the matching `text`, return it as-is
+        ),
+      }))
+    );
+
+    const changedPageId = updatedTerms.find(updatedTerm => updatedTerm.texts.find(text => text._id == id))?.pageId;
+
+    setTextChangedPageStatus(prevTextChangePageStatuses =>
+      prevTextChangePageStatuses.map(textChangedPageStatus =>
+        textChangedPageStatus.pageId == changedPageId ?
+          {
+            ...textChangedPageStatus,
+            isChanged: true
+          } :
+          textChangedPageStatus
+      )
+    );
+  };
+
+  // Handle changes in complete/publish switches
+  const handlePageStatus = (newStatus: AppTextPageStatusType) => {
+    setUpdatedTerms(prevTerms =>
+      prevTerms.map(term =>
+        term.pageId === newStatus.pageId
+          ? {
+            ...term,
+            isCompleted: newStatus.isCompleted,
+            isPublished: newStatus.isPublished,
+          }
+          : term
+      )
+    );
+
+    // Change the status
+    const data = {
+      pageId: newStatus.pageId,
+      updates: {
+        isCompleted: newStatus.isCompleted,
+        isPublished: newStatus.isPublished
+      }
+    }
+
+    setIsLoading(true);
+
+    translatorService
+      .updateAppTextPage(data)
+      .then(result => {
+        toast.success("Successfully updated!", {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        const updatedAppTextPages = props.appTextPages.map(appTextPage =>
+          appTextPage.pageId == newStatus.pageId ?
+            {
+              ...appTextPage,
+              isCompleted: newStatus.isCompleted,
+              isPublished: newStatus.isPublished,
+            } :
+            appTextPage
+        );
+
+        props.dispatch({
+          type: actionTypes.SET_APP_TEXT_PAGES,
+          payload: {
+            appTextPages: updatedAppTextPages
+          }
+        })
+
+        setIsLoading(false);
+      })
+      .catch(error => {
+        toast.error(error instanceof Error ? error.message : String(error), {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+        setIsLoading(false);
+      })
+  };
+
+  const handleSave = (id: string) => {
+    // Get the changed texts
+    const changedAppTextPage = updatedTerms.find(updatedTerm => updatedTerm.pageId == id);
+    const data = {
+      texts: changedAppTextPage?.texts || []
+    };
+
+    setIsLoading(true);
+
+    translatorService
+      .updateAppTexts(data)
+      .then(result => {
+        props.dispatch({
+          type: actionTypes.SET_APP_TEXT_PAGES,
+          payload: {
+            appTextPages: updatedTerms
+          }
+        });
+
+        setTextChangedPageStatus(prevTextChangePageStatuses =>
+          prevTextChangePageStatuses.map(textChangedPageStatus =>
+            textChangedPageStatus.pageId == id ?
+              {
+                ...textChangedPageStatus,
+                isChanged: false
+              } :
+              textChangedPageStatus
+          )
+        )
+
+        toast.success("Successfully updated!", {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        toast.error(error instanceof Error ? error.message : String(error), {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      })
   }
 
   const _renderTermEdit = () => {
     return (
-      <PageTerms
-        pageName="Welcome Page"
-        languageCode={currentLanguage}
-        languageLabel={getLanguageFromLanguageCode(currentLanguage)}
-        languages={languages}
-        currentLanguage={getLanguageFromLanguageCode(props.currentLanguage)}
-        currentUser={props.currentUser}
-        disable
-        isComplete={isWelcomeComplete}
-        isPublish={isWelcomePublish}
+      updatedTerms.map((appTextPage: AppTextPageType, index: number) => (
+        <PageTerms
+          key={index}
+          pageName={appTextPage.pageTitle}
+          defaultLanguage={defaultLanguage}
+          languages={languages}
+          currentLanguage={props.currentLanguage}
+          currentLanguageLabel={getLanguageFromLanguageCode(currentLanguage)}
+          currentUser={props.currentUser}
+          pageId={appTextPage.pageId}
+          terms={appTextPage.texts}
+          isComplete={appTextPage.isCompleted}
+          isPublish={appTextPage.isPublished}
+          hasChangedText={textChangedPageStatus.find(changedStatus => changedStatus.pageId == appTextPage.pageId)?.isChanged || false}
 
-        terms={[
-          {
-            variable: 'Welcome',
-            defaultTerm: 'Welcome default',
-            currentTerm: 'Welcome Edit',
-          },
-          {
-            variable: 'LogIn',
-            defaultTerm: 'Log In',
-            currentTerm: 'Log In Edit',
-          }
-        ]}
-
-        onChangeStatus={(complete: boolean, publish: boolean) => handleWelcomeStatus(complete, publish)}
-      />
+          onChangeDefaultLanguage={(languageCode: string) => setDefaultLanguage(languageCode)}
+          onChangeInput={(id: string, changedVal: string) => handleTermChange(id, changedVal)}
+          onChangeAppTextPageStatus={(status: AppTextPageStatusType) => handlePageStatus(status)}
+          onSave={(id: string) => handleSave(id)}
+        />
+      ))
     )
   };
 
@@ -228,10 +448,14 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
   };
 
   return (
-    <StyledContainer>
+    <StyledContainer flexDirection={isPortrait ? 'column' : 'row'}>
       {_renderHeader()}
 
       {_renderBody()}
+
+      {isLoading && <LoadingOverlay />}
+
+      <ToastContainer />
     </StyledContainer>
   )
 }
@@ -246,6 +470,7 @@ function mapStateToProps(state: AppStateType) {
     bookInfos: state.book.bookInfos,
     currentLanguage: state.book.language,
     currentBook: state.book.book,
+    appTextPages: state.translator.appTextPages,
   };
 }
 

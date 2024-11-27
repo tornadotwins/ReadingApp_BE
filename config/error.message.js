@@ -34,8 +34,11 @@ module.exports = {
   UNAUTHORIZED_USER: 'You are not permitted for the action.',
 
   // Translator
+  FAIL_GET_APP_TEXTS: 'Failed to get app texts',
   FAIL_CREATE_PAGE: 'Failed to create a page',
   FAIL_CREATE_APP_TEXT: 'Failed to create an app text',
   FAIL_UPDATE_PAGE: 'Failed to update a page',
   FAIL_UPDATE_APP_TEXT: 'Failed to update an app text',
+  APP_TEXT_NOT_FOUND: "Could't find a app text",
+  APP_PAGE_NOT_FOUND: "Couldn't find a page",
 };

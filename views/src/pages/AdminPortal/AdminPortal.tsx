@@ -110,10 +110,15 @@ function AdminPortal(props: AdminPortalPropsType) {
     localStorage.removeItem(ACCESS_TOKEN);
 
     props.dispatch({
-      type: actionTypes.SET_CURRENT_USER,
-      payload: {
-        user: null,
-      },
+      type: actionTypes.RESET_USER
+    });
+
+    props.dispatch({
+      type: actionTypes.RESET_BOOK
+    });
+
+    props.dispatch({
+      type: actionTypes.RESET_APP_TEXT_PAGES
     });
 
     navigate('/admin');

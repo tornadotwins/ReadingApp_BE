@@ -1,4 +1,9 @@
-import { LanguageType, UserType } from "@/pages/types";
+import {
+  AppTextType,
+  LanguageType,
+  UserType,
+  AppTextPageStatusType,
+} from "@/pages/types";
 
 type TermType = {
   variable: string;
@@ -8,17 +13,26 @@ type TermType = {
 
 type PageTermsPropsType = {
   pageName: string;
-  languageCode: string;
-  languageLabel: string;
+  defaultLanguage: string;
   currentLanguage: string;
+  currentLanguageLabel: string;
   currentUser: UserType;
   languages: LanguageType[];
-  terms: TermType[];
+  pageId: string;
+  terms: AppTextType[];
   disable?: boolean;
-  isComplete?: boolean;
-  isPublish?: boolean;
-
-  onChangeStatus: (isCompleted: boolean, isPublished: boolean) => void;
+  isComplete?: {
+    [key: string]: boolean,
+  };
+  isPublish?: {
+    [key: string]: boolean,
+  };
+  hasChangedText: boolean;
+  
+  onChangeDefaultLanguage: (languageCode: string) => void;
+  onChangeInput: (id: string, changedVal: string) => void;
+  onChangeAppTextPageStatus: (status: AppTextPageStatusType) => void;
+  onSave: (id: string) => void;
 };
 
 export type {

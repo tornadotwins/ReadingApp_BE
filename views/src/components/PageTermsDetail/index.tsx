@@ -1,6 +1,5 @@
 import Images from "@/config/images";
 import { Input, Text } from "../Base";
-import { TermType } from "../PageTerms/types";
 import {
   StyledDetailContainer,
   StyledDetailItemContainer,
@@ -10,12 +9,13 @@ import {
   StyledTermContainer,
 } from "./styles";
 import { PageTermsDetailPropsType } from "./types";
+import { AppTextType } from "@/pages/types";
 
 function PageTermsDetail(props: PageTermsDetailPropsType) {
   return (
     <StyledDetailContainer>
       {
-        props.terms.map((term: TermType, index: number) => (
+        props.terms.map((term: AppTextType, index: number) => (
           <StyledDetailItemContainer key={index}>
             <StyledTermContainer>
               <Text fontFamily="'Baloo Da 2'" fontWeight="400" fontSize={16} lineHeight={24} color="#A1A1A1">
@@ -28,15 +28,15 @@ function PageTermsDetail(props: PageTermsDetailPropsType) {
                 />
 
                 <Text fontFamily="'Baloo Da 2'" fontWeight="400" fontSize={16} lineHeight={24} color="#155D74">
-                  {term.defaultTerm}
+                  {term.text?.[props.defaultLanguage]}
                 </Text>
               </StyledDefaultTermContainer>
             </StyledTermContainer>
 
             <StyledCurrentTermContainer>
               <Input
-                value={term.currentTerm}
-                onChange={() => { }}
+                value={term.text?.[props.currentLanguage]}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => props.onInputChange(term._id, e.target.value)}
               />
             </StyledCurrentTermContainer>
           </StyledDetailItemContainer>

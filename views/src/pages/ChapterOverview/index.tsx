@@ -979,8 +979,19 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   // Log out
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
-    props.dispatch({ type: actionTypes.RESET_USER });
-    props.dispatch({ type: actionTypes.RESET_BOOK });
+
+    props.dispatch({
+      type: actionTypes.RESET_USER
+    });
+
+    props.dispatch({
+      type: actionTypes.RESET_BOOK
+    });
+
+    props.dispatch({
+      type: actionTypes.RESET_APP_TEXT_PAGES
+    });
+
     navigate('/admin');
   };
 
