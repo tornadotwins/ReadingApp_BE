@@ -4,6 +4,8 @@ type PageTermsDetailPropsType = {
   terms: AppTextType[];
   language: string;
   currentLanguage: string;
+
+  onInputChange: (id: string, changedVal: string) => void;
 }
 
 export type {

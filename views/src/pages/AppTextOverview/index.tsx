@@ -26,7 +26,7 @@ import {
 // Types
 import { AppStateType } from '@/reducers/types';
 import { AppTextOverviewPropsType } from "./types";
-import { AppTextPageType, LanguageType } from "../types";
+import { AppTextPageStatusType, AppTextPageType, LanguageType } from "../types";
 
 // Utils
 import { getLanguageCodeFromLanguage, getLanguageFromLanguageCode } from "@/utils";
@@ -51,10 +51,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
   const [selectedBook, setSelectedBook] = useState(BOOK_APP_TEXT);
   const [languages, setLanguages] = useState<LanguageType[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState('');
-
-  // page complete/publish
-  const [isWelcomeComplete, setIsWelcomeComplete] = useState(false);
-  const [isWelcomePublish, setIsWelcomePublish] = useState(false);
+  const [updatedTerms, setUpdatedTerms] = useState<AppTextPageType[]>(props.appTextPages);
 
   const navigate = useNavigate();
 
@@ -222,14 +219,44 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
     }
   }, []);
 
-  const handleWelcomeStatus = (isCompleted: boolean, isPublished: boolean) => {
-    setIsWelcomeComplete(isCompleted);
-    setIsWelcomePublish(isPublished);
+  // Handle changes in Input values
+  const handleTermChange = (id: string, changedVal: string) => {
+    setUpdatedTerms(prevTerms =>
+      prevTerms.map(term => ({
+        ...term, // Spread to keep other properties of `AppTextPageType`
+        texts: term.texts.map(text =>
+          text._id === id
+            ? {
+              ...text, // Spread to keep other properties of `AppTextType`
+              text: {
+                ...text.text, // Spread to keep other language texts
+                [currentLanguage]: changedVal, // Update only the current language
+              },
+            }
+            : text // If not the matching `text`, return it as-is
+        ),
+      }))
+    );
+  };
+
+  // Handle changes in complete/publish switches
+  const handlePageStatus = (newStatus: AppTextPageStatusType) => {
+    setUpdatedTerms(prevTerms =>
+      prevTerms.map(term =>
+        term.pageId === newStatus.pageId
+          ? {
+            ...term,
+            isCompleted: newStatus.isCompleted,
+            isPublished: newStatus.isPublished,
+          }
+          : term
+      )
+    );
   };
 
   const _renderTermEdit = () => {
     return (
-      props.appTextPages.map((appTextPage: AppTextPageType, index: number) => (
+      updatedTerms.map((appTextPage: AppTextPageType, index: number) => (
         <PageTerms
           key={index}
           pageName={appTextPage.pageTitle}
@@ -238,11 +265,13 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
           languages={languages}
           currentLanguage={getLanguageFromLanguageCode(props.currentLanguage)}
           currentUser={props.currentUser}
-          isComplete={isWelcomeComplete}
-          isPublish={isWelcomePublish}
+          pageId={appTextPage.pageId}
           terms={appTextPage.texts}
+          isComplete={appTextPage.isCompleted}
+          isPublish={appTextPage.isPublished}
 
-          onChangeStatus={(complete: boolean, publish: boolean) => handleWelcomeStatus(complete, publish)}
+          onChangeInput={(id: string, changedVal: string) => handleTermChange(id, changedVal)}
+          onChangeAppTextPageStatus={(status: AppTextPageStatusType) => handlePageStatus(status)}
         />
       ))
     )

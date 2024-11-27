@@ -1,12 +1,24 @@
-import { UserType } from "@/pages/types";
+import {
+  UserType,
+  AppTextPageStatusType,
+} from "@/pages/types";
 
 type AccordionExpandProps = {
   label: string;
   detail: any;
   value?: string;
   summaryTitle?: string;
-  isComplete?: boolean;
-  isPublish?: boolean;
+  pageId?: string;
+  isComplete?: {
+    en: boolean,
+    ar: boolean,
+    [key: string]: boolean,
+  };
+  isPublish?: {
+    en: boolean,
+    ar: boolean,
+    [key: string]: boolean,
+  };
   summaryIcon?: boolean;
   hasSwitches?: boolean;
   showArrow?: boolean;
@@ -18,6 +30,7 @@ type AccordionExpandProps = {
   onCurrentChapterTitleEnterPressed?: (value: string) => void;
   onCompleteChange?: (value: boolean) => void;
   onPublishChange?: (value: boolean) => void;
+  onChangeAppTextPageStatus: (status: AppTextPageStatusType) => void;
 };
 
 export type { AccordionExpandProps };

@@ -36,7 +36,7 @@ function PageTermsDetail(props: PageTermsDetailPropsType) {
             <StyledCurrentTermContainer>
               <Input
                 value={term.text?.[props.language]}
-                onChange={() => { }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => props.onInputChange(term._id, e.target.value)}
               />
             </StyledCurrentTermContainer>
           </StyledDetailItemContainer>

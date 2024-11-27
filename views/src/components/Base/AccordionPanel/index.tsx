@@ -78,7 +78,7 @@ function AccordionPanel(props: AccordionExpandProps) {
                 <StyledSwitchContainer>
                   <Switch
                     label="Complete: "
-                    value={props.isComplete || false}
+                    value={props.isComplete?.[props.currentLanguage || 'en'] || false}
                     disable={
                       (props.currentUser?.isAdmin ||
                         props.currentUser?.roles.some(
@@ -88,14 +88,21 @@ function AccordionPanel(props: AccordionExpandProps) {
                         false :
                         true
                     }
-                    onChange={(value: boolean) => props.onCompleteChange && props.onCompleteChange(value)}
+
+                    onChange={
+                      (value: boolean) =>
+                        props.onChangeAppTextPageStatus({
+                          pageId: props.pageId || '',
+                          isCompleted: { ...props.isComplete, [props.currentLanguage || '']: value },
+                          isPublished: props.isPublish,
+                        })}
                   />
                 </StyledSwitchContainer>
 
                 <StyledSwitchContainer onClick={(e => e.stopPropagation())}>
                   <Switch
                     label="Publish: "
-                    value={props.isPublish || false}
+                    value={props.isPublish?.[props.currentLanguage || 'en'] || false}
                     disable={
                       (props.currentUser?.isAdmin ||
                         props.currentUser?.roles.some(
@@ -105,7 +112,13 @@ function AccordionPanel(props: AccordionExpandProps) {
                         false :
                         true
                     }
-                    onChange={(value: boolean) => props.onPublishChange && props.onPublishChange(value)}
+                    onChange={
+                      (value: boolean) =>
+                        props.onChangeAppTextPageStatus({
+                          pageId: props.pageId || '',
+                          isCompleted: props.isComplete,
+                          isPublished: { ...props.isPublish, [props.currentLanguage || '']: value },
+                        })}
                   />
                 </StyledSwitchContainer>
               </StyledSwitchGroupContainer>

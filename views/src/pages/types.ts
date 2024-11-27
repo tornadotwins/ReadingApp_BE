@@ -33,16 +33,30 @@ type AppTextPageType = {
   pageNumber: number;
   pageTitle: string;
   isCompleted: {
-    en: string;
-    ar: string;
-    [key: string]: string;
+    en: boolean;
+    ar: boolean;
+    [key: string]: boolean;
   },
   isPublished: {
-    en: string;
-    ar: string;
-    [key: string]: string;
+    en: boolean;
+    ar: boolean;
+    [key: string]: boolean;
   },
   texts: AppTextType[];
+}
+
+type AppTextPageStatusType = {
+  pageId: string;
+  isCompleted: {
+    en: boolean;
+    ar: boolean;
+    [key: string]: boolean;
+  },
+  isPublished: {
+    en: boolean;
+    ar: boolean;
+    [key: string]: boolean;
+  },
 }
 
 export type {
@@ -51,4 +65,5 @@ export type {
   LanguageType,
   AppTextType,
   AppTextPageType,
+  AppTextPageStatusType,
 };
