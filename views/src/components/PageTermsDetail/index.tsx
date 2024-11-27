@@ -28,14 +28,14 @@ function PageTermsDetail(props: PageTermsDetailPropsType) {
                 />
 
                 <Text fontFamily="'Baloo Da 2'" fontWeight="400" fontSize={16} lineHeight={24} color="#155D74">
-                  {term.text?.[props.language]}
+                  {term.text?.[props.defaultLanguage]}
                 </Text>
               </StyledDefaultTermContainer>
             </StyledTermContainer>
 
             <StyledCurrentTermContainer>
               <Input
-                value={term.text?.[props.language]}
+                value={term.text?.[props.currentLanguage]}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => props.onInputChange(term._id, e.target.value)}
               />
             </StyledCurrentTermContainer>

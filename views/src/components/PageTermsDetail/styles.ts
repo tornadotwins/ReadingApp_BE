@@ -20,8 +20,9 @@ const StyledTermContainer = styled(Box) ({
   display: 'flex',
   alignItems: 'center',
 
-  '& >.MuiBox-root: first-of-type': {
+  '& > .MuiBox-root: first-of-type': {
     minWidth: '200px',
+    width: '200px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',

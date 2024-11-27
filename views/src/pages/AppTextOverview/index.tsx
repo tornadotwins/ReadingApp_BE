@@ -14,6 +14,7 @@ import {
   SelectBox,
   LoadingOverlay
 } from "@/components/Base";
+import PageTerms from "@/components/PageTerms";
 
 // Styles
 import {
@@ -38,7 +39,6 @@ import {
   BOOK_APP_TEXT,
 } from "@/config";
 import actionTypes from "@/actions/actionTypes";
-import PageTerms from "@/components/PageTerms";
 import translatorService from "@/services/translator.services";
 
 const TOOLS = [
@@ -51,6 +51,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
   const [selectedBook, setSelectedBook] = useState(BOOK_APP_TEXT);
   const [languages, setLanguages] = useState<LanguageType[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState('');
+  const [defaultLanguage, setDefaultLanguage] = useState('');
   const [updatedTerms, setUpdatedTerms] = useState<AppTextPageType[]>(props.appTextPages);
 
   const navigate = useNavigate();
@@ -254,22 +255,25 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
     );
   };
 
+
+
   const _renderTermEdit = () => {
     return (
       updatedTerms.map((appTextPage: AppTextPageType, index: number) => (
         <PageTerms
           key={index}
           pageName={appTextPage.pageTitle}
-          languageCode={currentLanguage}
-          languageLabel={getLanguageFromLanguageCode(currentLanguage)}
+          defaultLanguage={defaultLanguage}
           languages={languages}
-          currentLanguage={getLanguageFromLanguageCode(props.currentLanguage)}
+          currentLanguage={props.currentLanguage}
+          currentLanguageLabel={getLanguageFromLanguageCode(currentLanguage)}
           currentUser={props.currentUser}
           pageId={appTextPage.pageId}
           terms={appTextPage.texts}
           isComplete={appTextPage.isCompleted}
           isPublish={appTextPage.isPublished}
 
+          onChangeDefaultLanguage={(languageCode: string) => setDefaultLanguage(languageCode)}
           onChangeInput={(id: string, changedVal: string) => handleTermChange(id, changedVal)}
           onChangeAppTextPageStatus={(status: AppTextPageStatusType) => handlePageStatus(status)}
         />

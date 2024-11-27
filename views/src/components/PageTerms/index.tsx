@@ -14,7 +14,7 @@ function PageTerms(props: PageTermsPropsType) {
         hasSwitches
         summaryIcon
         currentUser={props.currentUser}
-        currentLanguage={props.languageCode}
+        currentLanguage={props.currentLanguage}
         pageId={props.pageId}
         isComplete={props.isComplete}
         isPublish={props.isPublish}
@@ -23,15 +23,19 @@ function PageTerms(props: PageTermsPropsType) {
           <>
             <PageTermsDetailHeader
               languages={props.languages}
-              language={props.languageCode}
+              language={props.currentLanguage}
               currentLanguage={props.currentLanguage}
+              currentLanguageLabel={props.currentLanguageLabel}
+              defaultLanguage={props.defaultLanguage}
               disable={props.disable}
+
+              onChangeDefaultLanguage={props.onChangeDefaultLanguage}
               onSave={() => { }}
             />
 
             <PageTermsDetail
+              defaultLanguage={props.defaultLanguage}
               currentLanguage={props.currentLanguage}
-              language={props.languageCode}
               terms={props.terms}
 
               onInputChange={props.onChangeInput}

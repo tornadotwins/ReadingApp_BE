@@ -13,9 +13,9 @@ type TermType = {
 
 type PageTermsPropsType = {
   pageName: string;
-  languageCode: string;
-  languageLabel: string;
+  defaultLanguage: string;
   currentLanguage: string;
+  currentLanguageLabel: string;
   currentUser: UserType;
   languages: LanguageType[];
   pageId: string;
@@ -32,6 +32,7 @@ type PageTermsPropsType = {
     [key: string]: boolean,
   };
   
+  onChangeDefaultLanguage: (languageCode: string) => void;
   onChangeInput: (id: string, changedVal: string) => void;
   onChangeAppTextPageStatus: (status: AppTextPageStatusType) => void;
 };
