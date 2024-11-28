@@ -32,6 +32,7 @@ type PageTermsPropsType = {
   onChangeDefaultLanguage: (languageCode: string) => void;
   onChangeInput: (id: string, changedVal: string) => void;
   onChangeAppTextPageStatus: (status: AppTextPageStatusType) => void;
+  onClickImage: (image: string) => void;
   onSave: (id: string) => void;
 };
 

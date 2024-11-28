@@ -1,6 +1,7 @@
 import {Box, styled} from '@mui/material';
 
 const StyledContainer = styled(Box) ({
+  width: '900px',
   border: '1px solid #1B7695',
   backgroundColor: '#F0F5FB',
   boxSizing: 'border-box',
@@ -18,7 +19,16 @@ const StyledContainer = styled(Box) ({
 
   '& .MuiAccordionSummary-content > .MuiBox-root :nth-of-type(2)': {
     padding: '0px !important',
-  }
+  },
+
+  '@media screen and (max-width: 1000px)': {
+    width: '700px'
+  },
+
+  '@media screen and (max-width: 780px)': {
+    margin: '20px',
+    width: '550px'
+  },
 });
 
 export {

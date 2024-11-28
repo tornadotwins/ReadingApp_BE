@@ -21,6 +21,7 @@ type AppTextType = {
   _id: string;
   variable: string;
   page: string;
+  image: string;
   text: {
     en: string;
     ar: string;

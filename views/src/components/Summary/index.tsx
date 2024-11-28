@@ -196,15 +196,15 @@ function Summary(props: SummaryPropsType) {
                 <StyledSummaryItemContainer>
                   <Switch
                     label="Publish: "
-                    value={props.isPublish}
+                    value={props.isComplete && props.isPublish}
                     disable={
-                      (props.currentUser.isAdmin ||
+                      (
+                        props.currentUser.isAdmin ||
                         props.currentUser.roles.some(
                           role => role.language == getLanguageFromLanguageCode(props.currentLanguage) &&
                             role.role.toLowerCase() == "publisher".toLowerCase()
-                        )) ?
-                        false :
-                        true
+                        )
+                      ) && !props.isComplete
                     }
                     onChange={(value: boolean) => props.translatePublish(value)}
                   />
@@ -258,15 +258,13 @@ function Summary(props: SummaryPropsType) {
           <StyledSummaryItemContainer>
             <Switch
               label="Publish: "
-              value={props.isPublish}
+              value={props.isComplete && props.isPublish}
               disable={
                 (props.currentUser.isAdmin ||
                   props.currentUser.roles.some(
                     role => role.language == getLanguageFromLanguageCode(props.currentLanguage) &&
                       role.role.toLowerCase() == "publisher".toLowerCase()
-                  )) ?
-                  false :
-                  true
+                  )) && !props.isComplete
               }
               onChange={(value: boolean) => props.translatePublish(value)}
             />

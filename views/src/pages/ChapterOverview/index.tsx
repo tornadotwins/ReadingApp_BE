@@ -324,6 +324,11 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     });
   }, [tableRows, tableHeaders]);
 
+  // Scroll to top when page is rendered
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, []);
+
   // Book Title Effect
   useEffect(() => {
     const loadBookAndConfigureTable = async () => {
@@ -712,6 +717,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   // Update chapter with isCompleted
   const handleTranslateComplete = async (isTranslateCompleted: boolean) => {
     setIsComplete(isTranslateCompleted);
+    setIsPublish(isTranslateCompleted && activeChapterInfo.chapterIsPublished?.[selectedLanguage]);
     setIsLoading(true);
 
     const newChapter = {
@@ -723,7 +729,10 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         ...activeChapterInfo.chapterIsCompleted,
         [selectedLanguage]: isTranslateCompleted
       },
-      isPublished: activeChapterInfo.chapterIsPublished
+      isPublished: {
+        ...activeChapterInfo.chapterIsPublished,
+        [selectedLanguage]: isTranslateCompleted && activeChapterInfo.chapterIsPublished?.[selectedLanguage]
+      }
     };
 
     bookService
@@ -1045,47 +1054,48 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   const _renderDetailSelector = () => {
     return (
-      !isImport &&
       <StyledSelectContainer>
         <StyledBackContainer onClick={() => navigate('/admin/bookoverview')}>
           <KeyboardBackspaceIcon />
           <Text fontFamily="Inter" color="#155D74" fontWeight="500">overview</Text>
         </StyledBackContainer>
 
-        <StyledSelectGroupContainer>
-          <Text fontFamily="Inter" color="#155D74" fontWeight="500">
-            {(selectedBook == BOOK_INJIL || selectedBook == BOOK_TAWRAT) ? 'Go to: ' : 'Go to Surah: '}
-          </Text>
-          <SelectBox
-            label=""
-            options={subBookSelectOptions}
-            value={subBookSelectOptions.find(option => option.value === selectedSubBook) ? selectedSubBook : ''}
-            backgroundColor="#fff"
-            textColor="#155D74"
-            onChange={handleSelectSubBookChange}
-          />
-
-          {
-            (selectedBook == BOOK_INJIL || selectedBook == BOOK_TAWRAT) &&
+        {!isImport &&
+          <StyledSelectGroupContainer>
+            <Text fontFamily="Inter" color="#155D74" fontWeight="500">
+              {(selectedBook == BOOK_INJIL || selectedBook == BOOK_TAWRAT) ? 'Go to: ' : 'Go to Surah: '}
+            </Text>
             <SelectBox
               label=""
-              options={chapterSelectOptions}
-              value={chapterSelectOptions.find(option => option.value === selectedChapter) ? selectedChapter : ''}
+              options={subBookSelectOptions}
+              value={subBookSelectOptions.find(option => option.value === selectedSubBook) ? selectedSubBook : ''}
               backgroundColor="#fff"
               textColor="#155D74"
-              onChange={handleSelectChapterChange}
+              onChange={handleSelectSubBookChange}
             />
-          }
 
-          <SelectBox
-            label=""
-            options={languages}
-            value={selectedLanguage}
-            backgroundColor="#fff"
-            textColor="#155D74"
-            onChange={handleSelectLanguageChange}
-          />
-        </StyledSelectGroupContainer>
+            {
+              (selectedBook == BOOK_INJIL || selectedBook == BOOK_TAWRAT) &&
+              <SelectBox
+                label=""
+                options={chapterSelectOptions}
+                value={chapterSelectOptions.find(option => option.value === selectedChapter) ? selectedChapter : ''}
+                backgroundColor="#fff"
+                textColor="#155D74"
+                onChange={handleSelectChapterChange}
+              />
+            }
+
+            <SelectBox
+              label=""
+              options={languages}
+              value={selectedLanguage}
+              backgroundColor="#fff"
+              textColor="#155D74"
+              onChange={handleSelectLanguageChange}
+            />
+          </StyledSelectGroupContainer>
+        }
       </StyledSelectContainer>
     )
   };
@@ -1207,13 +1217,14 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
         {_renderBookSelector()}
 
-        {_renderImportHint()}
+        {_renderToggle()}
 
         {_renderDetailSelector()}
 
+        {_renderImportHint()}
+
         {_renderSummary()}
 
-        {_renderToggle()}
 
         {_renderTableInfo()}
 

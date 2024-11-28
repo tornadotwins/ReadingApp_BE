@@ -19,6 +19,7 @@ const StyledBodyContainer = styled(Box) ({
   height: 'calc(100% - 73px)',
   margin: 'auto',
   marginTop: '73px',
+  paddingBottom: '20px',
 });
 
 const StyledBookSelectorContainer = styled(Box) ({

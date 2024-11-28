@@ -6,6 +6,7 @@ type PageTermsDetailPropsType = {
   defaultLanguage: string;
 
   onInputChange: (id: string, changedVal: string) => void;
+  onImageClick: (image: string) => void;
 }
 
 export type {

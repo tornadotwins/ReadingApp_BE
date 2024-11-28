@@ -10,6 +10,7 @@ import {
 } from "./styles";
 import { PageTermsDetailPropsType } from "./types";
 import { AppTextType } from "@/pages/types";
+import { API_URL } from "@/config";
 
 function PageTermsDetail(props: PageTermsDetailPropsType) {
   return (
@@ -24,7 +25,9 @@ function PageTermsDetail(props: PageTermsDetailPropsType) {
 
               <StyledDefaultTermContainer>
                 <StyledPreviewImg
+                  noimage={!term.image ? 'true' : 'false'}
                   src={Images.icon_preview}
+                  onClick={(e) => term.image ? props.onImageClick(API_URL + term.image) : e.preventDefault()}
                 />
 
                 <Text fontFamily="'Baloo Da 2'" fontWeight="400" fontSize={16} lineHeight={24} color="#155D74">
@@ -42,10 +45,6 @@ function PageTermsDetail(props: PageTermsDetailPropsType) {
           </StyledDetailItemContainer>
         ))
       }
-
-      <Text color="#A1A1A1" textAlign="center" fontFamily="'Baloo Da 2'">
-        Of course this list goes on as long as it is but it’s short here for the design
-      </Text>
     </StyledDetailContainer>
   )
 }

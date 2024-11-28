@@ -40,6 +40,7 @@ function PageTerms(props: PageTermsPropsType) {
               terms={props.terms}
 
               onInputChange={props.onChangeInput}
+              onImageClick={props.onClickImage}
             />
           </>
         }
