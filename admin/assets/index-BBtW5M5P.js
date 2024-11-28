@@ -1,0 +1,1 @@
+import{j as e}from"./createTheme-Bart6mQ9.js";import{M as a,aI as r,ah as t}from"./App-ClMOZkrG.js";import"./index-C_467eEf.js";function o(){return e.jsxs(e.Fragment,{children:[e.jsx(a,{title:"page 3"}),e.jsx(r,{children:e.jsx(t,{variant:"h3",children:"Page 3"})})]})}export{o as default};

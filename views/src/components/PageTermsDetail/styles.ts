@@ -13,7 +13,13 @@ const StyledDetailItemContainer = styled(Box) ({
 
   '& >:first-of-type': {
     minWidth: '200px',
-  }
+  },
+
+  '@media screen and (max-width: 600px)': {
+    width: '100%',
+    display: 'block',
+    marginTop: '10px'
+  },
 });
 
 const StyledTermContainer = styled(Box) ({
@@ -37,6 +43,11 @@ const StyledTermContainer = styled(Box) ({
       minWidth: '70px',
       width: '70px',
       fontSize: '14px !important'
+    },
+
+    '@media screen and (max-width: 600px)': {
+      minWidth: '100px',
+      width: '100px',
     },
   }
 });
@@ -62,6 +73,11 @@ const StyledDefaultTermContainer = styled(Box)({
       width: '140px',
       fontSize: '14px !important'
     },
+
+    '@media screen and (max-width: 600px)': {
+      minWidth: '120px',
+      width: '120px',
+    },
   }
 });
 
@@ -83,7 +99,7 @@ const StyledCurrentTermContainer = styled(Box) ({
         fontFamily: '"Baloo Da 2" !important',
         color: '#155D74'
       }
-    }
+    },
   },
 
   '@media screen and (max-width: 780px)': {
@@ -92,6 +108,10 @@ const StyledCurrentTermContainer = styled(Box) ({
     '& input': {
       fontSize: '14px !important'
     }
+  },
+
+  '@media screen and (max-width: 600px)': {
+    width: '100%',
   },
 });
 

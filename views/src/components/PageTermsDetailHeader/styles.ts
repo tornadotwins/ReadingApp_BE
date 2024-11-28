@@ -7,6 +7,11 @@ const StyledTermDetailHeaderContainer = styled(Box) ({
   justifyContent: 'space-between',
   boxSizing: 'border-box',
   padding: '10px 0px',
+
+  '@media screen and (max-width: 600px)': {
+    width: '100%',
+    display: 'block',
+  },
 });
 
 const StyledLanguageSelectContainer = styled(Box) ({
@@ -28,22 +33,26 @@ const StyledLanguageSelectContainer = styled(Box) ({
   },
 
   '@media screen and (max-width: 780px)': {
-      '& .MuiFormControl-root': {
-        width: '100px !important',
+    '& .MuiFormControl-root': {
+      width: '100px !important',
 
-        '& .MuiInputBase-root': {
-          width: '100%',
+      '& .MuiInputBase-root': {
+        width: '100%',
 
-          '& .MuiSelect-select': {
-            padding: '10px !important',
+        '& .MuiSelect-select': {
+          padding: '10px !important',
 
-            '& .MuiBox-root': {
-              fontSize: '14px !important'
-            },
+          '& .MuiBox-root': {
+            fontSize: '14px !important'
           },
         },
       },
     },
+
+    '@media screen and (max-width: 600px)': {
+      marginBottom: '10px'
+    },
+  },
 });
 
 const StyledTermDetailHeaderButtonContainer = styled(Box) <{isdisable: string}> (({isdisable}) => ({

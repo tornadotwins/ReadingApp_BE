@@ -29,6 +29,39 @@ const StyledContainer = styled(Box) ({
     margin: '20px',
     width: '550px'
   },
+
+  '@media screen and (max-width: 600px)': {
+    margin: '20px',
+    width: 'calc(100% - 30px)',
+    padding: '0px',
+    
+    '& .MuiAccordionSummary-content': {
+      '& .MuiBox-root': {
+        justifyContent: 'left !important',
+        fontSize: '14px !important',
+        display: 'flex'
+      },
+
+      '& > .MuiBox-root > .MuiBox-root': {
+        width: '120px',
+        minWidth: '120px',
+        overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+
+        '& > .MuiBox-root': {
+          display: 'block',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }
+      },
+
+      '& > .MuiBox-root :nth-of-type(2) > .MuiBox-root > .MuiBox-root > .MuiBox-root:first-of-type': {
+        display: 'none'
+      }
+    },
+  },
 });
 
 export {
