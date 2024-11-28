@@ -709,6 +709,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   // Update chapter with isCompleted
   const handleTranslateComplete = async (isTranslateCompleted: boolean) => {
     setIsComplete(isTranslateCompleted);
+    setIsPublish(isTranslateCompleted && activeChapterInfo.chapterIsPublished?.[selectedLanguage]);
     setIsLoading(true);
 
     const newChapter = {
@@ -720,7 +721,10 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         ...activeChapterInfo.chapterIsCompleted,
         [selectedLanguage]: isTranslateCompleted
       },
-      isPublished: activeChapterInfo.chapterIsPublished
+      isPublished: {
+        ...activeChapterInfo.chapterIsPublished,
+        [selectedLanguage]: isTranslateCompleted && activeChapterInfo.chapterIsPublished?.[selectedLanguage]
+      }
     };
 
     bookService
