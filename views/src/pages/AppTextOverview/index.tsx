@@ -350,6 +350,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
       })
   };
 
+  // Handle when the user clickes "Save Changes" button
   const handleSave = (id: string) => {
     // Get the changed texts
     const changedAppTextPage = updatedTerms.find(updatedTerm => updatedTerm.pageId == id);
@@ -409,6 +410,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
       })
   };
 
+  // Handle when the user clicks "Preview" icon
   const handleImageClick = (image: string) => {
     setImage(image);
     setIsOpenImageDialog(true);

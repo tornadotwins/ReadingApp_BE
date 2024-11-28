@@ -97,7 +97,13 @@ function AccordionPanel(props: AccordionExpandProps) {
                           ...props.isComplete,
                           [props.currentLanguage || '']: value,
                         },
-                        isPublished: props.isPublish || { en: false, ar: false },
+                        isPublished: ({
+                          ...props.isPublish,
+                          [props.currentLanguage || 'en']: (
+                            value && props.isPublish?.[props.currentLanguage || 'en']
+                          ) || false
+                        }) ||
+                          { en: false, ar: false },
                       })
                     }
 
@@ -107,13 +113,16 @@ function AccordionPanel(props: AccordionExpandProps) {
                 <StyledSwitchContainer onClick={(e => e.stopPropagation())}>
                   <Switch
                     label="Publish: "
-                    value={props.isPublish?.[props.currentLanguage || 'en'] || false}
+                    value={(props.isComplete?.[props.currentLanguage || 'en'] && props.isPublish?.[props.currentLanguage || 'en']) || false}
                     disable={
-                      (props.currentUser?.isAdmin ||
-                        props.currentUser?.roles.some(
-                          role => role.language == getLanguageFromLanguageCode(props.currentLanguage || 'en') &&
-                            role.role.toLowerCase() == "publisher".toLowerCase()
-                        )) ?
+                      (
+                        (props.currentUser?.isAdmin ||
+                          props.currentUser?.roles.some(
+                            role => role.language == getLanguageFromLanguageCode(props.currentLanguage || 'en') &&
+                              role.role.toLowerCase() == "publisher".toLowerCase()
+                          )) &&
+                        props.isComplete?.[props.currentLanguage || 'en']
+                      ) ?
                         false :
                         true
                     }
