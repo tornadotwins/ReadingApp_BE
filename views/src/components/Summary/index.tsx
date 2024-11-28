@@ -181,11 +181,13 @@ function Summary(props: SummaryPropsType) {
                     label="Complete: "
                     value={props.isComplete}
                     disable={
-                      (props.currentUser.isAdmin ||
+                      (
+                        props.currentUser.isAdmin ||
                         props.currentUser.roles.some(
                           role => role.language == getLanguageFromLanguageCode(props.currentLanguage) &&
                             (role.role.toLowerCase() == "translator".toLowerCase() || role.role.toLowerCase() == "publisher".toLowerCase())
-                        )) ?
+                        )
+                      ) && props.languageCountVerse ?
                         false :
                         true
                     }
@@ -243,11 +245,13 @@ function Summary(props: SummaryPropsType) {
               label="Complete: "
               value={props.isComplete}
               disable={
-                (props.currentUser.isAdmin ||
+                (
+                  props.currentUser.isAdmin ||
                   props.currentUser.roles.some(
                     role => role.language == getLanguageFromLanguageCode(props.currentLanguage) &&
                       (role.role.toLowerCase() == "translator".toLowerCase() || role.role.toLowerCase() == "publisher".toLowerCase())
-                  )) ?
+                  )
+                ) && props.languageCountVerse ?
                   false :
                   true
               }

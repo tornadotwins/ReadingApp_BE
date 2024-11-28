@@ -356,7 +356,6 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           if (!newSubBookOptions.some(opt => opt.value === selectedSubBook)) {
             setSelectedSubBook(newSubBookOptions[0]?.value || '');
           }
-
         } else {
           await fetchBookInfoByTitle(selectedBook);
         }
@@ -465,7 +464,14 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           setIsLoading(false);
         })
         .catch(() => {
-          toast.error("There is no verses in the chapter. You must import it first.", {
+          setTableHeaders([]);
+          setTableRows([]);
+          setTotalCountVerse(0);
+          setLanguageCountVerse(0);
+          setIsComplete(false);
+          setIsPublish(false);
+
+          toast.error(`There is no verses in the chapter. You must import it first.`, {
             position: 'top-right',
             draggable: true,
             theme: 'colored',
