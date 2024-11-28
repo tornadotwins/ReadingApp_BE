@@ -25,7 +25,7 @@ function PageTermsDetail(props: PageTermsDetailPropsType) {
 
               <StyledDefaultTermContainer>
                 <StyledPreviewImg
-                  disabled={!term.image ? 'true' : 'false'}
+                  noimage={!term.image ? 'true' : 'false'}
                   src={Images.icon_preview}
                   onClick={(e) => term.image ? props.onImageClick(API_URL + term.image) : e.preventDefault()}
                 />
@@ -45,10 +45,6 @@ function PageTermsDetail(props: PageTermsDetailPropsType) {
           </StyledDetailItemContainer>
         ))
       }
-
-      <Text color="#A1A1A1" textAlign="center" fontFamily="'Baloo Da 2'">
-        Of course this list goes on as long as it is but it’s short here for the design
-      </Text>
     </StyledDetailContainer>
   )
 }

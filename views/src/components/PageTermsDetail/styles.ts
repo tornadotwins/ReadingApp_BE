@@ -56,12 +56,12 @@ const StyledCurrentTermContainer = styled(Box) ({
   }
 });
 
-const StyledPreviewImg = styled('img') <{disabled: string}> (({disabled}) => ({
+const StyledPreviewImg = styled('img') <{noimage: string}> (({noimage}) => ({
   width: '20px',
   height: '20px',
   marginRight: '10px',
-  cursor: disabled == 'true' ? 'not-allowed' : 'pointer',
-  opacity: disabled == 'true' ? '0.5' : '1'
+  cursor: noimage == 'true' ? 'not-allowed' : 'pointer',
+  opacity: noimage == 'true' ? '0.5' : '1'
 }));
 
 
