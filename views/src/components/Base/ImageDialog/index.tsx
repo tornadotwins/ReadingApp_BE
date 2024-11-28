@@ -25,7 +25,7 @@ function ImageDialog(props: DialogPropsType) {
         </StyledImageContainer>
         <StyledButtonContainer>
           <Button
-            label={'O  K'}
+            label={'OK'}
             onClick={props.onCancel}
             reference={saveRef}
           />
