@@ -19,7 +19,16 @@ const StyledContainer = styled(Box) ({
 
   '& .MuiAccordionSummary-content > .MuiBox-root :nth-of-type(2)': {
     padding: '0px !important',
-  }
+  },
+
+  '@media screen and (max-width: 1000px)': {
+    width: '700px'
+  },
+
+  '@media screen and (max-width: 780px)': {
+    margin: '20px',
+    width: '550px'
+  },
 });
 
 export {

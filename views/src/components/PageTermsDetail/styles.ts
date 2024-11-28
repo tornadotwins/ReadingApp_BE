@@ -1,5 +1,4 @@
 import { Box, styled } from "@mui/material";
-import { minWidth } from "@mui/system";
 
 const StyledDetailContainer = styled(Box)({
   width: '100%',
@@ -27,20 +26,42 @@ const StyledTermContainer = styled(Box) ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+    marginRight: '10px',
+
+    '@media screen and (max-width: 1000px)': {
+      minWidth: '100px',
+      width: '100px'
+    },
+
+    '@media screen and (max-width: 780px)': {
+      minWidth: '70px',
+      width: '70px',
+      fontSize: '14px !important'
+    },
   }
-})
+});
 
 const StyledDefaultTermContainer = styled(Box)({
   display: 'flex',
   alignItems: 'center',
-  width: '600px',
 
   '& .MuiBox-root': {
-    minWidth: '300px',
-    width: '300px',
+    minWidth: '200px',
+    width: '200px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+
+    '@media screen and (max-width: 1000px)': {
+      minWidth: '150px',
+      width: '150px'
+    },
+
+    '@media screen and (max-width: 780px)': {
+      minWidth: '140px',
+      width: '140px',
+      fontSize: '14px !important'
+    },
   }
 });
 
@@ -63,7 +84,15 @@ const StyledCurrentTermContainer = styled(Box) ({
         color: '#155D74'
       }
     }
-  }
+  },
+
+  '@media screen and (max-width: 780px)': {
+    width: '200px',
+
+    '& input': {
+      fontSize: '14px !important'
+    }
+  },
 });
 
 const StyledPreviewImg = styled('img') <{noimage: string}> (({noimage}) => ({
@@ -71,7 +100,12 @@ const StyledPreviewImg = styled('img') <{noimage: string}> (({noimage}) => ({
   height: '20px',
   marginRight: '10px',
   cursor: noimage == 'true' ? 'not-allowed' : 'pointer',
-  opacity: noimage == 'true' ? '0.5' : '1'
+  opacity: noimage == 'true' ? '0.5' : '1',
+
+  '@media screen and (max-width: 780px)': {
+    width: '15px',
+    height: '15px'
+  },
 }));
 
 
