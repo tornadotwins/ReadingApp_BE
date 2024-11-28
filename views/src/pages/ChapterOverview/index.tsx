@@ -196,8 +196,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           setSelectedChapter(result?.subBooks[0]?.chapterInfos[0].chapterId);
         setIsLoading(false);
       })
-      .catch((error) => {
-        toast.error(error instanceof Error ? error.message : String(error), {
+      .catch(() => {
+        toast.error('Failed to fetch book', {
           position: 'top-right',
           draggable: true,
           theme: 'colored',
@@ -231,8 +231,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
         setIsLoading(false);
       })
-      .catch((error) => {
-        toast.error(error instanceof Error ? error.message : String(error), {
+      .catch(() => {
+        toast.error("There is no verses in the chapter. You must import it first.", {
           position: 'top-right',
           draggable: true,
           theme: 'colored',
@@ -372,8 +372,16 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
         configureTableData();
       } catch (error) {
-        console.error('Error loading data:', error);
-        toast.error(error instanceof Error ? error.message : String(error));
+        toast.error('Failed to load book information', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
       } finally {
         setIsLoading(false);
       }
@@ -727,8 +735,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         updateReduxBookInfoWithChapter(updatedChapter)
         setIsLoading(false);
       })
-      .catch(error => {
-        toast.error(error instanceof Error ? error.message : String(error), {
+      .catch(() => {
+        toast.error('Failed to complete the chapter', {
           position: 'top-right',
           draggable: true,
           theme: 'colored',
@@ -767,8 +775,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         updateReduxBookInfoWithChapter(updatedChapter)
         setIsLoading(false);
       })
-      .catch(error => {
-        toast.error(error instanceof Error ? error.message : String(error), {
+      .catch(() => {
+        toast.error('Failed to publish the chapter', {
           position: 'top-right',
           draggable: true,
           theme: 'colored',
@@ -836,8 +844,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
           setIsLoading(false);
         })
-        .catch(error => {
-          toast.error(error instanceof Error ? error.message : String(error), {
+        .catch(() => {
+          toast.error('Failed to update the summary of chapter', {
             position: 'top-right',
             draggable: true,
             theme: 'colored',
@@ -962,8 +970,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           autoClose: 3000
         });
       })
-      .catch(error => {
-        toast.success(error, {
+      .catch(() => {
+        toast.success('Failed to save book', {
           position: 'top-right',
           draggable: true,
           theme: 'colored',

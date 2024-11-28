@@ -143,7 +143,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
 
           setIsLoading(false);
         } catch (error) {
-          toast.error(error instanceof Error ? error.message : String(error), {
+          toast.error('Failed to fetch book information', {
             position: 'top-right',
             draggable: true,
             theme: 'colored',
