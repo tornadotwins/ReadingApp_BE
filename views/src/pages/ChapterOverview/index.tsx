@@ -213,38 +213,38 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   }, [selectedBook]);
 
   // Fetch Chapter info by chapterId
-  const fetchChapterInfoByChapterId = useCallback((chapterId: string) => {
-    setIsLoading(true);
+  // const fetchChapterInfoByChapterId = useCallback((chapterId: string) => {
+  //   setIsLoading(true);
 
-    bookService
-      .getChapterInfoByChapterId(chapterId)
-      .then((result) => {
-        setActiveChapterInfo(result);
-        setVerseInfos(result.verses);
+  //   bookService
+  //     .getChapterInfoByChapterId(chapterId)
+  //     .then((result) => {
+  //       setActiveChapterInfo(result);
+  //       setVerseInfos(result.verses);
 
-        props.dispatch({
-          type: actionTypes.ADD_CHAPTERINFO,
-          payload: {
-            chapterInfo: result
-          }
-        });
+  //       props.dispatch({
+  //         type: actionTypes.ADD_CHAPTERINFO,
+  //         payload: {
+  //           chapterInfo: result
+  //         }
+  //       });
 
-        setIsLoading(false);
-      })
-      .catch(() => {
-        toast.error("There is no verses in the chapter. You must import it first.", {
-          position: 'top-right',
-          draggable: true,
-          theme: 'colored',
-          transition: Bounce,
-          closeOnClick: true,
-          pauseOnHover: true,
-          hideProgressBar: false,
-          autoClose: 3000
-        });
-        setIsLoading(false);
-      })
-  }, [selectedChapter]);
+  //       setIsLoading(false);
+  //     })
+  //     .catch(() => {
+  //       toast.error("There is no verses in the chapter. You must import it first.", {
+  //         position: 'top-right',
+  //         draggable: true,
+  //         theme: 'colored',
+  //         transition: Bounce,
+  //         closeOnClick: true,
+  //         pauseOnHover: true,
+  //         hideProgressBar: false,
+  //         autoClose: 3000
+  //       });
+  //       setIsLoading(false);
+  //     })
+  // }, [selectedChapter]);
 
   // Set cell data for table
   const configureTableData = useCallback(() => {
@@ -371,7 +371,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
             setActiveChapterInfo(existingChapterInfo);
             setVerseInfos(existingChapterInfo.verses);
           } else {
-            await fetchChapterInfoByChapterId(selectedChapter);
+            // await fetchChapterInfoByChapterId(selectedChapter);
           }
         }
 
@@ -425,6 +425,39 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   // Chapter Effect
   useEffect(() => {
+    const fetchChapterInfoByChapterId = async (chapterId: string) => {
+      setIsLoading(true);
+
+      bookService
+        .getChapterInfoByChapterId(chapterId)
+        .then((result) => {
+          setActiveChapterInfo(result);
+          setVerseInfos(result.verses);
+
+          props.dispatch({
+            type: actionTypes.ADD_CHAPTERINFO,
+            payload: {
+              chapterInfo: result
+            }
+          });
+
+          setIsLoading(false);
+        })
+        .catch(() => {
+          toast.error("There is no verses in the chapter. You must import it first.", {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
+          });
+          setIsLoading(false);
+        })
+    }
+
     setTableHeaders([]);
     setTableRows([]);
 
