@@ -1,4 +1,5 @@
 import { Box, styled } from "@mui/material";
+import { minWidth } from "@mui/system";
 
 const StyledDetailContainer = styled(Box)({
   width: '100%',
@@ -32,6 +33,15 @@ const StyledTermContainer = styled(Box) ({
 const StyledDefaultTermContainer = styled(Box)({
   display: 'flex',
   alignItems: 'center',
+  width: '600px',
+
+  '& .MuiBox-root': {
+    minWidth: '300px',
+    width: '300px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  }
 });
 
 const StyledCurrentTermContainer = styled(Box) ({

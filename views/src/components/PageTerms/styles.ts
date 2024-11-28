@@ -1,6 +1,7 @@
 import {Box, styled} from '@mui/material';
 
 const StyledContainer = styled(Box) ({
+  width: '900px',
   border: '1px solid #1B7695',
   backgroundColor: '#F0F5FB',
   boxSizing: 'border-box',
