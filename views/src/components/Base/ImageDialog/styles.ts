@@ -37,7 +37,7 @@ const StyledDialogTitle = styled (DialogTitle) ({
 
 const StyledDialogContent = styled(DialogContent) ({
   backgroundColor: '#155D74',
-  padding: '17px',
+  padding: '0px 0px 10px 0px',
   height: '90%',
   display: 'flex',
   flexDirection: 'column',
