@@ -1217,6 +1217,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         <StyledExportButtonContainer>
           <Button
             label="Export to Excel"
+            disabled={!tableHeaders.length}
             icon={<DownloadIcon />}
             onClick={exportTable2Excel}
           />
