@@ -97,16 +97,11 @@ function AccordionPanel(props: AccordionExpandProps) {
                           ...props.isComplete,
                           [props.currentLanguage || '']: value,
                         },
-                        isPublished: ({
-                          ...props.isPublish,
-                          [props.currentLanguage || 'en']: (
-                            value && props.isPublish?.[props.currentLanguage || 'en']
-                          ) || false
-                        }) ||
-                          { en: false, ar: false },
+                        isPublished: props.isPublish
+                          ? { ...props.isPublish, [props.currentLanguage || 'en']: value && props.isPublish?.[props.currentLanguage || 'en'] }
+                          : { en: false, ar: false },
                       })
                     }
-
                   />
                 </StyledSwitchContainer>
 
