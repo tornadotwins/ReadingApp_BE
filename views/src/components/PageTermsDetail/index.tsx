@@ -25,8 +25,9 @@ function PageTermsDetail(props: PageTermsDetailPropsType) {
 
               <StyledDefaultTermContainer>
                 <StyledPreviewImg
+                  disabled={!term.image ? 'true' : 'false'}
                   src={Images.icon_preview}
-                  onClick={() => props.onImageClick(API_URL + term.image)}
+                  onClick={(e) => term.image ? props.onImageClick(API_URL + term.image) : e.preventDefault()}
                 />
 
                 <Text fontFamily="'Baloo Da 2'" fontWeight="400" fontSize={16} lineHeight={24} color="#155D74">
