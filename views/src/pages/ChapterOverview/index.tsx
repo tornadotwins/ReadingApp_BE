@@ -471,7 +471,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           setIsComplete(false);
           setIsPublish(false);
 
-          toast.error(`There is no verses in the chapter. You must import it first.`, {
+          toast.warning(`Chapter is empty. Click Import to add verses.`, {
             position: 'top-right',
             draggable: true,
             theme: 'colored',
@@ -765,7 +765,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   // Update chapter with isCompleted
   const handleTranslateComplete = async (isTranslateCompleted: boolean) => {
     setIsComplete(isTranslateCompleted);
-    setIsPublish(isTranslateCompleted && activeChapterInfo.chapterIsPublished?.[selectedLanguage]);
+    setIsPublish(isTranslateCompleted && isPublish);
     setIsLoading(true);
 
     const newChapter = {
@@ -779,7 +779,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       },
       isPublished: {
         ...activeChapterInfo.chapterIsPublished,
-        [selectedLanguage]: isTranslateCompleted && activeChapterInfo.chapterIsPublished?.[selectedLanguage]
+        [selectedLanguage]: isTranslateCompleted && isPublish
       }
     };
 
