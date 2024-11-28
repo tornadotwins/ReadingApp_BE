@@ -1214,7 +1214,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           }
         </Text>
 
-        <StyledExportButtonContainer>
+        <StyledExportButtonContainer isdisable={!tableHeaders.length ? 'true' : 'false'}>
           <Button
             label="Export to Excel"
             disabled={!tableHeaders.length}

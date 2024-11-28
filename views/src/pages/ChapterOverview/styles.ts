@@ -164,7 +164,7 @@ const StyledTableInfoContainer = styled(Box) ({
   margin: '20px 40px',
 });
 
-const StyledExportButtonContainer = styled(Box) ({
+const StyledExportButtonContainer = styled(Box) <{isdisable: string}> (({isdisable}) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -172,10 +172,10 @@ const StyledExportButtonContainer = styled(Box) ({
   padding: '0px 10px',
   boxSizing: 'border-box',
   backgroundColor: '#FFAA5D',
-  cursor: 'pointer',
+  cursor: isdisable == 'true' ? 'not-allowed' : 'pointer',
 
   '&:hover': {
-    backgroundColor: '#EE994C'
+    backgroundColor: isdisable == 'true' ? '#FFAA5D' : '#EE994C',
   },
 
   '& .MuiBox-root': {
@@ -183,10 +183,10 @@ const StyledExportButtonContainer = styled(Box) ({
     textTransform: 'none',
 
     '&:hover': {
-    backgroundColor: '#EE994C'
+      backgroundColor: isdisable == 'true' ? '#FFAA5D' : '#EE994C',
   },
   }
-});
+}));
 
 const StyledTranslatorPortalContainer = styled(Box) ({
   width: '90%',
