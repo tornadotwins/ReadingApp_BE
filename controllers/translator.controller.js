@@ -1,5 +1,8 @@
 const AppText = require('../models/appText.model');
 const AppTextPage = require('../models/appTextPage.model');
+const SubBook = require('../models/subBook.model');
+const Chapter = require('../models/chapter.model');
+const Introduction = require('../models/introduction.model');
 const ERROR_MESSAGES = require('../config/error.message');
 
 /////////////////////////////////////////////////////////////////////////
@@ -201,6 +204,94 @@ exports.updateAppTextPage = async (req, res) => {
     return res.status(400).json({
       message: ERROR_MESSAGES.FAIL_UPDATE_PAGE,
       error: error.message,
+    });
+  }
+};
+
+/////////////////////////////////////////////////////////////////////////
+////////////////////////// Create Intro Verses //////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.createIntro = async (req, res) => {
+  const { bookId, subBookId, introData, language } = req.body;
+
+  // Validate parameters
+  if ((!bookId && !subBookId) || (bookId && subBookId) || !language) {
+    return res
+      .status(400)
+      .json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+  }
+
+  // Validate intro data
+  for (const data of introData) {
+    if (
+      data.isCollapse &&
+      (!data.title || !data.content || data.content.length === 0)
+    ) {
+      return res.status(400).send({
+        error: `Invalid input for collapsed data - Number ${data.number}`,
+      });
+    }
+
+    if (data.image && Object.keys(data.text).length === 0) {
+      return res.status(400).send({
+        error: `Image and text cannot coexist - Number ${data.number}`,
+      });
+    }
+  }
+
+  try {
+    let createdChapter;
+    if (bookId) {
+      // If it's a book introduction, create new subBook and chapter
+      const newSubBook = new SubBook({
+        number: 0,
+        title: { ar: 'مقدمة', en: 'Introduction' },
+        book: bookId,
+        noChapter: true,
+      });
+      const savedSubBook = await newSubBook.save();
+
+      const newChapter = new Chapter({
+        chapterNumber: 0,
+        subBook: savedSubBook._id,
+        audio: {},
+        isTranslated: {
+          [language]: true,
+        },
+      });
+      createdChapter = await newChapter.save();
+
+      // Save intros related to the created chapter
+      const introPromises = introData.map((data) => {
+        const newIntro = new Introduction({
+          chapter: createdChapter._id,
+          text: data.text,
+          image: data.image,
+          number: data.number,
+          isCollapse: data.isCollapse,
+          title: data.title,
+          content: data.content,
+        });
+        return newIntro.save();
+      });
+
+      // Wait for all intros to be saved
+      await Promise.all(introPromises);
+    } else {
+      // If it's a sub book introduction, handle accordingly
+      console.log('Sub book introduction');
+      // No chapter creation in this case
+    }
+
+    // Return all saved intros
+    const intros = await Introduction.find({
+      chapter: createdChapter._id,
+    });
+    return res.status(200).json(intros);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'An error occurred while saving the intros.',
     });
   }
 };

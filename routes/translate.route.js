@@ -9,5 +9,6 @@ router.post('/createPage', TranslatorController.createAppTextPage);
 router.post('/createAppText', TranslatorController.createAppText);
 router.put('/appTexts', TranslatorController.updateAppTexts);
 router.put('/appTextPage', TranslatorController.updateAppTextPage);
+router.post('/createIntro', TranslatorController.createIntro);
 
 module.exports = router;
