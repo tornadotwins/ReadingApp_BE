@@ -3,17 +3,11 @@ const Schema = mongoose.Schema;
 
 const IntroductionSchema = new Schema({
   chapter: { type: Schema.Types.ObjectId, ref: 'Chapter' },
-  text: {
-    en: { type: String },
-    ar: { type: String },
-  },
+  text: { type: Object },
   image: { type: String },
   number: { type: Number },
   isCollapse: { type: Boolean },
-  title: {
-    en: { type: String },
-    ar: { type: String },
-  },
+  title: { type: Object },
   content: { type: Array },
   createdAt: { type: Number, default: Date.now() },
   updatedAt: { type: Number, default: Date.now() },
