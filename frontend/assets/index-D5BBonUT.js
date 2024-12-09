@@ -1,1 +1,0 @@
-import"./index-Co3tk9z7.js";const l=()=>{let t=0;for(let o=0;o<localStorage.length;o++){const e=localStorage.key(o);if(e){const s=localStorage.getItem(e);s&&(t+=e.length+s.length)}}const r=t/1048576;return Number(r.toFixed(2))},a=t=>t<715?4:t<800?5:6,c=t=>{const r=["th","st","nd","rd"],o=t%10,e=t%100;return e>=11&&e<=13?t+"th":t+(r[o]||r[0])};export{l as a,c,a as g};
