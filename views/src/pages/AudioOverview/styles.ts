@@ -98,10 +98,8 @@ const StyledAudioOverviewContainer = styled(Box) ({
 });
 
 const StyledFileImporterContainer = styled(Box) ({
-  width: '90%',
   height: 'calc(100% - 73px)',
-  margin: 'auto',
-  marginTop: '20px',
+  margin: '20px 40px',
 
   '& :nth-of-type(2)': {
     border: '1px solid #A1A1A1',
@@ -122,21 +120,28 @@ const StyledButtonGroupContainer = styled(Box) ({
   boxSizing: 'border-box',
 });
 
-const StyledButton = styled(Box) ({
+const StyledButton = styled(Box) <{isdisable: string}> (({isdisable}) => ({
   display: 'flex',
   alignItems: 'center',
   backgroundColor: '#FFAA5D',
   color: '#474747',
   border: '1px solid #474747',
+  cursor: isdisable == 'true' ? 'not-allowed' : 'pointer',
+  opacity: isdisable == 'true' ? '.8' : '1',
+
+  '& :hover': {
+    backgroundColor: '#DD883B',
+  },
 
   '& button': {
     textTransform: 'capitalize',
+    borderRadius: '0px',
+    
+    '& .MuiBox-root': {
+      backgroundColor: 'transparent'
+    }
   },
-
-  '& :hover': {
-    backgroundColor: '#EE994C',
-  }
-});
+}));
 
 const StyledUploadButtonGroupContainer = styled(Box) ({
   display: 'flex',
@@ -152,6 +157,11 @@ const StyledAudioPlayerContainer = styled(Box) ({
 
 const StyledAudioPlayer = styled(Box) ({
   marginTop: '15px',
+
+  '& >.MuiPaper-root': {
+    width: '100%',
+    marginLeft: '0px'
+  }
 });
 
 const StyledTimeLineProgressContainer = styled(Box) ({

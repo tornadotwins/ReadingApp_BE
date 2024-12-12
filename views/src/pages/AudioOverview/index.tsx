@@ -530,22 +530,23 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const _renderButtonGroup = () => {
     return (
       <StyledButtonGroupContainer>
-        <StyledButton>
+        <StyledButton isdisable={edlFile ? 'false' : 'true'}>
           <Button
             label="Download CSV"
+            disabled={!edlFile}
             onClick={() => { }}
           />
         </StyledButton>
 
         <StyledUploadButtonGroupContainer>
-          <StyledButton>
+          <StyledButton isdisable={'false'}>
             <Button
               label="Save Markers"
               onClick={() => { }}
             />
           </StyledButton>
 
-          <StyledButton>
+          <StyledButton isdisable={'false'}>
             <Button
               label="Upload Audio"
               onClick={() => { }}
@@ -561,7 +562,6 @@ function AudioOverview(props: AudioOverviewPropsType) {
     'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.wav',
   ];
 
-
   const _renderAudioPlayer = () => {
     return (
       <StyledAudioPlayerContainer>
@@ -576,7 +576,6 @@ function AudioOverview(props: AudioOverviewPropsType) {
             variation="default"
             spacing={3}
             download={true}
-            autoplay={true}
             order="standart"
             loop={true}
             src={src}
@@ -597,7 +596,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const _renderAudioTable = () => {
     return (
       <StyledAudioTableContainer>
-        
+
       </StyledAudioTableContainer>
     )
   }
