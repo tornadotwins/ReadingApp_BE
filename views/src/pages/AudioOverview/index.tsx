@@ -3,12 +3,13 @@ import { connect } from "react-redux";
 import { Dispatch } from 'redux';
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast, Bounce, ToastContainer } from "material-react-toastify";
+import AudioPlayer from "material-ui-audio-player";
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Summary from "@/components/Summary";
 import Header from "@/components/Header";
 import BookSelector from "@/components/BookSelector";
-import { Text, SelectBox, LoadingOverlay, FilePicker } from "@/components/Base";
+import { Text, SelectBox, LoadingOverlay, FilePicker, Button } from "@/components/Base";
 
 import bookService from "@/services/book.services";
 
@@ -33,6 +34,13 @@ import {
   StyledBackContainer,
   StyledSelectGroupContainer,
   StyledFileImporterContainer,
+  StyledButtonGroupContainer,
+  StyledButton,
+  StyledUploadButtonGroupContainer,
+  StyledAudioPlayerContainer,
+  StyledAudioPlayer,
+  StyledTimeLineProgressContainer,
+  StyledAudioTableContainer,
 } from "./styles";
 
 import actionTypes from "@/actions/actionTypes";
@@ -507,7 +515,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const _renderEDLImporter = () => {
     return (
       <StyledFileImporterContainer>
-        <Text color="#155D74" fontFamily="'Baloo Da 2'" >
+        <Text color="#155D74" fontFamily="'Baloo Da 2'">
           Select EDL File:
         </Text>
 
@@ -516,6 +524,81 @@ function AudioOverview(props: AudioOverviewPropsType) {
           onChange={(e: ChangeEvent<HTMLInputElement>) => setEdlFile(e.target.files ? e.target.files[0] : null)}
         />
       </StyledFileImporterContainer>
+    )
+  }
+
+  const _renderButtonGroup = () => {
+    return (
+      <StyledButtonGroupContainer>
+        <StyledButton>
+          <Button
+            label="Download CSV"
+            onClick={() => { }}
+          />
+        </StyledButton>
+
+        <StyledUploadButtonGroupContainer>
+          <StyledButton>
+            <Button
+              label="Save Markers"
+              onClick={() => { }}
+            />
+          </StyledButton>
+
+          <StyledButton>
+            <Button
+              label="Upload Audio"
+              onClick={() => { }}
+            />
+          </StyledButton>
+        </StyledUploadButtonGroupContainer>
+      </StyledButtonGroupContainer>
+    )
+  }
+
+  const src = [
+    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.wav',
+  ];
+
+
+  const _renderAudioPlayer = () => {
+    return (
+      <StyledAudioPlayerContainer>
+        <Text color="#155D74" fontFamily="'Baloo Da 2'">
+          {`Playing: ${audioFile?.name || 'Audio'}`}
+        </Text>
+
+        <StyledAudioPlayer>
+          <AudioPlayer
+            elevation={1}
+            width="100%"
+            variation="default"
+            spacing={3}
+            download={true}
+            autoplay={true}
+            order="standart"
+            loop={true}
+            src={src}
+          />
+        </StyledAudioPlayer>
+      </StyledAudioPlayerContainer>
+    )
+  }
+
+  const _renderTimeLineProgress = () => {
+    return (
+      <StyledTimeLineProgressContainer>
+
+      </StyledTimeLineProgressContainer>
+    )
+  }
+
+  const _renderAudioTable = () => {
+    return (
+      <StyledAudioTableContainer>
+        
+      </StyledAudioTableContainer>
     )
   }
 
@@ -533,6 +616,14 @@ function AudioOverview(props: AudioOverviewPropsType) {
         {_renderAudioImporter()}
 
         {_renderEDLImporter()}
+
+        {_renderButtonGroup()}
+
+        {_renderAudioPlayer()}
+
+        {_renderTimeLineProgress()}
+
+        {_renderAudioTable()}
       </StyledAudioOverviewContainer>
     )
   }

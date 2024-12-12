@@ -114,6 +114,62 @@ const StyledFileImporterContainer = styled(Box) ({
   }
 });
 
+const StyledButtonGroupContainer = styled(Box) ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  margin: '20px 40px',
+  boxSizing: 'border-box',
+});
+
+const StyledButton = styled(Box) ({
+  display: 'flex',
+  alignItems: 'center',
+  backgroundColor: '#FFAA5D',
+  color: '#474747',
+  border: '1px solid #474747',
+
+  '& button': {
+    textTransform: 'capitalize',
+  },
+
+  '& :hover': {
+    backgroundColor: '#EE994C',
+  }
+});
+
+const StyledUploadButtonGroupContainer = styled(Box) ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  width: '20%',
+  alignItems: 'center'
+});
+
+const StyledAudioPlayerContainer = styled(Box) ({
+  boxSizing: 'border-box',
+  margin: '20px 40px',
+});
+
+const StyledAudioPlayer = styled(Box) ({
+  marginTop: '15px',
+});
+
+const StyledTimeLineProgressContainer = styled(Box) ({
+  display: 'flex',
+  backgroundColor: '#007bff',
+  borderRadius: '10px',
+  height: '10px',
+  boxSizing: 'border-box',
+  margin: '20px 40px',
+  cursor: 'pointer'
+});
+
+const StyledAudioTableContainer = styled(Box) ({
+  display: 'flex',
+  boxSizing: 'border-box',
+  margin: '20px 40px',
+})
+
 export {
   StyledContainer,
   StyledBookSelectorContainer,
@@ -122,4 +178,11 @@ export {
   StyledSelectGroupContainer,
   StyledAudioOverviewContainer,
   StyledFileImporterContainer,
+  StyledButtonGroupContainer,
+  StyledButton,
+  StyledUploadButtonGroupContainer,
+  StyledAudioPlayerContainer,
+  StyledAudioPlayer,
+  StyledTimeLineProgressContainer,
+  StyledAudioTableContainer,
 }
