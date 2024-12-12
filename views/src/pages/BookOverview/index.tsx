@@ -327,6 +327,8 @@ const BookOverview = (props: BookOverviewPropsType) => {
                   languageCode={currentLanguage}
                   bookInfo={bookInfo}
                   isQuranOrZabur={false}
+
+                  moveToAudioOverview={() => navigate('/admin/audiooverview')}
                 />
               )}
               {currentBookOverviewType === 'Reference' && (
@@ -364,6 +366,8 @@ const BookOverview = (props: BookOverviewPropsType) => {
               languageCode={currentLanguage}
               bookInfo={bookInfo}
               isQuranOrZabur={true}
+
+              moveToAudioOverview={() => navigate('/admin/audiooverview')}
             />
           </>
         )}

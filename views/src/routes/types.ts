@@ -10,6 +10,7 @@ enum Pages {
   BookOverview,
   ChapterOverview,
   AppTextOverview,
+  AudioOverview,
   Page2,
   Page3,
   Page4,
