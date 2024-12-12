@@ -100,6 +100,8 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [audioSrc, setAudioSrc] = useState('');
   const [edlFile, setEdlFile] = useState<File | null>(null);
+  const [csvData, setCsvData] = useState<string>('');
+  const [jsonMarkerData, setJsonMarkerdata] = useState<object[]>([]);
 
   const navigate = useNavigate();
   const isPortrait = useOrientation();
@@ -761,8 +763,90 @@ function AudioOverview(props: AudioOverviewPropsType) {
     );
   };
 
+  const timecodeToSeconds = (timecode: string): number => {
+    const parts = timecode.split(":");
+    if (parts.length !== 4) throw new Error(`Invalid timecode format: ${timecode}`);
+
+    const hours = parseInt(parts[0], 10) || 0;
+    const minutes = parseInt(parts[1], 10) || 0;
+    const seconds = parseInt(parts[2], 10) || 0;
+    const frames = parseInt(parts[3], 10) || 0;
+
+    const frameRate = 25; // Modify if needed
+    return hours * 3600 + minutes * 60 + seconds + frames / frameRate;
+  };
+
+
+  const convertEdl2Csv = (edlContent: string): string => {
+    const lines = edlContent.split("\n");
+    const markers: { name: string; time: string }[] = [];
+
+    let lastTime: string | null = null;
+
+    lines.forEach((line) => {
+      // Match timecode
+      const timeMatch = line.match(/(\d{2}:\d{2}:\d{2}:\d{2})/);
+      if (timeMatch) {
+        lastTime = timeMatch[1]; // Correctly assign the full match (not undefined)
+      }
+
+      // Match marker name
+      const markerMatch = line.match(/\|M:(.*?)(\s|$)/); // Handle end of line
+      if (markerMatch && lastTime) {
+        const markerName = markerMatch[1].trim();
+        const markerSeconds = timecodeToSeconds(lastTime) - 3600; // Adjust for offset
+        markers.push({ name: markerName, time: markerSeconds.toFixed(2) });
+      }
+    });
+
+    // Create CSV content
+    const csvHeader = "Marker Name, Marker Time";
+    const csvRows = markers.map((marker) => `${marker.name},${marker.time}`);
+    return [csvHeader, ...csvRows].join("\n");
+  };
+
+  const downloadCSV = () => {
+    const blob = new Blob([csvData], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    const fileName = `${Date.now()}_${edlFile?.name?.split('.edl')[0]}.csv`
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const convertCsv2Json = (csv: string): object[] => {
+    const rows = csv.split("\n").filter((row) => row.trim() !== ""); // Split rows and filter out empty lines
+    const headers = rows[0].split(",").map((header) => header.trim()); // Extract headers
+
+    const json = rows.slice(1).map((row) => {
+      const values = row.split(",").map((value) => value.trim());
+      return headers.reduce((acc, header, index) => {
+        acc[header] = values[index]; // Map values to headers
+        return acc;
+      }, {} as Record<string, string>);
+    });
+
+    return json;
+  };
+
   useEffect(() => {
-    console.log(edlFile)
+    if (!edlFile)
+      return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.result) {
+        const edlContent = reader.result.toString();
+        const csv = convertEdl2Csv(edlContent);
+        const jsonCsv = convertCsv2Json(csv);
+        setJsonMarkerdata(jsonCsv);
+
+        setCsvData(csv);
+      }
+    }
+    reader.readAsText(edlFile);
   }, [edlFile]);
 
   const _renderEDLImporter = () => {
@@ -806,7 +890,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
           <Button
             label="Download CSV"
             disabled={!edlFile}
-            onClick={() => { }}
+            onClick={downloadCSV}
           />
         </StyledButton>
 
@@ -833,7 +917,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   const _renderAudioPlayer = () => {
     return (
-      audioFile && 
+      audioFile &&
       <StyledAudioPlayerContainer>
         <Text color="#155D74" fontFamily="'Baloo Da 2'">
           {audioFile ? `Playing: ${audioFile?.name || 'Audio'}` : 'No audio file is selected'}
@@ -855,7 +939,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   const _renderTimeLineProgress = () => {
     return (
-      audioFile && 
+      audioFile &&
       <StyledTimeLineProgressContainer>
 
       </StyledTimeLineProgressContainer>
