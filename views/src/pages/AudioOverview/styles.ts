@@ -97,6 +97,23 @@ const StyledAudioOverviewContainer = styled(Box) ({
   marginTop: '73px',
 });
 
+const StyledFileImporterContainer = styled(Box) ({
+  width: '90%',
+  height: 'calc(100% - 73px)',
+  margin: 'auto',
+  marginTop: '20px',
+
+  '& :nth-of-type(2)': {
+    border: '1px solid #A1A1A1',
+    borderRadius: '5px',
+
+    '& input': {
+      width: '100%',
+      cursor: 'pointer'
+    }
+  }
+});
+
 export {
   StyledContainer,
   StyledBookSelectorContainer,
@@ -104,4 +121,5 @@ export {
   StyledBackContainer,
   StyledSelectGroupContainer,
   StyledAudioOverviewContainer,
+  StyledFileImporterContainer,
 }

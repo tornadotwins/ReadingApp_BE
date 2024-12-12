@@ -74,6 +74,7 @@ function Importer(props: ImporterPropsType) {
 
         <StyledFilePicker>
           <FilePicker
+            type=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             onChange={(e: ChangeEvent<HTMLInputElement>) => props.onChangeFile(e)}
           />
         </StyledFilePicker>

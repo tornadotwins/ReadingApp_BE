@@ -54,9 +54,14 @@ type ChapterModelType = {
   };
 }
 
+type ParseDataType = {
+  [key: string]: string,
+}
+
 export type {
   AudioOverviewPropsType,
   SelectOptionType,
   SubBookModelType,
   ChapterModelType,
+  ParseDataType,
 }

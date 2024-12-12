@@ -1,8 +1,8 @@
 import { ChangeEvent } from "react"
 
 type FilePickerPropsType = {
+  type: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  // onChange: (e: File) => void
 }
 
 export type {

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo, ChangeEvent } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from 'redux';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -8,7 +8,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Summary from "@/components/Summary";
 import Header from "@/components/Header";
 import BookSelector from "@/components/BookSelector";
-import { Text, SelectBox, LoadingOverlay } from "@/components/Base";
+import { Text, SelectBox, LoadingOverlay, FilePicker } from "@/components/Base";
 
 import bookService from "@/services/book.services";
 
@@ -32,6 +32,7 @@ import {
   StyledSelectContainer,
   StyledBackContainer,
   StyledSelectGroupContainer,
+  StyledFileImporterContainer,
 } from "./styles";
 
 import actionTypes from "@/actions/actionTypes";
@@ -84,6 +85,9 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const [inputTransliteration, setInputTransliteration] = useState('');
   const [inputEnglishChaptername, setInputEnglishChaptername] = useState('');
   const [inputCurrentLanguageChapterName, setInputCurrentLanguageChapterName] = useState('');
+
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [edlFile, setEdlFile] = useState<File | null>(null);
 
   const navigate = useNavigate();
   const isPortrait = useOrientation();
@@ -477,6 +481,44 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   };
 
+  useEffect(() => {
+    console.log({ audioFile });
+  }, [audioFile]);
+
+  useEffect(() => {
+    console.log({ edlFile });
+  }, [edlFile]);
+
+  const _renderAudioImporter = () => {
+    return (
+      <StyledFileImporterContainer>
+        <Text color="#155D74" fontFamily="'Baloo Da 2'" >
+          Select Audio File:
+        </Text>
+
+        <FilePicker
+          type=".mp3, .m4a"
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setAudioFile(e.target.files ? e.target.files[0] : null)}
+        />
+      </StyledFileImporterContainer>
+    );
+  };
+
+  const _renderEDLImporter = () => {
+    return (
+      <StyledFileImporterContainer>
+        <Text color="#155D74" fontFamily="'Baloo Da 2'" >
+          Select EDL File:
+        </Text>
+
+        <FilePicker
+          type=".edl"
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setEdlFile(e.target.files ? e.target.files[0] : null)}
+        />
+      </StyledFileImporterContainer>
+    )
+  }
+
   const _renderBody = () => {
     return (
       <StyledAudioOverviewContainer>
@@ -487,6 +529,10 @@ function AudioOverview(props: AudioOverviewPropsType) {
         {_renderDetailSelector()}
 
         {_renderSummary()}
+
+        {_renderAudioImporter()}
+
+        {_renderEDLImporter()}
       </StyledAudioOverviewContainer>
     )
   }
