@@ -11,6 +11,12 @@ type AudioOverviewPropsType = {
   dispatch: Dispatch
 };
 
+type SelectOptionType = {
+  label: string;
+  value: string;
+}
+
 export type {
   AudioOverviewPropsType,
+  SelectOptionType,
 }

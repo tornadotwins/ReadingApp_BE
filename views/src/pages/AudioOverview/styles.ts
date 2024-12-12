@@ -18,6 +18,78 @@ const StyledBookSelectorContainer = styled(Box) ({
   margin: "20px 40px",
 });
 
+const StyledSelectContainer = styled(Box) ({
+  margin: '20px 40px',
+  display: 'flex',
+  alignItems: 'center',
+
+  '@media screen and (max-width: 800px)': {
+    display: 'block',
+  },
+});
+
+const StyledBackContainer = styled(Box) ({
+  height: '40px',
+  display: 'flex',
+  alignItems: 'center',
+  cursor: 'pointer',
+  marginRight: '250px',
+  transitionDuration: '.25s',
+
+  '&:hover': {
+    transform: 'scale(1.1)',
+  },
+
+  '& .MuiSvgIcon-root' : {
+    width: '16px',
+    marginRight: '10px',
+    fill: '#155D74'
+  },
+
+  '@media screen and (max-width: 1050px)': {
+    marginRight: '100px',
+  },
+
+  '@media screen and (max-width: 900px)': {
+    marginRight: '30px',
+  }
+});
+
+const StyledSelectGroupContainer = styled(Box) ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+
+  '& >.MuiBox-root': {
+    minWidth: '100px',
+    marginRight: '20px'
+  },
+
+  '& > .MuiFormControl-root': {
+    marginRight: '20px'
+  },
+
+  '@media screen and (max-width: 900px)': {
+    '& >.MuiBox-root': {
+      minWidth: '50px',
+      marginRight: '10px',
+    },
+  },
+
+  '@media screen and (max-width: 650px)': {
+    display: 'block',
+
+    '& > .MuiFormControl-root': {
+      alignItems: 'start',
+
+      '& .MuiInputBase-root': {
+        width: '100%'
+      }
+    },
+  }
+});
+
+
 const StyledAudioOverviewContainer = styled(Box) ({
   width: '100%',
   height: 'calc(100% - 73px)',
@@ -28,5 +100,8 @@ const StyledAudioOverviewContainer = styled(Box) ({
 export {
   StyledContainer,
   StyledBookSelectorContainer,
+  StyledSelectContainer,
+  StyledBackContainer,
+  StyledSelectGroupContainer,
   StyledAudioOverviewContainer,
 }

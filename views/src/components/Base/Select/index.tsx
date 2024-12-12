@@ -25,7 +25,7 @@ function SelectBox(props: SelectBoxProps) {
           props.onChange(e);
         }}
       >
-        {props.options.map((option) => (
+        {props.options?.map((option) => (
           <StyledMenuItem
             key={option.value || ''}
             value={option.value}
