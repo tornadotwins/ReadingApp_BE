@@ -2,19 +2,26 @@ import { useState, useMemo } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from 'redux';
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast, Bounce, ToastContainer } from "material-react-toastify";
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import Summary from "@/components/Summary";
 import Header from "@/components/Header";
 import BookSelector from "@/components/BookSelector";
-import { Text, SelectBox } from "@/components/Base";
+import { Text, SelectBox, LoadingOverlay } from "@/components/Base";
+
+import bookService from "@/services/book.services";
 
 import useOrientation from "@/hooks/useOrientation";
 import { AppStateType } from "@/reducers/types";
 import {
   AudioOverviewPropsType,
-  SelectOptionType
+  SelectOptionType,
+  SubBookModelType,
+  ChapterModelType,
 } from "./types";
 import {
+  BookType,
   SubBookInfoType,
   ChapterInfoType,
 } from "../BookOverview/types";
@@ -33,7 +40,10 @@ import {
   BOOK_SELECTORS,
   BOOK_INJIL,
   BOOK_TAWRAT,
+  BOOK_QURAN,
+  BOOK_ZABUR,
 } from "@/config";
+import { ERROR_SOMETHING_WRONG_FOR_SUBBOOK } from "@/config/error-messages";
 import Tools from "@/components/Tools";
 
 const TOOLS = [
@@ -51,7 +61,13 @@ function AudioOverview(props: AudioOverviewPropsType) {
     chapterInfo: ChapterInfoType
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [selectedBook, setSelectedBook] = useState(props.currentBook);
+
+  const [activeBookInfo, setActiveBookInfo] = useState<BookType | null>(null);
+  const [activeSubBook, setActiveSubBook] = useState<SubBookInfoType>(locationState?.subBookInfo);
+  const [activeChapterInfo, setActiveChapterInfo] = useState<ChapterInfoType>(locationState?.chapterInfo);
 
   const [subBookSelectOptions, setSubBookSelectOptions] = useState<SelectOptionType[]>([]);
   const [chapterSelectOptions, setChapterSelectOptions] = useState<SelectOptionType[]>([]);
@@ -59,6 +75,15 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const [selectedSubBook, setSelectedSubBook] = useState<string>(locationState?.subBookInfo?.subBookId);
   const [selectedChapter, setSelectedChapter] = useState<string>(locationState?.chapterId);
   const [selectedLanguage, setSelectedLanguage] = useState<string>(props.currentLanguage);
+
+  const [totalCountVerse, setTotalCountVerse] = useState(0);
+  const [languageCountVerse, setLanguageCountVerse] = useState(0);
+  const [isComplete, setIsComplete] = useState(false);
+  const [isPublish, setIsPublish] = useState(false);
+  const [inputArabicChapterName, setInputArabicChapterName] = useState('');
+  const [inputTransliteration, setInputTransliteration] = useState('');
+  const [inputEnglishChaptername, setInputEnglishChaptername] = useState('');
+  const [inputCurrentLanguageChapterName, setInputCurrentLanguageChapterName] = useState('');
 
   const navigate = useNavigate();
   const isPortrait = useOrientation();
@@ -192,6 +217,266 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   };
 
+  const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
+    const newChapterInfo: ChapterInfoType = {
+      chapterAudio: updatedChapterInfo.audio,
+      chapterId: updatedChapterInfo._id,
+      chapterNumber: updatedChapterInfo.chapterNumber,
+      chapterTranslated: updatedChapterInfo.isTranslated,
+      chapterIsCompleted: updatedChapterInfo.isCompleted,
+      chapterIsPublished: updatedChapterInfo.isPublished,
+      subBookId: updatedChapterInfo.subBook,
+      verses: activeChapterInfo.verses,
+    }
+
+    const updatedBookInfos = props.bookInfos.map((book) => ({
+      ...book,
+      subBooks: book.subBooks.map((subBook) => ({
+        ...subBook,
+        chapterInfos: subBook.chapterInfos.map((chapter) =>
+          chapter.chapterId === selectedChapter
+            ? { ...chapter, ...newChapterInfo }
+            : chapter
+        ),
+      })),
+    }));
+
+    props.dispatch({
+      type: actionTypes.SET_BOOKINFOS,
+      payload: {
+        bookInfos: updatedBookInfos
+      }
+    });
+
+    props.dispatch({
+      type: actionTypes.UPDATE_CHAPTERINFOS,
+      payload: {
+        chapterInfo: newChapterInfo,
+      }
+    })
+  };
+
+  const updateReduxBookInfoWithSubBook = (updatedSubBookInfo: SubBookModelType) => {
+    // Update book info with updated Chapter Information
+    const updatedSubBookInfoInSubBookType: SubBookInfoType = {
+      chapterInfos: activeSubBook?.chapterInfos || [],
+      subBookId: activeSubBook?.subBookId || '',
+      subBookNumber: activeSubBook?.subBookNumber || 1,
+      subBookTitle: updatedSubBookInfo.title,
+      noChapter: true,
+    }
+
+    const updatedBookInfos = props.bookInfos.map((book) => ({
+      ...book,
+      subBooks: book.subBooks.map((subBook => (
+        subBook.subBookId == selectedSubBook
+          ? { ...subBook, ...updatedSubBookInfoInSubBookType }
+          : subBook
+      )))
+    }));
+
+    props.dispatch({
+      type: actionTypes.SET_BOOKINFOS,
+      payload: {
+        bookInfos: updatedBookInfos
+      }
+    })
+  };
+
+  // Update chapter with isCompleted
+  const handleTranslateComplete = async (isTranslateCompleted: boolean) => {
+    setIsComplete(isTranslateCompleted);
+    setIsPublish(isTranslateCompleted && isPublish);
+    setIsLoading(true);
+
+    const newChapter = {
+      chapterNumber: activeChapterInfo.chapterNumber || 1,
+      subBook: activeChapterInfo.subBookId || '',
+      audio: activeChapterInfo.chapterAudio,
+      isTranslated: activeChapterInfo.chapterTranslated,
+      isCompleted: {
+        ...activeChapterInfo.chapterIsCompleted,
+        [selectedLanguage]: isTranslateCompleted
+      },
+      isPublished: {
+        ...activeChapterInfo.chapterIsPublished,
+        [selectedLanguage]: isTranslateCompleted && isPublish
+      }
+    };
+
+    bookService
+      .updateChapterInfo({
+        chapterId: selectedChapter,
+        newChapterInfo: newChapter
+      })
+      .then(updatedChapter => {
+        updateReduxBookInfoWithChapter(updatedChapter)
+        setIsLoading(false);
+      })
+      .catch(() => {
+        toast.error('Failed to complete the chapter', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      });
+  };
+
+  // Update chapter with isPublished
+  const handleTranslatePublish = async (isTranslatePublished: boolean) => {
+    setIsPublish(isTranslatePublished);
+
+    const newChapter = {
+      chapterNumber: activeChapterInfo.chapterNumber || 1,
+      subBook: activeChapterInfo.subBookId || '',
+      audio: activeChapterInfo.chapterAudio,
+      isTranslated: activeChapterInfo.chapterTranslated,
+      isCompleted: activeChapterInfo.chapterIsCompleted,
+      isPublished: {
+        ...activeChapterInfo.chapterIsPublished, [selectedLanguage]: isTranslatePublished
+      }
+    };
+
+    bookService
+      .updateChapterInfo({
+        chapterId: selectedChapter,
+        newChapterInfo: newChapter
+      })
+      .then(updatedChapter => {
+        updateReduxBookInfoWithChapter(updatedChapter)
+        setIsLoading(false);
+      })
+      .catch(() => {
+        toast.error('Failed to publish the chapter', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      });
+  };
+
+  // handle changing the chapter name (language)
+  const handleCurrentLanguageChapterNameChange = (value: string) => {
+    if (selectedLanguage == 'en') {
+      setInputEnglishChaptername(value);
+    } else if (selectedLanguage == 'ar') {
+      setInputArabicChapterName(value);
+    }
+    setInputCurrentLanguageChapterName(value);
+  };
+
+  // handle changing the Arabic Chapter name
+  const handleArabicChapterNameChange = (value: string) => {
+    if (selectedLanguage == 'ar') {
+      setInputCurrentLanguageChapterName(value);
+    }
+    setInputArabicChapterName(value);
+  };
+
+  // handle changing the English Chapter name
+  const handleEnglishChapterNameChange = (value: string) => {
+    if (selectedLanguage == 'en') {
+      setInputCurrentLanguageChapterName(value);
+    }
+    setInputEnglishChaptername(value);
+  };
+
+  // Update Chapter Summary
+  const updateSummaryTitleInfos = (currentChapterTitle: string, arabicChapterTitle: string, transliteration: string, englishChapterTitle: string) => {
+    const subBookTitle = {
+      [`${selectedLanguage}`]: currentChapterTitle,
+      'ar': arabicChapterTitle,
+      'transliteration': transliteration,
+      'en': englishChapterTitle,
+    }
+
+    const updatedSubBookInfo = { ...activeSubBook, subBookTitle };
+
+    const updatedSubBookInfoWithSubBookModelType: SubBookModelType = {
+      title: updatedSubBookInfo.subBookTitle,
+      number: updatedSubBookInfo.subBookNumber || 1,
+      book: activeBookInfo?.bookId || '',
+      noChapter: true
+    };
+
+    if (activeSubBook?.subBookId) {
+      setIsLoading(true);
+      bookService
+        .updateSubBookInfo({ subBookId: activeSubBook?.subBookId, newSubBookInfo: updatedSubBookInfoWithSubBookModelType })
+        .then(result => {
+          updateReduxBookInfoWithSubBook(result);
+
+          setIsLoading(false);
+        })
+        .catch(() => {
+          toast.error('Failed to update the summary of chapter', {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
+          });
+
+          setIsLoading(false);
+        })
+    } else {
+      toast.error(ERROR_SOMETHING_WRONG_FOR_SUBBOOK, {
+        position: 'top-right',
+        draggable: true,
+        theme: 'colored',
+        transition: Bounce,
+        closeOnClick: true,
+        pauseOnHover: true,
+        hideProgressBar: false,
+        autoClose: 3000
+      });
+    }
+  };
+
+  const _renderSummary = () => {
+    return (
+      <Summary
+        currentUser={props.currentUser}
+        currentBook={props.currentBook}
+        totalCountVerse={totalCountVerse}
+        languageCountVerse={languageCountVerse}
+        isComplete={isComplete}
+        isPublish={isPublish}
+        isSpecialBook={selectedBook == BOOK_QURAN || selectedBook == BOOK_ZABUR}
+        currentLanguage={selectedLanguage}
+        arabicChapterTitle={inputArabicChapterName}
+        englishChapterTitle={inputEnglishChaptername}
+        transliteration={inputTransliteration}
+        currentChapterTitle={inputCurrentLanguageChapterName}
+
+        translateComplete={(value: boolean) => handleTranslateComplete(value)}
+        translatePublish={(value: boolean) => handleTranslatePublish(value)}
+        handleCurrentChapterTitleChange={(value: string) => handleCurrentLanguageChapterNameChange(value)}
+        handleArabicChapterTitleChange={(value: string) => handleArabicChapterNameChange(value)}
+        handleTransliterationChapterTitleChange={(value: string) => setInputTransliteration(value)}
+        handleEnglishChapterTitleChange={(value: string) => handleEnglishChapterNameChange(value)}
+        handleUpdateChapterSummary={updateSummaryTitleInfos}
+      />
+    )
+  };
+
   const _renderBody = () => {
     return (
       <StyledAudioOverviewContainer>
@@ -200,6 +485,8 @@ function AudioOverview(props: AudioOverviewPropsType) {
         {_renderBookSelector()}
 
         {_renderDetailSelector()}
+
+        {_renderSummary()}
       </StyledAudioOverviewContainer>
     )
   }
@@ -211,6 +498,9 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
         {_renderBody()}
       </StyledContainer>
+
+      <ToastContainer />
+      {isLoading && <LoadingOverlay />}
     </>
   )
 }

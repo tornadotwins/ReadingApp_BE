@@ -1,5 +1,5 @@
 import { Dispatch } from "redux";
-import { ChapterInfoType } from "../BookOverview/types"
+import { BookType, ChapterInfoType } from "../BookOverview/types"
 import { UserType } from "../types";
 
 type AudioOverviewPropsType = {
@@ -7,6 +7,7 @@ type AudioOverviewPropsType = {
   currentUser: UserType,
   currentLanguage: string,
   currentBook: string,
+  bookInfos: BookType[],
   
   dispatch: Dispatch
 };
@@ -14,9 +15,48 @@ type AudioOverviewPropsType = {
 type SelectOptionType = {
   label: string;
   value: string;
+};
+
+type SubBookModelType = {
+  number: number,
+  title: {
+    ar: string;
+    en: string;
+    [key: string]: string;
+  },
+  book: string,
+  noChapter: boolean
+}
+
+type ChapterModelType = {
+  _id: string;
+  subBook: string;
+  chapterNumber: number;
+  isTranslated: {
+    ar: boolean;
+    en: boolean;
+    [key: string]: boolean;
+  };
+  audio: {
+    ar: string;
+    en: string;
+    [key: string]: string;
+  };
+  isCompleted: {
+    ar: boolean;
+    en: boolean;
+    [key: string]: boolean;
+  };
+  isPublished: {
+    ar: boolean;
+    en: boolean;
+    [key: string]: boolean;
+  };
 }
 
 export type {
   AudioOverviewPropsType,
   SelectOptionType,
+  SubBookModelType,
+  ChapterModelType,
 }

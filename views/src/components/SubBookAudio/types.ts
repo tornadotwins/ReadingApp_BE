@@ -6,7 +6,7 @@ type SubBookAudioPropsType = {
   languageCode: string,
   isQuranOrZabur?: boolean,
 
-  moveToAudioOverview: () => void,
+  moveToAudioOverview: (chapterId: string) => void,
 }
 
 export type {

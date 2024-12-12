@@ -214,6 +214,24 @@ const BookOverview = (props: BookOverviewPropsType) => {
     navigate('/admin/apptext');
   }
 
+  const moveToAudioOverview = (chapterId: string) => {
+    const subBookInfo = bookInfo?.subBooks.find(
+      (subBook: SubBookInfoType) => subBook?.chapterInfos?.find(
+        (chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId
+      ));
+
+    const chapterInfo = subBookInfo?.chapterInfos.find((chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId);
+
+    const passData = {
+      chapterId,
+      subBookInfo: subBookInfo,
+      chapterInfo: chapterInfo,
+      languages: languages
+    };
+
+    navigate('/admin/audiooverview', { state: passData });
+  }
+
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
 
@@ -328,7 +346,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
                   bookInfo={bookInfo}
                   isQuranOrZabur={false}
 
-                  moveToAudioOverview={() => navigate('/admin/audiooverview')}
+                  moveToAudioOverview={moveToAudioOverview}
                 />
               )}
               {currentBookOverviewType === 'Reference' && (
@@ -367,7 +385,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
               bookInfo={bookInfo}
               isQuranOrZabur={true}
 
-              moveToAudioOverview={() => navigate('/admin/audiooverview')}
+              moveToAudioOverview={moveToAudioOverview}
             />
           </>
         )}

@@ -7,7 +7,7 @@ type ChapterAudioOverviewPropsType = {
   bookInfo: BookType;
   isQuranOrZabur?: boolean;
 
-  moveToAudioOverview: () => void;
+  moveToAudioOverview: (chapterId: string) => void;
 }
 
 export type {

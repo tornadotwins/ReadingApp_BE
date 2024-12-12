@@ -1,8 +1,9 @@
 type ChapterSquarePropsType = {
   chapterNumber: number;
+  chapterId: string;
   audioStatus: string;
 
-  onClick: () => void;
+  onClick: (chapterId: string) => void;
 }
 
 export type {
