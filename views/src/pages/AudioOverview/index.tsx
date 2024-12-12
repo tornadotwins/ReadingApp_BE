@@ -54,6 +54,7 @@ import {
 } from "@/config";
 import { ERROR_SOMETHING_WRONG_FOR_SUBBOOK } from "@/config/error-messages";
 import Tools from "@/components/Tools";
+import audioService from "@/services/audio.services";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -95,6 +96,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const [inputCurrentLanguageChapterName, setInputCurrentLanguageChapterName] = useState('');
 
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [audioSrc, setAudioSrc] = useState('');
   const [edlFile, setEdlFile] = useState<File | null>(null);
 
   const navigate = useNavigate();
@@ -490,12 +492,11 @@ function AudioOverview(props: AudioOverviewPropsType) {
   };
 
   useEffect(() => {
-    console.log({ audioFile });
+    if (audioFile){
+      const url = URL.createObjectURL(audioFile);
+      setAudioSrc(url);
+    }
   }, [audioFile]);
-
-  useEffect(() => {
-    console.log({ edlFile });
-  }, [edlFile]);
 
   const _renderAudioImporter = () => {
     return (
@@ -512,6 +513,10 @@ function AudioOverview(props: AudioOverviewPropsType) {
     );
   };
 
+  useEffect(() => {
+    console.log(edlFile)
+  }, [edlFile]);
+
   const _renderEDLImporter = () => {
     return (
       <StyledFileImporterContainer>
@@ -527,6 +532,24 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   }
 
+  const handleUploadAudio = () => {
+    const audioData = new FormData();
+    if (audioFile) {
+      setIsLoading(true);
+      audioData.append('file', audioFile, audioFile.name + Date.now());
+      audioService
+        .uploadAudio(audioData)
+        .then(res => {
+          console.log(res);
+          setIsLoading(false);
+        })
+        .catch(error => {
+          console.log(error);
+          setIsLoading(false);
+        })
+    }
+  }
+
   const _renderButtonGroup = () => {
     return (
       <StyledButtonGroupContainer>
@@ -539,17 +562,19 @@ function AudioOverview(props: AudioOverviewPropsType) {
         </StyledButton>
 
         <StyledUploadButtonGroupContainer>
-          <StyledButton isdisable={'false'}>
+          <StyledButton isdisable={edlFile ? 'false' : 'true'}>
             <Button
               label="Save Markers"
+              disabled={!edlFile}
               onClick={() => { }}
             />
           </StyledButton>
 
-          <StyledButton isdisable={'false'}>
+          <StyledButton isdisable={audioFile ? 'false' : 'true'}>
             <Button
               label="Upload Audio"
-              onClick={() => { }}
+              disabled={!audioFile}
+              onClick={handleUploadAudio}
             />
           </StyledButton>
         </StyledUploadButtonGroupContainer>
@@ -557,16 +582,11 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   }
 
-  const src = [
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.wav',
-  ];
-
   const _renderAudioPlayer = () => {
     return (
       <StyledAudioPlayerContainer>
         <Text color="#155D74" fontFamily="'Baloo Da 2'">
-          {`Playing: ${audioFile?.name || 'Audio'}`}
+          {audioFile ? `Playing: ${audioFile?.name || 'Audio'}` : 'No audio file is selected'}
         </Text>
 
         <StyledAudioPlayer>
@@ -578,7 +598,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
             download={true}
             order="standart"
             loop={true}
-            src={src}
+            src={audioSrc}
           />
         </StyledAudioPlayer>
       </StyledAudioPlayerContainer>
