@@ -833,6 +833,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   const _renderAudioPlayer = () => {
     return (
+      audioFile && 
       <StyledAudioPlayerContainer>
         <Text color="#155D74" fontFamily="'Baloo Da 2'">
           {audioFile ? `Playing: ${audioFile?.name || 'Audio'}` : 'No audio file is selected'}
@@ -854,6 +855,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   const _renderTimeLineProgress = () => {
     return (
+      audioFile && 
       <StyledTimeLineProgressContainer>
 
       </StyledTimeLineProgressContainer>
