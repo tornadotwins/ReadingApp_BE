@@ -3,7 +3,7 @@ import axios from "axios";
 import { API_URL } from "../config";
 
 class AudioService {
-  uploadAudio = (data: string) => {
+  uploadAudio = (data: FormData) => {
     return new Promise((resolve, reject) => {
       const url = API_URL + '/audio/uploadAudio';
 

@@ -11,6 +11,7 @@ const bookmarkRoute = require('./routes/bookmark.route');
 
 const adminAuthRoute = require('./routes/adminAuth.route');
 const translatorRoute = require('./routes/translate.route');
+const audioRoute = require('./routes/audio.route');
 
 const dbConfig = require('./config/db.config');
 const path = require('path');
@@ -45,7 +46,7 @@ app.use(function (req, res, next) {
   }
   next();
 });
-app.use(bodyParser.json({ limit: '20mb' }));  // Set the maximum request data size to 20MB
+app.use(bodyParser.json({ limit: '20mb' })); // Set the maximum request data size to 20MB
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('combined'));
 
@@ -59,6 +60,8 @@ app.use('/bookmarks', bookmarkRoute);
 
 app.use('/admin/auth', adminAuthRoute);
 app.use('/translator', translatorRoute);
+app.use('/audio', audioRoute);
+
 
 app.get('/admin/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'index.html'));

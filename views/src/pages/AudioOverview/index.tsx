@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, ChangeEvent } from "react";
+import { useState, useEffect, useMemo, ChangeEvent, useCallback } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from 'redux';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -25,6 +25,7 @@ import {
   BookType,
   SubBookInfoType,
   ChapterInfoType,
+  VerseType,
 } from "../BookOverview/types";
 import {
   StyledContainer,
@@ -78,6 +79,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const [activeBookInfo, setActiveBookInfo] = useState<BookType | null>(null);
   const [activeSubBook, setActiveSubBook] = useState<SubBookInfoType>(locationState?.subBookInfo);
   const [activeChapterInfo, setActiveChapterInfo] = useState<ChapterInfoType>(locationState?.chapterInfo);
+  const [verseInfos, setVerseInfos] = useState<VerseType[]>([]);
 
   const [subBookSelectOptions, setSubBookSelectOptions] = useState<SelectOptionType[]>([]);
   const [chapterSelectOptions, setChapterSelectOptions] = useState<SelectOptionType[]>([]);
@@ -103,6 +105,11 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const isPortrait = useOrientation();
 
   const languages = useMemo(() => location?.state?.languages, [props.currentUser]);
+
+  // Scroll to top when page is rendered
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, []);
 
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
@@ -131,7 +138,248 @@ function AudioOverview(props: AudioOverviewPropsType) {
         onLogOut={onLogout}
       />
     )
-  }
+  };
+
+  // Fetch book info by book title
+  const fetchBookInfoByTitle = useCallback((bookTitle: string) => {
+    setIsLoading(true);
+    bookService
+      .getBookInfoByTitle(bookTitle)
+      .then((result: BookType) => {
+        setActiveBookInfo(result);
+
+        props.dispatch({
+          type: actionTypes.ADD_BOOKINFO,
+          payload: {
+            bookInfo: result,
+          }
+        })
+
+        // Deduplicate sub-books
+        const uniqueSubBooks = Array.from(
+          new Set(result.subBooks.map(sb => sb.subBookId))
+        ).map(id => result.subBooks.find(sb => sb.subBookId === id)!);
+
+        const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
+          label: subBook.subBookTitle?.[selectedLanguage],
+          value: subBook.subBookId
+        }));
+
+        setSubBookSelectOptions(newSubBookOptions);
+
+        setSelectedSubBook(
+          newSubBookOptions.some(newSubBookOption => newSubBookOption.value == selectedSubBook) ?
+            selectedSubBook :
+            newSubBookOptions.length ?
+              newSubBookOptions[0].value :
+              ''
+        );
+
+        // Set first sub-book if no selection exists
+        if (newSubBookOptions.length > 0 && !selectedSubBook) {
+          setSelectedSubBook(newSubBookOptions[0].value);
+        }
+
+        const newChapterOptions = result?.subBooks[0]?.chapterInfos?.map(chapterInfo => ({
+          label: chapterInfo?.chapterNumber?.toString(),
+          value: chapterInfo?.chapterId
+        }));
+        setChapterSelectOptions(newChapterOptions);
+
+        // Set first sub-book if no selection exists
+        if (newSubBookOptions.length > 0 && !selectedSubBook) {
+          setSelectedSubBook(newSubBookOptions[0].value);
+        }
+
+        // Set first chapter if no selection exists
+        if (chapterSelectOptions.length > 0)
+          setSelectedChapter(result?.subBooks[0]?.chapterInfos[0].chapterId);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        toast.error('Failed to fetch book', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      });
+  }, [selectedBook]);
+
+  // Fetch Chapter info by chapterId
+  const fetchChapterInfoByChapterId = useCallback(async (chapterId: string) => {
+    setIsLoading(true);
+
+    return await bookService
+      .getChapterInfoByChapterId(chapterId)
+  }, [selectedChapter]);
+
+  // Book Title Effect
+  useEffect(() => {
+    const loadBookAndConfigureTable = async () => {
+      setIsLoading(true);
+      try {
+        // Check if book exists in Redux store
+        const existingBook = props.bookInfos.find((bookInfo: BookType) => bookInfo.bookTitle.en == selectedBook);
+
+        if (existingBook) {
+          setActiveBookInfo(existingBook);
+
+          // Update subbook options
+          const uniqueSubBooks = Array.from(
+            new Set(existingBook.subBooks.map(sb => sb.subBookId))
+          ).map(id => existingBook.subBooks.find(sb => sb.subBookId === id)!);
+
+          const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
+            label: subBook.subBookTitle?.[selectedLanguage],
+            value: subBook.subBookId
+          }));
+
+          setSubBookSelectOptions(newSubBookOptions);
+
+          // Update selected subbook if needed
+          if (!newSubBookOptions.some(opt => opt.value === selectedSubBook)) {
+            setSelectedSubBook(newSubBookOptions[0]?.value || '');
+          }
+        } else {
+          await fetchBookInfoByTitle(selectedBook);
+        }
+
+        // Load chapter info if we have a selected chapter
+        if (selectedChapter) {
+          const existingChapterInfo = props.chapterInfos.find(
+            chapterInfo => chapterInfo.chapterId == selectedChapter
+          );
+
+          if (existingChapterInfo) {
+            setActiveChapterInfo(existingChapterInfo);
+            setVerseInfos(existingChapterInfo.verses);
+          } else {
+            fetchChapterInfoByChapterId(selectedChapter)
+              .then((result) => {
+                setActiveChapterInfo(result);
+                setVerseInfos(result.verses);
+
+                props.dispatch({
+                  type: actionTypes.ADD_CHAPTERINFO,
+                  payload: {
+                    chapterInfo: result
+                  }
+                });
+
+                setIsLoading(false);
+              })
+              .catch(() => {
+                setIsLoading(false);
+              });
+          }
+        }
+
+        // configureTableData();
+      } catch (error) {
+        toast.error('Failed to load book information', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadBookAndConfigureTable();
+  }, [selectedBook]);
+
+  // Sub Book Effect
+  useEffect(() => {
+    const bookInfo = props.bookInfos.find(bookInfo => bookInfo.subBooks.find(subBook => subBook.subBookId == selectedSubBook));
+    const subBookInfo = bookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
+
+    subBookInfo && setActiveSubBook(subBookInfo);
+
+    setInputCurrentLanguageChapterName(subBookInfo?.subBookTitle?.[selectedLanguage] || '');
+    setInputArabicChapterName(subBookInfo?.subBookTitle?.ar || '');
+    setInputEnglishChaptername(subBookInfo?.subBookTitle?.en || "");
+    setInputTransliteration(subBookInfo?.subBookTitle?.transliteration || '');
+
+    const newChapterOptions = subBookInfo?.chapterInfos?.map(chapterInfo => ({
+      value: chapterInfo.chapterId,
+      label: chapterInfo.chapterNumber.toString(),
+    }));
+
+    if (newChapterOptions && locationState.chapterId) {
+      setChapterSelectOptions(newChapterOptions);
+      setSelectedChapter(locationState.chapterId);
+    } else if (newChapterOptions) {
+      setChapterSelectOptions(newChapterOptions);
+      setSelectedChapter(newChapterOptions[0].value);
+    }
+
+    // configureTableData();
+  }, [selectedSubBook]);
+
+  // Chapter Effect
+  useEffect(() => {
+    // setTableHeaders([]);
+    // setTableRows([]);
+
+    // Check if the chapter is existing in Redux store
+    const existingChapterInfo = props.chapterInfos?.find(chapterInfo => chapterInfo.chapterId == selectedChapter);
+    if (existingChapterInfo) {
+      setActiveChapterInfo(existingChapterInfo);
+      setVerseInfos(existingChapterInfo.verses);
+    } else {
+      fetchChapterInfoByChapterId(selectedChapter)
+        .then((result) => {
+          setActiveChapterInfo(result);
+          setVerseInfos(result.verses);
+
+          props.dispatch({
+            type: actionTypes.ADD_CHAPTERINFO,
+            payload: {
+              chapterInfo: result
+            }
+          });
+
+          setIsLoading(false);
+        })
+        .catch(() => {
+          // setTableHeaders([]);
+          // setTableRows([]);
+          setTotalCountVerse(0);
+          setLanguageCountVerse(0);
+          setIsComplete(false);
+          setIsPublish(false);
+
+          toast.warning(`Chapter is empty. Click Import to add verses.`, {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
+          });
+          setIsLoading(false);
+        })
+    }
+
+    locationState.chapterId = ''
+
+    // configureTableData();
+  }, [selectedChapter]);
 
   const handleSelectedBook = (bookTitle: string) => {
     setSelectedBook(bookTitle);
@@ -492,7 +740,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
   };
 
   useEffect(() => {
-    if (audioFile){
+    if (audioFile) {
       const url = URL.createObjectURL(audioFile);
       setAudioSrc(url);
     }
@@ -532,11 +780,12 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   }
 
-  const handleUploadAudio = () => {
+  const handleUploadAudio = useCallback(() => {
     const audioData = new FormData();
     if (audioFile) {
       setIsLoading(true);
-      audioData.append('file', audioFile, audioFile.name + Date.now());
+      audioData.append('file', audioFile, `${Date.now()}_${audioFile.name}`);
+
       audioService
         .uploadAudio(audioData)
         .then(res => {
@@ -548,7 +797,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
           setIsLoading(false);
         })
     }
-  }
+  }, [audioFile]);
 
   const _renderButtonGroup = () => {
     return (
@@ -591,11 +840,9 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
         <StyledAudioPlayer>
           <AudioPlayer
-            elevation={1}
             width="100%"
             variation="default"
             spacing={3}
-            download={true}
             order="standart"
             loop={true}
             src={audioSrc}

@@ -8,6 +8,7 @@ type AudioOverviewPropsType = {
   currentLanguage: string,
   currentBook: string,
   bookInfos: BookType[],
+  chapterInfos: ChapterInfoType[];
   
   dispatch: Dispatch
 };
