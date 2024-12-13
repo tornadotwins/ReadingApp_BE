@@ -9,7 +9,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Summary from "@/components/Summary";
 import Header from "@/components/Header";
 import BookSelector from "@/components/BookSelector";
-import { Text, SelectBox, LoadingOverlay, FilePicker, Button } from "@/components/Base";
+import { Text, SelectBox, LoadingOverlay, FilePicker, Button, TablePanel } from "@/components/Base";
 
 import bookService from "@/services/book.services";
 
@@ -20,6 +20,7 @@ import {
   SelectOptionType,
   SubBookModelType,
   ChapterModelType,
+  MarkerType,
 } from "./types";
 import {
   BookType,
@@ -42,6 +43,7 @@ import {
   StyledAudioPlayer,
   StyledTimeLineProgressContainer,
   StyledAudioTableContainer,
+  StyledMarkTableContainer,
 } from "./styles";
 
 import actionTypes from "@/actions/actionTypes";
@@ -56,6 +58,7 @@ import {
 import { ERROR_SOMETHING_WRONG_FOR_SUBBOOK } from "@/config/error-messages";
 import Tools from "@/components/Tools";
 import audioService from "@/services/audio.services";
+import { TableRowType } from "@/components/Base/TablePanel/types";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -103,6 +106,8 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const [csvData, setCsvData] = useState<string>('');
   const [jsonMarkerData, setJsonMarkerdata] = useState<object[]>([]);
 
+  const [tableRows, setTableRows] = useState<TableRowType[]>([]);
+
   const navigate = useNavigate();
   const isPortrait = useOrientation();
 
@@ -145,81 +150,15 @@ function AudioOverview(props: AudioOverviewPropsType) {
   // Fetch book info by book title
   const fetchBookInfoByTitle = useCallback((bookTitle: string) => {
     setIsLoading(true);
-    bookService
-      .getBookInfoByTitle(bookTitle)
-      .then((result: BookType) => {
-        setActiveBookInfo(result);
+    return bookService.getBookInfoByTitle(bookTitle);
 
-        props.dispatch({
-          type: actionTypes.ADD_BOOKINFO,
-          payload: {
-            bookInfo: result,
-          }
-        })
-
-        // Deduplicate sub-books
-        const uniqueSubBooks = Array.from(
-          new Set(result.subBooks.map(sb => sb.subBookId))
-        ).map(id => result.subBooks.find(sb => sb.subBookId === id)!);
-
-        const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
-          label: subBook.subBookTitle?.[selectedLanguage],
-          value: subBook.subBookId
-        }));
-
-        setSubBookSelectOptions(newSubBookOptions);
-
-        setSelectedSubBook(
-          newSubBookOptions.some(newSubBookOption => newSubBookOption.value == selectedSubBook) ?
-            selectedSubBook :
-            newSubBookOptions.length ?
-              newSubBookOptions[0].value :
-              ''
-        );
-
-        // Set first sub-book if no selection exists
-        if (newSubBookOptions.length > 0 && !selectedSubBook) {
-          setSelectedSubBook(newSubBookOptions[0].value);
-        }
-
-        const newChapterOptions = result?.subBooks[0]?.chapterInfos?.map(chapterInfo => ({
-          label: chapterInfo?.chapterNumber?.toString(),
-          value: chapterInfo?.chapterId
-        }));
-        setChapterSelectOptions(newChapterOptions);
-
-        // Set first sub-book if no selection exists
-        if (newSubBookOptions.length > 0 && !selectedSubBook) {
-          setSelectedSubBook(newSubBookOptions[0].value);
-        }
-
-        // Set first chapter if no selection exists
-        if (chapterSelectOptions.length > 0)
-          setSelectedChapter(result?.subBooks[0]?.chapterInfos[0].chapterId);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        toast.error('Failed to fetch book', {
-          position: 'top-right',
-          draggable: true,
-          theme: 'colored',
-          transition: Bounce,
-          closeOnClick: true,
-          pauseOnHover: true,
-          hideProgressBar: false,
-          autoClose: 3000
-        });
-
-        setIsLoading(false);
-      });
   }, [selectedBook]);
 
   // Fetch Chapter info by chapterId
   const fetchChapterInfoByChapterId = useCallback(async (chapterId: string) => {
     setIsLoading(true);
 
-    return await bookService
-      .getChapterInfoByChapterId(chapterId)
+    return await bookService.getChapterInfoByChapterId(chapterId)
   }, [selectedChapter]);
 
   // Book Title Effect
@@ -250,7 +189,72 @@ function AudioOverview(props: AudioOverviewPropsType) {
             setSelectedSubBook(newSubBookOptions[0]?.value || '');
           }
         } else {
-          await fetchBookInfoByTitle(selectedBook);
+          fetchBookInfoByTitle(selectedBook)
+            .then((result: BookType) => {
+              setActiveBookInfo(result);
+
+              props.dispatch({
+                type: actionTypes.ADD_BOOKINFO,
+                payload: {
+                  bookInfo: result,
+                }
+              })
+
+              // Deduplicate sub-books
+              const uniqueSubBooks = Array.from(
+                new Set(result.subBooks.map(sb => sb.subBookId))
+              ).map(id => result.subBooks.find(sb => sb.subBookId === id)!);
+
+              const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
+                label: subBook.subBookTitle?.[selectedLanguage],
+                value: subBook.subBookId
+              }));
+
+              setSubBookSelectOptions(newSubBookOptions);
+
+              setSelectedSubBook(
+                newSubBookOptions.some(newSubBookOption => newSubBookOption.value == selectedSubBook) ?
+                  selectedSubBook :
+                  newSubBookOptions.length ?
+                    newSubBookOptions[0].value :
+                    ''
+              );
+
+              // Set first sub-book if no selection exists
+              if (newSubBookOptions.length > 0 && !selectedSubBook) {
+                setSelectedSubBook(newSubBookOptions[0].value);
+              }
+
+              const newChapterOptions = result?.subBooks[0]?.chapterInfos?.map(chapterInfo => ({
+                label: chapterInfo?.chapterNumber?.toString(),
+                value: chapterInfo?.chapterId
+              }));
+              setChapterSelectOptions(newChapterOptions);
+
+              // Set first sub-book if no selection exists
+              if (newSubBookOptions.length > 0 && !selectedSubBook) {
+                setSelectedSubBook(newSubBookOptions[0].value);
+              }
+
+              // Set first chapter if no selection exists
+              if (chapterSelectOptions.length > 0)
+                setSelectedChapter(result?.subBooks[0]?.chapterInfos[0].chapterId);
+              setIsLoading(false);
+            })
+            .catch(() => {
+              toast.error('Failed to fetch book', {
+                position: 'top-right',
+                draggable: true,
+                theme: 'colored',
+                transition: Bounce,
+                closeOnClick: true,
+                pauseOnHover: true,
+                hideProgressBar: false,
+                autoClose: 3000
+              });
+
+              setIsLoading(false);
+            });
         }
 
         // Load chapter info if we have a selected chapter
@@ -327,20 +331,16 @@ function AudioOverview(props: AudioOverviewPropsType) {
       setChapterSelectOptions(newChapterOptions);
       setSelectedChapter(newChapterOptions[0].value);
     }
-
-    // configureTableData();
   }, [selectedSubBook]);
 
   // Chapter Effect
   useEffect(() => {
-    // setTableHeaders([]);
-    // setTableRows([]);
-
     // Check if the chapter is existing in Redux store
     const existingChapterInfo = props.chapterInfos?.find(chapterInfo => chapterInfo.chapterId == selectedChapter);
     if (existingChapterInfo) {
       setActiveChapterInfo(existingChapterInfo);
       setVerseInfos(existingChapterInfo.verses);
+      setTotalCountVerse(existingChapterInfo.verses.length);
     } else {
       fetchChapterInfoByChapterId(selectedChapter)
         .then((result) => {
@@ -357,14 +357,12 @@ function AudioOverview(props: AudioOverviewPropsType) {
           setIsLoading(false);
         })
         .catch(() => {
-          // setTableHeaders([]);
-          // setTableRows([]);
           setTotalCountVerse(0);
           setLanguageCountVerse(0);
           setIsComplete(false);
           setIsPublish(false);
 
-          toast.warning(`Chapter is empty. Click Import to add verses.`, {
+          toast.warning(`Please select chapter number.`, {
             position: 'top-right',
             draggable: true,
             theme: 'colored',
@@ -776,7 +774,6 @@ function AudioOverview(props: AudioOverviewPropsType) {
     return hours * 3600 + minutes * 60 + seconds + frames / frameRate;
   };
 
-
   const convertEdl2Csv = (edlContent: string): string => {
     const lines = edlContent.split("\n");
     const markers: { name: string; time: string }[] = [];
@@ -840,8 +837,31 @@ function AudioOverview(props: AudioOverviewPropsType) {
       if (reader.result) {
         const edlContent = reader.result.toString();
         const csv = convertEdl2Csv(edlContent);
-        const jsonCsv = convertCsv2Json(csv);
+        const jsonCsv = convertCsv2Json(csv) as MarkerType[];
         setJsonMarkerdata(jsonCsv);
+
+        const newRows: TableRowType[] = [];
+
+        for (let index = 0; index < jsonCsv.length; index++) {
+          const newRow = {
+            'Verse': verseInfos[index].verseText?.[selectedLanguage],
+            'Marker Name': jsonCsv[index]['Marker Name'],
+            'Marker Time': jsonCsv[index]['Marker Time'],
+            'Action': (
+              <StyledButton isdisable={audioFile && edlFile ? 'false' : 'true'}>
+                <Button
+                  label="Play"
+                  disabled={!audioFile || !edlFile}
+                  onClick={() => console.log(jsonCsv[index]['Marker Time'])}
+                />
+              </StyledButton>
+            ),
+          };
+
+          newRows.push(newRow);
+        }
+
+        setTableRows(newRows || []);
 
         setCsvData(csv);
       }
@@ -954,6 +974,17 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   }
 
+  const _renderMarkTable = () => {
+    return (
+      <StyledMarkTableContainer>
+        <TablePanel
+          headers={["Verse", "Marker Name", "Marker Time", "Action"]}
+          rows={tableRows}
+        />
+      </StyledMarkTableContainer>
+    )
+  }
+
   const _renderBody = () => {
     return (
       <StyledAudioOverviewContainer>
@@ -976,6 +1007,8 @@ function AudioOverview(props: AudioOverviewPropsType) {
         {_renderTimeLineProgress()}
 
         {_renderAudioTable()}
+
+        {_renderMarkTable()}
       </StyledAudioOverviewContainer>
     )
   }
@@ -1002,6 +1035,7 @@ function mapStateToProps(state: AppStateType) {
   return {
     currentUser: state.user.currentUser,
     bookInfos: state.book.bookInfos,
+    chapterInfos: state.book.chapterInfos,
     currentLanguage: state.book.language,
     currentBook: state.book.book,
     appTextPages: state.translator.appTextPages,

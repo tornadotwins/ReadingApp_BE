@@ -1274,7 +1274,6 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
         {_renderSummary()}
 
-
         {_renderTableInfo()}
 
         {_renderTable()}

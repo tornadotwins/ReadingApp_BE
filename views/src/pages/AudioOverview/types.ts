@@ -59,10 +59,17 @@ type ParseDataType = {
   [key: string]: string,
 }
 
+type MarkerType = {
+  'Marker Name': string,
+  'Marker Time': string,
+  'Action': JSX.Element,
+}
+
 export type {
   AudioOverviewPropsType,
   SelectOptionType,
   SubBookModelType,
   ChapterModelType,
   ParseDataType,
+  MarkerType,
 }

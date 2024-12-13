@@ -123,6 +123,7 @@ const StyledButtonGroupContainer = styled(Box) ({
 const StyledButton = styled(Box) <{isdisable: string}> (({isdisable}) => ({
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
   backgroundColor: '#FFAA5D',
   color: '#474747',
   border: '1px solid #474747',
@@ -136,6 +137,7 @@ const StyledButton = styled(Box) <{isdisable: string}> (({isdisable}) => ({
   '& button': {
     textTransform: 'capitalize',
     borderRadius: '0px',
+    width: '100%',
     
     '& .MuiBox-root': {
       backgroundColor: 'transparent'
@@ -178,7 +180,13 @@ const StyledAudioTableContainer = styled(Box) ({
   display: 'flex',
   boxSizing: 'border-box',
   margin: '20px 40px',
-})
+});
+
+const StyledMarkTableContainer = styled(Box) ({
+  display: 'flex',
+  alignItems: 'center',
+  margin: '20px 40px'
+});
 
 export {
   StyledContainer,
@@ -195,4 +203,5 @@ export {
   StyledAudioPlayer,
   StyledTimeLineProgressContainer,
   StyledAudioTableContainer,
+  StyledMarkTableContainer,
 }
