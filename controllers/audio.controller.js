@@ -1,7 +1,9 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+
 const Chapter = require('../models/chapter.model');
+const ERROR_MESSAGES = require('../config/error.message');
 
 // Set up storage for multer
 const storage = multer.diskStorage({
@@ -51,6 +53,11 @@ exports.uploadAudio = (req, res) => {
     };
 
     const existingChapter = await Chapter.findById(chapterId);
+
+    if (!existingChapter)
+      return res
+        .status(400)
+        .json({ message: ERROR_MESSAGES.CHAPTER_NOT_FOUND });
 
     // Check if the audio for the language is existed
     const audioForExistingChapter = existingChapter.audio;
