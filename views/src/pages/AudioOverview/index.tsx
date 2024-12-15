@@ -104,7 +104,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const [audioSrc, setAudioSrc] = useState('');
   const [edlFile, setEdlFile] = useState<File | null>(null);
   const [csvData, setCsvData] = useState<string>('');
-  const [jsonMarkerData, setJsonMarkerdata] = useState<object[]>([]);
+  // const [jsonMarkerData, setJsonMarkerdata] = useState<object[]>([]);
 
   const [tableRows, setTableRows] = useState<TableRowType[]>([]);
 
@@ -838,7 +838,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
         const edlContent = reader.result.toString();
         const csv = convertEdl2Csv(edlContent);
         const jsonCsv = convertCsv2Json(csv) as MarkerType[];
-        setJsonMarkerdata(jsonCsv);
+        // setJsonMarkerdata(jsonCsv);
 
         const newRows: TableRowType[] = [];
 
@@ -889,6 +889,10 @@ function AudioOverview(props: AudioOverviewPropsType) {
     if (audioFile) {
       setIsLoading(true);
       audioData.append('file', audioFile, `${Date.now()}_${audioFile.name}`);
+      audioData.append('chapterId', selectedChapter);
+      audioData.append('languageCode', selectedLanguage);
+      audioData.append('isCompleted', isComplete ? 'true' : 'false');
+      audioData.append('isPublished', isPublish ? 'true' : 'false');
 
       audioService
         .uploadAudio(audioData)
@@ -901,7 +905,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
           setIsLoading(false);
         })
     }
-  }, [audioFile]);
+  }, [audioFile, selectedLanguage, selectedSubBook, selectedChapter]);
 
   const _renderButtonGroup = () => {
     return (
@@ -976,6 +980,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   const _renderMarkTable = () => {
     return (
+      edlFile &&
       <StyledMarkTableContainer>
         <TablePanel
           headers={["Verse", "Marker Name", "Marker Time", "Action"]}
