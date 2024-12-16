@@ -867,7 +867,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   const handleAudioPlay = (startTime: string, endTime: string) => {
     setStartTime(Number(startTime));
-    setEndTime(Number(endTime));
+    endTime ? setEndTime(Number(endTime)) : setEndTime(0);
     setIsAudioPlaying(true)
   }
 
@@ -895,7 +895,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
                 <Button
                   label="Play"
                   disabled={!audioFile || !edlFile}
-                  onClick={() => handleAudioPlay(jsonCsv[index]['Marker Time'], index < jsonCsv.length ? jsonCsv[index + 1]['Marker Time'] : '')}
+                  onClick={() => handleAudioPlay(jsonCsv[index]['Marker Time'], index < jsonCsv.length - 1 ? jsonCsv[index + 1]['Marker Time'] : '')}
                 />
               </StyledButton>
             ),
@@ -1000,7 +1000,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
       }
       )
       .catch(error => console.log(error))
-  }, [jsonMarkerData, selectedChapter, selectedLanguage])
+  }, [jsonMarkerData, selectedChapter, selectedLanguage]);
 
   const _renderButtonGroup = () => {
     return (

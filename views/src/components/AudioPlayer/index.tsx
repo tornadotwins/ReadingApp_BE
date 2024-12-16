@@ -32,7 +32,7 @@ function AudioPlayer(props: AudioPlayerPropsType) {
       props.setCurrentTime(Math.floor(audio.currentTime));
 
       // Pause the audio when it reaches endTime
-      if (audio.currentTime >= props.endTime) {
+      if (props.endTime && audio.currentTime >= props.endTime) {
         audio.pause();
         props.setIsPlaying(false);
       }
