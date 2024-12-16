@@ -29,6 +29,13 @@ type SubBookModelType = {
   noChapter: boolean
 }
 
+type AudioType = {
+  language: string,
+  isCompleted: boolean,
+  isPublished: boolean,
+  audio: string,
+}
+
 type ChapterModelType = {
   _id: string;
   subBook: string;
@@ -38,11 +45,7 @@ type ChapterModelType = {
     en: boolean;
     [key: string]: boolean;
   };
-  audio: {
-    ar: string;
-    en: string;
-    [key: string]: string;
-  };
+  audio: AudioType[];
   isCompleted: {
     ar: boolean;
     en: boolean;

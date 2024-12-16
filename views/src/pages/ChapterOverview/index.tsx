@@ -140,110 +140,12 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const isPortrait = useOrientation();
   const navigate = useNavigate();
 
-  // Fetch book info by book title
-  const fetchBookInfoByTitle = useCallback((bookTitle: string) => {
-    setIsLoading(true);
-    bookService
-      .getBookInfoByTitle(bookTitle)
-      .then((result: BookType) => {
-        setActiveBookInfo(result);
-
-        props.dispatch({
-          type: actionTypes.ADD_BOOKINFO,
-          payload: {
-            bookInfo: result,
-          }
-        })
-
-        // Deduplicate sub-books
-        const uniqueSubBooks = Array.from(
-          new Set(result.subBooks.map(sb => sb.subBookId))
-        ).map(id => result.subBooks.find(sb => sb.subBookId === id)!);
-
-        const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
-          label: subBook.subBookTitle?.[selectedLanguage],
-          value: subBook.subBookId
-        }));
-
-        setSubBookSelectOptions(newSubBookOptions);
-
-        setSelectedSubBook(
-          newSubBookOptions.some(newSubBookOption => newSubBookOption.value == selectedSubBook) ?
-            selectedSubBook :
-            newSubBookOptions.length ?
-              newSubBookOptions[0].value :
-              ''
-        );
-
-        // Set first sub-book if no selection exists
-        if (newSubBookOptions.length > 0 && !selectedSubBook) {
-          setSelectedSubBook(newSubBookOptions[0].value);
-        }
-
-        const newChapterOptions = result?.subBooks[0]?.chapterInfos?.map(chapterInfo => ({
-          label: chapterInfo?.chapterNumber?.toString(),
-          value: chapterInfo?.chapterId
-        }));
-        setChapterSelectOptions(newChapterOptions);
-
-        // Set first sub-book if no selection exists
-        if (newSubBookOptions.length > 0 && !selectedSubBook) {
-          setSelectedSubBook(newSubBookOptions[0].value);
-        }
-
-        // Set first chapter if no selection exists
-        if (chapterSelectOptions.length > 0)
-          setSelectedChapter(result?.subBooks[0]?.chapterInfos[0].chapterId);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        toast.error('Failed to fetch book', {
-          position: 'top-right',
-          draggable: true,
-          theme: 'colored',
-          transition: Bounce,
-          closeOnClick: true,
-          pauseOnHover: true,
-          hideProgressBar: false,
-          autoClose: 3000
-        });
-
-        setIsLoading(false);
-      });
-  }, [selectedBook]);
-
   // Fetch Chapter info by chapterId
   const fetchChapterInfoByChapterId = useCallback(async (chapterId: string) => {
     setIsLoading(true);
 
     return await bookService
       .getChapterInfoByChapterId(chapterId)
-    // .then((result) => {
-    //   setActiveChapterInfo(result);
-    //   setVerseInfos(result.verses);
-
-    //   props.dispatch({
-    //     type: actionTypes.ADD_CHAPTERINFO,
-    //     payload: {
-    //       chapterInfo: result
-    //     }
-    //   });
-
-    //   setIsLoading(false);
-    // })
-    // .catch(() => {
-    //   toast.error("There is no verses in the chapter. You must import it first.", {
-    //     position: 'top-right',
-    //     draggable: true,
-    //     theme: 'colored',
-    //     transition: Bounce,
-    //     closeOnClick: true,
-    //     pauseOnHover: true,
-    //     hideProgressBar: false,
-    //     autoClose: 3000
-    //   });
-    //   setIsLoading(false);
-    // })
   }, [selectedChapter]);
 
   // Set cell data for table
@@ -326,7 +228,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   // Scroll to top when page is rendered
   useEffect(() => {
-    window.scrollTo({ top: 0 })
+    window.scrollTo({ top: 0 });
   }, []);
 
   // Book Title Effect
@@ -356,8 +258,6 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           if (!newSubBookOptions.some(opt => opt.value === selectedSubBook)) {
             setSelectedSubBook(newSubBookOptions[0]?.value || '');
           }
-        } else {
-          await fetchBookInfoByTitle(selectedBook);
         }
 
         // Load chapter info if we have a selected chapter
@@ -368,12 +268,10 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
           if (existingChapterInfo) {
             setActiveChapterInfo(existingChapterInfo);
-            setVerseInfos(existingChapterInfo.verses);
           } else {
             fetchChapterInfoByChapterId(selectedChapter)
               .then((result) => {
                 setActiveChapterInfo(result);
-                setVerseInfos(result.verses);
 
                 props.dispatch({
                   type: actionTypes.ADD_CHAPTERINFO,
@@ -412,7 +310,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   // Sub Book Effect
   useEffect(() => {
-    const bookInfo = props.bookInfos.find(bookInfo => bookInfo.subBooks.find(subBook => subBook.subBookId == selectedSubBook));
+    const bookInfo = props.bookInfos.find(bookInfo => bookInfo?.bookTitle.en == props.currentBook);
+    console.log({ bookInfo })
     const subBookInfo = bookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
 
     subBookInfo && setActiveSubBook(subBookInfo);
@@ -436,7 +335,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     }
 
     configureTableData();
-  }, [selectedSubBook]);
+  }, [selectedSubBook, props.bookInfos, props.currentBook]);
 
   // Chapter Effect
   useEffect(() => {
@@ -447,12 +346,12 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     const existingChapterInfo = props.chapterInfos.find(chapterInfo => chapterInfo.chapterId == selectedChapter);
     if (existingChapterInfo) {
       setActiveChapterInfo(existingChapterInfo);
-      setVerseInfos(existingChapterInfo.verses);
+      setVerseInfos(existingChapterInfo?.verses || []);
     } else {
       fetchChapterInfoByChapterId(selectedChapter)
         .then((result) => {
           setActiveChapterInfo(result);
-          setVerseInfos(result.verses);
+          setVerseInfos(result.verses || []);
 
           props.dispatch({
             type: actionTypes.ADD_CHAPTERINFO,
@@ -492,20 +391,24 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   // Set the default values when render the page first
   useEffect(() => {
+    setLanguageCountVerse(0);
     configureTableData();
 
-    setLanguageCountVerse(0);
     const isCompleted = activeChapterInfo?.chapterIsCompleted?.[selectedLanguage] || false;
     const isPublished = activeChapterInfo?.chapterIsPublished?.[selectedLanguage] || false;
+    setIsComplete(isCompleted);
+    setIsPublish(isPublished);
+
     setTotalCountVerse(activeChapterInfo?.verses?.length || 0);
     activeChapterInfo.verses?.map(verse =>
       setLanguageCountVerse((prevLanguageCountVerse) => (verse?.verseText?.[selectedLanguage] ? prevLanguageCountVerse + 1 : prevLanguageCountVerse))
     );
 
-    setInputCurrentLanguageChapterName(activeSubBook?.subBookTitle?.[selectedLanguage] || '')
+    setInputCurrentLanguageChapterName(activeSubBook?.subBookTitle?.[selectedLanguage] || '');
+    setInputArabicChapterName(activeSubBook?.subBookTitle?.ar || '');
+    setInputEnglishChaptername(activeSubBook?.subBookTitle?.en || '');
 
-    setIsComplete(isCompleted);
-    setIsPublish(isPublished);
+    setSelectedChapter(activeChapterInfo.chapterId);
   }, [verseInfos, activeBookInfo, activeSubBook, activeChapterInfo, selectedLanguage]);
 
   useEffect(() => {
@@ -705,7 +608,6 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       chapterIsCompleted: updatedChapterInfo.isCompleted,
       chapterIsPublished: updatedChapterInfo.isPublished,
       subBookId: updatedChapterInfo.subBook,
-      verses: activeChapterInfo.verses,
     }
 
     const updatedBookInfos = props.bookInfos.map((book) => ({

@@ -556,19 +556,25 @@ function AudioOverview(props: AudioOverviewPropsType) {
     setIsPublish(isTranslateCompleted && isPublish);
     setIsLoading(true);
 
+    const chapterAudio = activeChapterInfo.chapterAudio;
+
+    const updatedChapterAudio = [
+      ...chapterAudio,
+      {
+        language: selectedLanguage,
+        isCompleted: isTranslateCompleted,
+        isPublished: chapterAudio.find(audio => audio.language == selectedLanguage)?.isPublished ? true : false,
+        audio: chapterAudio.find(audio => audio.language == selectedLanguage)?.audio || '',
+      }
+    ];
+
     const newChapter = {
       chapterNumber: activeChapterInfo.chapterNumber || 1,
       subBook: activeChapterInfo.subBookId || '',
-      audio: activeChapterInfo.chapterAudio,
+      audio: updatedChapterAudio,
       isTranslated: activeChapterInfo.chapterTranslated,
-      isCompleted: {
-        ...activeChapterInfo.chapterIsCompleted,
-        [selectedLanguage]: isTranslateCompleted
-      },
-      isPublished: {
-        ...activeChapterInfo.chapterIsPublished,
-        [selectedLanguage]: isTranslateCompleted && isPublish
-      }
+      isCompleted: activeChapterInfo.chapterIsCompleted,
+      isPublished: activeChapterInfo.chapterIsPublished
     };
 
     bookService
