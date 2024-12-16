@@ -6,6 +6,7 @@ type BookOverviewPropsType = {
   bookInfos: BookType[];
   currentLanguage: string;
   currentBook: string;
+
   dispatch: Dispatch;
 };
 
@@ -29,6 +30,13 @@ type VerseType = {
   verseReference: {
     ref: string[]
   };
+};
+
+type AudioType = {
+  language: string,
+  isCompleted: boolean,
+  isPublished: boolean,
+  audio: string,
 }
 
 type ChapterInfoType = {
@@ -39,13 +47,8 @@ type ChapterInfoType = {
     en: boolean;
     [key: string]: boolean;
   };
-  chapterAudio: {
-    ar: string;
-    en: string;
-    [key: string]: string
-  };
+  chapterAudio: AudioType[];
   subBookId?: string;
-  verses: VerseType[];
   chapterIsCompleted: {
     ar: boolean;
     en: boolean;
@@ -56,6 +59,7 @@ type ChapterInfoType = {
     en: boolean;
     [key: string]: boolean;
   };
+  verses?: VerseType[];
 };
 
 type SubBookInfoType = {

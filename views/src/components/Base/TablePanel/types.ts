@@ -1,5 +1,5 @@
 type TableRowType = {
-  [key: string]: string;
+  [key: string]: string | JSX.Element;
 };
 
 type TableType = {

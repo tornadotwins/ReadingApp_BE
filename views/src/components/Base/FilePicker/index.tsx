@@ -17,7 +17,7 @@ function FilePicker(props: FilePickerPropsType) {
       <TextField
         type="file"
         onChange={handleFileChange}
-        inputProps={{ accept: ".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }}
+        inputProps={{ accept: props.type }}
         variant="outlined"
       />
       {file && <p>{file.name}</p>}

@@ -760,7 +760,6 @@ exports.getBookInformationByTitle = async (req, res) => {
         // Resolve verses for each chapter
         const chapterInfos = await Promise.all(
           chapters.map(async (chapter) => {
-            const verses = await Verse.find({ chapter: chapter._id });
             return {
               chapterId: chapter._id,
               chapterNumber: chapter.chapterNumber,
@@ -768,7 +767,6 @@ exports.getBookInformationByTitle = async (req, res) => {
               chapterIsTranslated: chapter.isTranslated,
               chapterIsCompleted: chapter.isCompleted,
               chapterIsPublished: chapter.isPublished,
-              verses,
             };
           }),
         );
@@ -825,7 +823,7 @@ exports.updateChapterInfo = async (req, res) => {
       updatedAt: Date.now(),
     };
 
-    const updatedChapter = await Chapter.findByIdAndUpdate(
+    let updatedChapter = await Chapter.findByIdAndUpdate(
       chapterId,
       newChapterInfoWithUpdatedDate,
       { new: true, runValidators: true },
@@ -835,6 +833,27 @@ exports.updateChapterInfo = async (req, res) => {
       return res
         .status(400)
         .json({ message: ERROR_MESSAGES.CHAPTER_NOT_FOUND });
+
+    const verses = await Verse.find({ chapter: chapterId }).sort({
+      number: 1,
+    });
+
+    let updatedVerses = [];
+    verses.map((verse) => {
+      updatedVerses.push({
+        verseId: verse._id,
+        verseHeader: verse.header,
+        verseAudioStart: verse.audioStart,
+        verseNumber: verse.number,
+        verseText: verse.text,
+        verseReference: verse.reference,
+      });
+    });
+
+    updatedChapter = {
+      ...updatedChapter.toObject(),
+      verses: updatedVerses,
+    };
 
     return res.status(200).json(updatedChapter);
   } catch (error) {

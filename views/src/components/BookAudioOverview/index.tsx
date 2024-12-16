@@ -25,6 +25,8 @@ const BookAudioOverview = (props: ChapterAudioOverviewPropsType) => {
             subBook={subBook}
             languageCode={props.languageCode}
             isQuranOrZabur={props.isQuranOrZabur}
+
+            moveToAudioOverview={props.moveToAudioOverview}
           />
         )
       }
@@ -35,6 +37,8 @@ const BookAudioOverview = (props: ChapterAudioOverviewPropsType) => {
           book={props.bookInfo}
           languageCode={props.languageCode}
           isQuranOrZabur={props.isQuranOrZabur}
+
+          moveToAudioOverview={props.moveToAudioOverview}
         />
       }
     </StyledContainer>

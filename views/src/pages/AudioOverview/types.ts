@@ -1,21 +1,32 @@
 import { Dispatch } from "redux";
-import {
-  BookType,
-  ChapterInfoType,
-  SubBookInfoType,
-  VerseType
-} from "../BookOverview/types"
+import { BookType, ChapterInfoType } from "../BookOverview/types"
 import { UserType } from "../types";
 
-type ChapterOverviewPropsType = {
-  chapterInfo?: ChapterInfoType;
-  subBookInfo?: SubBookInfoType;
-  currentUser: UserType;
-  bookInfos: BookType[];
+type AudioOverviewPropsType = {
+  chapterInfo?: ChapterInfoType,
+  currentUser: UserType,
+  currentLanguage: string,
+  currentBook: string,
+  bookInfos: BookType[],
   chapterInfos: ChapterInfoType[];
-  currentLanguage: string;
-  currentBook: string;
-  dispatch: Dispatch;
+  
+  dispatch: Dispatch
+};
+
+type SelectOptionType = {
+  label: string;
+  value: string;
+};
+
+type SubBookModelType = {
+  number: number,
+  title: {
+    ar: string;
+    en: string;
+    [key: string]: string;
+  },
+  book: string,
+  noChapter: boolean
 }
 
 type AudioType = {
@@ -45,33 +56,23 @@ type ChapterModelType = {
     en: boolean;
     [key: string]: boolean;
   };
-  verses?: VerseType[]
-}
-
-type SubBookModelType = {
-  number: number,
-  title: {
-    ar: string;
-    en: string;
-    [key: string]: string;
-  },
-  book: string,
-  noChapter: boolean
-}
-
-type SelectOptionType = {
-  label: string;
-  value: string;
 }
 
 type ParseDataType = {
   [key: string]: string,
 }
 
+type MarkerType = {
+  'Marker Name': string,
+  'Marker Time': string,
+  'Action': JSX.Element,
+}
+
 export type {
-  ChapterOverviewPropsType,
-  ChapterModelType,
-  SubBookModelType,
+  AudioOverviewPropsType,
   SelectOptionType,
+  SubBookModelType,
+  ChapterModelType,
   ParseDataType,
+  MarkerType,
 }
