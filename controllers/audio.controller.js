@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 const Chapter = require('../models/chapter.model');
+const Verse = require('../models/verse.model');
 const ERROR_MESSAGES = require('../config/error.message');
 
 // Set up storage for multer
@@ -24,6 +25,9 @@ const storage = multer.diskStorage({
 // Multer middleware for single file upload
 const upload = multer({ storage }).single('file');
 
+/////////////////////////////////////////////////////////////////////////
+////////// Upload Audio File and Save it to Chapter collection //////////
+/////////////////////////////////////////////////////////////////////////
 exports.uploadAudio = (req, res) => {
   upload(req, res, async function (err) {
     if (err) {
@@ -83,4 +87,55 @@ exports.uploadAudio = (req, res) => {
       filePath: req.file.path,
     });
   });
+};
+
+/////////////////////////////////////////////////////////////////////////
+//////////////////////// Save Audio mark to verse ///////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.saveMarker = async (req, res) => {
+  try {
+    const { chapterId, languageCode, markerData } = req.body;
+    const verses = await Verse.find({ chapter: chapterId }).sort({
+      number: 1,
+    });
+
+    if (!verses || verses.length === 0) {
+      return res
+        .status(400)
+        .json({ message: ERROR_MESSAGES.CHAPTER_NOT_FOUND });
+    }
+
+    // Use Promise.all to wait for all updates to complete
+    const updatedVerses = await Promise.all(
+      verses.map(async (verse) => {
+        let verseAudioStartInfo = verse.audioStart;
+        const verseNumber = verse.number;
+
+        const verseMarker = markerData.find(
+          (marker) =>
+            marker?.['Verse Number'] == verseNumber.toString(),
+        );
+
+        verseAudioStartInfo = {
+          ...verseAudioStartInfo,
+          [languageCode]: verseMarker?.['Marker Time'],
+        };
+
+        return Verse.findByIdAndUpdate(
+          verse._id,
+          {
+            audioStart: verseAudioStartInfo,
+            updatedAt: Date.now(),
+          },
+          { new: true, runValidators: true },
+        );
+      }),
+    );
+
+    return res.status(200).json(updatedVerses);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.NETWORK_ERROR });
+  }
 };

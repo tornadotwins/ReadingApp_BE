@@ -104,7 +104,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const [audioSrc, setAudioSrc] = useState('');
   const [edlFile, setEdlFile] = useState<File | null>(null);
   const [csvData, setCsvData] = useState<string>('');
-  // const [jsonMarkerData, setJsonMarkerdata] = useState<object[]>([]);
+  const [jsonMarkerData, setJsonMarkerdata] = useState<object[]>([]);
 
   const [tableRows, setTableRows] = useState<TableRowType[]>([]);
 
@@ -341,8 +341,8 @@ function AudioOverview(props: AudioOverviewPropsType) {
       setActiveChapterInfo(existingChapterInfo);
       setVerseInfos(existingChapterInfo.verses);
       setTotalCountVerse(existingChapterInfo.verses.length);
-      
-      existingChapterInfo.verses.map(verse => 
+
+      existingChapterInfo.verses.map(verse =>
         setLanguageCountVerse(prevLanguageCountVerse => verse?.verseAudioStart?.[selectedLanguage] ? prevLanguageCountVerse + 1 : prevLanguageCountVerse)
       )
     } else {
@@ -802,8 +802,8 @@ function AudioOverview(props: AudioOverviewPropsType) {
     });
 
     // Create CSV content
-    const csvHeader = "Marker Name, Marker Time";
-    const csvRows = markers.map((marker) => `${marker.name},${marker.time}`);
+    const csvHeader = "Verse Number, Marker Name, Marker Time";
+    const csvRows = markers.map((marker, index) => `${index + 1}, ${marker.name},${marker.time}`);
     return [csvHeader, ...csvRows].join("\n");
   };
 
@@ -843,7 +843,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
         const edlContent = reader.result.toString();
         const csv = convertEdl2Csv(edlContent);
         const jsonCsv = convertCsv2Json(csv) as MarkerType[];
-        // setJsonMarkerdata(jsonCsv);
+        setJsonMarkerdata(jsonCsv);
 
         const newRows: TableRowType[] = [];
 
@@ -912,6 +912,10 @@ function AudioOverview(props: AudioOverviewPropsType) {
     }
   }, [audioFile, selectedLanguage, selectedSubBook, selectedChapter]);
 
+  const handleUploadMarkers = useCallback(() => {
+    
+  }, [jsonMarkerData])
+
   const _renderButtonGroup = () => {
     return (
       <StyledButtonGroupContainer>
@@ -928,7 +932,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
             <Button
               label="Save Markers"
               disabled={!edlFile}
-              onClick={() => { }}
+              onClick={handleUploadMarkers}
             />
           </StyledButton>
 
