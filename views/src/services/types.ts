@@ -43,6 +43,12 @@ type UpdateSubBookRequestType = {
   newSubBookInfo: SubBookModelType,
 }
 
+type SaveMarkerRequestType = {
+  chapterId: string,
+  languageCode: string,
+  markerData: object[],
+}
+
 export type {
   UserRequestType,
   TranslatorRequestType,
@@ -50,4 +56,5 @@ export type {
   UpdateChapterRequestType,
   UpdateAppTextRequestType,
   UpdateSubBookRequestType,
+  SaveMarkerRequestType,
 }

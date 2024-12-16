@@ -1,5 +1,8 @@
 import axios from "axios";
 
+import {
+  SaveMarkerRequestType,
+} from './types'
 import { API_URL } from "../config";
 
 class AudioService {
@@ -14,6 +17,21 @@ class AudioService {
         })
         .catch(error => {
           reject(error);
+        })
+    })
+  }
+
+  saveMarker = (data: SaveMarkerRequestType) => {
+    return new Promise((resolve, reject) => {
+      const url = API_URL + '/audio/saveMarker';
+
+      axios
+        .post(url, data)
+        .then(result => {
+          resolve(result.data);
+        })
+        .catch(error => {
+          reject(error)
         })
     })
   }

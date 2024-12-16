@@ -913,8 +913,18 @@ function AudioOverview(props: AudioOverviewPropsType) {
   }, [audioFile, selectedLanguage, selectedSubBook, selectedChapter]);
 
   const handleUploadMarkers = useCallback(() => {
-    
-  }, [jsonMarkerData])
+    console.log(selectedChapter, jsonMarkerData, selectedLanguage)
+    audioService
+      .saveMarker({
+        chapterId: selectedChapter,
+        languageCode: selectedLanguage,
+        markerData: jsonMarkerData
+      })
+      .then(result =>
+        console.log(result)
+      )
+      .catch(error => console.log(error))
+  }, [jsonMarkerData, selectedChapter, selectedLanguage])
 
   const _renderButtonGroup = () => {
     return (
