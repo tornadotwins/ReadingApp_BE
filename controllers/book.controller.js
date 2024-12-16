@@ -760,7 +760,6 @@ exports.getBookInformationByTitle = async (req, res) => {
         // Resolve verses for each chapter
         const chapterInfos = await Promise.all(
           chapters.map(async (chapter) => {
-            const verses = await Verse.find({ chapter: chapter._id });
             return {
               chapterId: chapter._id,
               chapterNumber: chapter.chapterNumber,
@@ -768,7 +767,6 @@ exports.getBookInformationByTitle = async (req, res) => {
               chapterIsTranslated: chapter.isTranslated,
               chapterIsCompleted: chapter.isCompleted,
               chapterIsPublished: chapter.isPublished,
-              verses,
             };
           }),
         );

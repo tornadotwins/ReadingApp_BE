@@ -337,6 +337,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
   useEffect(() => {
     // Check if the chapter is existing in Redux store
     const existingChapterInfo = props.chapterInfos?.find(chapterInfo => chapterInfo.chapterId == selectedChapter);
+    console.log({ existingChapterInfo })
     if (existingChapterInfo) {
       setActiveChapterInfo(existingChapterInfo);
       setVerseInfos(existingChapterInfo.verses);
@@ -346,6 +347,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
         .then((result) => {
           setActiveChapterInfo(result);
           setVerseInfos(result.verses);
+          setTotalCountVerse(result.verses.length);
 
           props.dispatch({
             type: actionTypes.ADD_CHAPTERINFO,
