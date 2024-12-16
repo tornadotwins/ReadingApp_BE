@@ -311,7 +311,6 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   // Sub Book Effect
   useEffect(() => {
     const bookInfo = props.bookInfos.find(bookInfo => bookInfo?.bookTitle.en == props.currentBook);
-    console.log({ bookInfo })
     const subBookInfo = bookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
 
     subBookInfo && setActiveSubBook(subBookInfo);

@@ -77,8 +77,6 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [selectedBook, setSelectedBook] = useState(props.currentBook);
-
   const [activeBookInfo, setActiveBookInfo] = useState<BookType | null>(null);
   const [activeSubBook, setActiveSubBook] = useState<SubBookInfoType>(locationState?.subBookInfo);
   const [activeChapterInfo, setActiveChapterInfo] = useState<ChapterInfoType>(locationState?.chapterInfo);
@@ -87,6 +85,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const [subBookSelectOptions, setSubBookSelectOptions] = useState<SelectOptionType[]>([]);
   const [chapterSelectOptions, setChapterSelectOptions] = useState<SelectOptionType[]>([]);
 
+  const [selectedBook, setSelectedBook] = useState(props.currentBook);
   const [selectedSubBook, setSelectedSubBook] = useState<string>(locationState?.subBookInfo?.subBookId);
   const [selectedChapter, setSelectedChapter] = useState<string>(locationState?.chapterId);
   const [selectedLanguage, setSelectedLanguage] = useState<string>(props.currentLanguage);
@@ -147,13 +146,6 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   };
 
-  // Fetch book info by book title
-  const fetchBookInfoByTitle = useCallback((bookTitle: string) => {
-    setIsLoading(true);
-    return bookService.getBookInfoByTitle(bookTitle);
-
-  }, [selectedBook]);
-
   // Fetch Chapter info by chapterId
   const fetchChapterInfoByChapterId = useCallback(async (chapterId: string) => {
     setIsLoading(true);
@@ -188,73 +180,6 @@ function AudioOverview(props: AudioOverviewPropsType) {
           if (!newSubBookOptions.some(opt => opt.value === selectedSubBook)) {
             setSelectedSubBook(newSubBookOptions[0]?.value || '');
           }
-        } else {
-          fetchBookInfoByTitle(selectedBook)
-            .then((result: BookType) => {
-              setActiveBookInfo(result);
-
-              props.dispatch({
-                type: actionTypes.ADD_BOOKINFO,
-                payload: {
-                  bookInfo: result,
-                }
-              })
-
-              // Deduplicate sub-books
-              const uniqueSubBooks = Array.from(
-                new Set(result.subBooks.map(sb => sb.subBookId))
-              ).map(id => result.subBooks.find(sb => sb.subBookId === id)!);
-
-              const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
-                label: subBook.subBookTitle?.[selectedLanguage],
-                value: subBook.subBookId
-              }));
-
-              setSubBookSelectOptions(newSubBookOptions);
-
-              setSelectedSubBook(
-                newSubBookOptions.some(newSubBookOption => newSubBookOption.value == selectedSubBook) ?
-                  selectedSubBook :
-                  newSubBookOptions.length ?
-                    newSubBookOptions[0].value :
-                    ''
-              );
-
-              // Set first sub-book if no selection exists
-              if (newSubBookOptions.length > 0 && !selectedSubBook) {
-                setSelectedSubBook(newSubBookOptions[0].value);
-              }
-
-              const newChapterOptions = result?.subBooks[0]?.chapterInfos?.map(chapterInfo => ({
-                label: chapterInfo?.chapterNumber?.toString(),
-                value: chapterInfo?.chapterId
-              }));
-              setChapterSelectOptions(newChapterOptions);
-
-              // Set first sub-book if no selection exists
-              if (newSubBookOptions.length > 0 && !selectedSubBook) {
-                setSelectedSubBook(newSubBookOptions[0].value);
-              }
-
-              // Set first chapter if no selection exists
-              if (chapterSelectOptions.length > 0)
-                setSelectedChapter(result?.subBooks[0]?.chapterInfos[0].chapterId);
-              setIsLoading(false);
-            })
-            .catch(() => {
-              toast.error('Failed to fetch book', {
-                position: 'top-right',
-                draggable: true,
-                theme: 'colored',
-                transition: Bounce,
-                closeOnClick: true,
-                pauseOnHover: true,
-                hideProgressBar: false,
-                autoClose: 3000
-              });
-
-              setIsLoading(false);
-            });
         }
 
         // Load chapter info if we have a selected chapter
@@ -265,12 +190,10 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
           if (existingChapterInfo) {
             setActiveChapterInfo(existingChapterInfo);
-            setVerseInfos(existingChapterInfo.verses);
           } else {
             fetchChapterInfoByChapterId(selectedChapter)
               .then((result) => {
                 setActiveChapterInfo(result);
-                setVerseInfos(result.verses);
 
                 props.dispatch({
                   type: actionTypes.ADD_CHAPTERINFO,
@@ -286,8 +209,6 @@ function AudioOverview(props: AudioOverviewPropsType) {
               });
           }
         }
-
-        // configureTableData();
       } catch (error) {
         toast.error('Failed to load book information', {
           position: 'top-right',
@@ -309,7 +230,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   // Sub Book Effect
   useEffect(() => {
-    const bookInfo = props.bookInfos.find(bookInfo => bookInfo.subBooks.find(subBook => subBook.subBookId == selectedSubBook));
+    const bookInfo = props.bookInfos.find(bookInfo => bookInfo?.bookTitle.en == props.currentBook);
     const subBookInfo = bookInfo?.subBooks.find(subBook => subBook.subBookId == selectedSubBook);
 
     subBookInfo && setActiveSubBook(subBookInfo);
@@ -321,7 +242,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
     const newChapterOptions = subBookInfo?.chapterInfos?.map(chapterInfo => ({
       value: chapterInfo.chapterId,
-      label: chapterInfo.chapterNumber.toString(),
+      label: chapterInfo.chapterNumber == 0 ? 'Introduction' : chapterInfo.chapterNumber.toString(),
     }));
 
     if (newChapterOptions && locationState.chapterId) {
@@ -331,26 +252,20 @@ function AudioOverview(props: AudioOverviewPropsType) {
       setChapterSelectOptions(newChapterOptions);
       setSelectedChapter(newChapterOptions[0].value);
     }
-  }, [selectedSubBook]);
+  }, [selectedSubBook, props.currentBook, props.bookInfos]);
 
   // Chapter Effect
   useEffect(() => {
     // Check if the chapter is existing in Redux store
-    const existingChapterInfo = props.chapterInfos?.find(chapterInfo => chapterInfo.chapterId == selectedChapter);
+    const existingChapterInfo = props.chapterInfos.find(chapterInfo => chapterInfo.chapterId == selectedChapter);
     if (existingChapterInfo) {
       setActiveChapterInfo(existingChapterInfo);
-      setVerseInfos(existingChapterInfo.verses);
-      setTotalCountVerse(existingChapterInfo.verses.length);
-
-      existingChapterInfo.verses.map(verse =>
-        setLanguageCountVerse(prevLanguageCountVerse => verse?.verseAudioStart?.[selectedLanguage] ? prevLanguageCountVerse + 1 : prevLanguageCountVerse)
-      )
+      setVerseInfos(existingChapterInfo?.verses || []);
     } else {
       fetchChapterInfoByChapterId(selectedChapter)
         .then((result) => {
           setActiveChapterInfo(result);
-          setVerseInfos(result.verses);
-          setTotalCountVerse(result.verses.length);
+          setVerseInfos(result.verses || []);
 
           props.dispatch({
             type: actionTypes.ADD_CHAPTERINFO,
@@ -367,7 +282,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
           setIsComplete(false);
           setIsPublish(false);
 
-          toast.warning(`Please select chapter number.`, {
+          toast.warning(`Chapter is empty.`, {
             position: 'top-right',
             draggable: true,
             theme: 'colored',
@@ -381,10 +296,32 @@ function AudioOverview(props: AudioOverviewPropsType) {
         })
     }
 
-    locationState.chapterId = ''
-
-    // configureTableData();
+    locationState.chapterId = '';
   }, [selectedChapter]);
+
+  // Set the default values when render the page first
+  useEffect(() => {
+    setLanguageCountVerse(0);
+
+    const audioInfo = activeChapterInfo?.chapterAudio?.find(audio => audio.language == selectedLanguage);
+
+    const isCompleted = audioInfo?.isCompleted || false;
+    const isPublished = audioInfo?.isPublished || false;
+    setIsComplete(isCompleted);
+    setIsPublish(isPublished);
+
+    setTotalCountVerse(activeChapterInfo?.verses?.length || 0);
+
+    activeChapterInfo.verses?.map(verse =>
+      setLanguageCountVerse((prevLanguageCountVerse) => (verse?.verseAudioStart?.[selectedLanguage] ? prevLanguageCountVerse + 1 : prevLanguageCountVerse))
+    );
+
+    setInputCurrentLanguageChapterName(activeSubBook?.subBookTitle?.[selectedLanguage] || '');
+    setInputArabicChapterName(activeSubBook?.subBookTitle?.ar || '');
+    setInputEnglishChaptername(activeSubBook?.subBookTitle?.en || '');
+
+    setSelectedChapter(activeChapterInfo.chapterId);
+  }, [verseInfos, activeBookInfo, activeSubBook, activeChapterInfo, selectedLanguage]);
 
   const handleSelectedBook = (bookTitle: string) => {
     setSelectedBook(bookTitle);
