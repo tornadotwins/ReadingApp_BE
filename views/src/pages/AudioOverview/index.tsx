@@ -337,11 +337,14 @@ function AudioOverview(props: AudioOverviewPropsType) {
   useEffect(() => {
     // Check if the chapter is existing in Redux store
     const existingChapterInfo = props.chapterInfos?.find(chapterInfo => chapterInfo.chapterId == selectedChapter);
-    console.log({ existingChapterInfo })
     if (existingChapterInfo) {
       setActiveChapterInfo(existingChapterInfo);
       setVerseInfos(existingChapterInfo.verses);
       setTotalCountVerse(existingChapterInfo.verses.length);
+      
+      existingChapterInfo.verses.map(verse => 
+        setLanguageCountVerse(prevLanguageCountVerse => verse?.verseAudioStart?.[selectedLanguage] ? prevLanguageCountVerse + 1 : prevLanguageCountVerse)
+      )
     } else {
       fetchChapterInfoByChapterId(selectedChapter)
         .then((result) => {
