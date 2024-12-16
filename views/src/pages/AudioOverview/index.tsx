@@ -1,9 +1,8 @@
-import { useState, useEffect, useMemo, ChangeEvent, useCallback } from "react";
+import { useState, useEffect, useMemo, ChangeEvent, useCallback, useRef } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from 'redux';
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast, Bounce, ToastContainer } from "material-react-toastify";
-import AudioPlayer from "material-ui-audio-player";
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Summary from "@/components/Summary";
@@ -19,6 +18,7 @@ import {
   AudioOverviewPropsType,
   SelectOptionType,
   SubBookModelType,
+  // ChapterModelType,
   MarkerType,
 } from "./types";
 import {
@@ -58,6 +58,7 @@ import { ERROR_SOMETHING_WRONG_FOR_SUBBOOK } from "@/config/error-messages";
 import Tools from "@/components/Tools";
 import audioService from "@/services/audio.services";
 import { TableRowType } from "@/components/Base/TablePanel/types";
+import AudioPlayer from "@/components/AudioPlayer";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -105,6 +106,12 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const [jsonMarkerData, setJsonMarkerdata] = useState<object[]>([]);
 
   const [tableRows, setTableRows] = useState<TableRowType[]>([]);
+
+  const [startTime, setStartTime] = useState(0);
+  const [endTime, setEndTime] = useState(0);
+  const [audioCurrentTime, setAudioCurrentTime] = useState(0);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const audioRef = useRef(new Audio());
 
   const navigate = useNavigate();
   const isPortrait = useOrientation();
@@ -420,6 +427,44 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   };
 
+  // const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
+  //   const newChapterInfo: ChapterInfoType = {
+  //     chapterAudio: updatedChapterInfo.audio,
+  //     chapterId: updatedChapterInfo._id,
+  //     chapterNumber: updatedChapterInfo.chapterNumber,
+  //     chapterTranslated: updatedChapterInfo.isTranslated,
+  //     chapterIsCompleted: updatedChapterInfo.isCompleted,
+  //     chapterIsPublished: updatedChapterInfo.isPublished,
+  //     subBookId: updatedChapterInfo.subBook,
+  //   }
+
+  //   const updatedBookInfos = props.bookInfos.map((book) => ({
+  //     ...book,
+  //     subBooks: book.subBooks.map((subBook) => ({
+  //       ...subBook,
+  //       chapterInfos: subBook.chapterInfos.map((chapter) =>
+  //         chapter.chapterId === selectedChapter
+  //           ? { ...chapter, ...newChapterInfo }
+  //           : chapter
+  //       ),
+  //     })),
+  //   }));
+
+  //   props.dispatch({
+  //     type: actionTypes.SET_BOOKINFOS,
+  //     payload: {
+  //       bookInfos: updatedBookInfos
+  //     }
+  //   });
+
+  //   props.dispatch({
+  //     type: actionTypes.UPDATE_CHAPTERINFOS,
+  //     payload: {
+  //       chapterInfo: newChapterInfo,
+  //     }
+  //   })
+  // };
+
   const updateReduxBookInfoWithSubBook = (updatedSubBookInfo: SubBookModelType) => {
     // Update book info with updated Chapter Information
     const updatedSubBookInfoInSubBookType: SubBookInfoType = {
@@ -493,6 +538,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
             verses: result.verses
           }
 
+          // updateReduxBookInfoWithChapter(result);
           updateReduxChapterInfos(updatedChapterInfo);
 
           toast.success(`Success to ${isAudioCompleted ? 'complete' : 'incomplete'} the audio`, {
@@ -819,6 +865,12 @@ function AudioOverview(props: AudioOverviewPropsType) {
     return json;
   };
 
+  const handleAudioPlay = (startTime: string, endTime: string) => {
+    setStartTime(Number(startTime));
+    setEndTime(Number(endTime));
+    setIsAudioPlaying(true)
+  }
+
   useEffect(() => {
     if (!edlFile)
       return;
@@ -843,7 +895,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
                 <Button
                   label="Play"
                   disabled={!audioFile || !edlFile}
-                  onClick={() => console.log(jsonCsv[index]['Marker Time'])}
+                  onClick={() => handleAudioPlay(jsonCsv[index]['Marker Time'], index < jsonCsv.length ? jsonCsv[index + 1]['Marker Time'] : '')}
                 />
               </StyledButton>
             ),
@@ -982,6 +1034,11 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   }
 
+  const handleTimeChange = (newTime: number) => {
+    audioRef.current.currentTime = newTime;
+    setAudioCurrentTime(newTime);
+  };
+
   const _renderAudioPlayer = () => {
     return (
       audioFile &&
@@ -992,12 +1049,15 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
         <StyledAudioPlayer>
           <AudioPlayer
-            width="100%"
-            variation="default"
-            spacing={3}
-            order="standart"
-            loop={true}
             src={audioSrc}
+            startTime={startTime}
+            endTime={endTime}
+            currentTime={audioCurrentTime}
+            isPlaying={isAudioPlaying}
+
+            setCurrentTime={(val: number) => setAudioCurrentTime(val)}
+            setIsPlaying={(val: boolean) => setIsAudioPlaying(val)}
+            onTimeChange={(val: number) => handleTimeChange(val)}
           />
         </StyledAudioPlayer>
       </StyledAudioPlayerContainer>
