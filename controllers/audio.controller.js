@@ -68,24 +68,53 @@ exports.uploadAudio = (req, res) => {
     const isExistingAudio = audioForExistingChapter.some(
       (audio) => audio.language == languageCode,
     );
+
+    let newChapter;
     if (isExistingAudio) {
       // If the audio exists, update it
-      await Chapter.updateOne(
+      newChapter = await Chapter.findOneAndUpdate(
         { _id: chapterId, 'audio.language': languageCode }, // Find the chapter and audio entry by language
         { $set: { 'audio.$': audioInfo, updatedAt: Date.now() } }, // Update the audio and set the updatedAt timestamp
+        { new: true, runValidators: true },
       );
     } else {
       // If the audio doesn't exist, add the new audio
-      await Chapter.updateOne(
+      newChapter = await Chapter.findOneAndUpdate(
         { _id: chapterId },
         { $push: { audio: audioInfo }, updatedAt: Date.now() }, // Add new audio entry and set updatedAt timestamp
+        { new: true, runValidators: true },
       );
     }
 
-    return res.status(200).json({
-      message: 'Audio uploaded successfully',
-      filePath: req.file.path,
+    let updatedNewChapter = {
+      chapterId: newChapter._id,
+      chapterAudio: newChapter.audio,
+      chapterNumber: newChapter.chapterNumber,
+      chapterTranslated: newChapter.isTranslated,
+      chapterIsCompleted: newChapter.isCompleted,
+      chapterIsPublished: newChapter.isPublished,
+      subBookId: newChapter.subBook,
+    };
+
+    const verses = await Verse.find({ chapter: chapterId }).sort({
+      number: 1,
     });
+
+    let updatedVerses = [];
+    verses.map((verse) => {
+      updatedVerses.push({
+        verseId: verse._id,
+        verseHeader: verse.header,
+        verseAudioStart: verse.audioStart,
+        verseNumber: verse.number,
+        verseText: verse.text,
+        verseReference: verse.reference,
+      });
+    });
+
+    updatedNewChapter = { ...updatedNewChapter, verses: updatedVerses };
+
+    return res.status(200).json(updatedNewChapter);
   });
 };
 

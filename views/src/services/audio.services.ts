@@ -4,9 +4,10 @@ import {
   SaveMarkerRequestType,
 } from './types'
 import { API_URL } from "../config";
+import { ChapterInfoType } from "@/pages/BookOverview/types";
 
 class AudioService {
-  uploadAudio = (data: FormData) => {
+  uploadAudio = (data: FormData): Promise<ChapterInfoType> => {
     return new Promise((resolve, reject) => {
       const url = API_URL + '/audio/uploadAudio';
 

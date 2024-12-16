@@ -19,7 +19,6 @@ import {
   AudioOverviewPropsType,
   SelectOptionType,
   SubBookModelType,
-  ChapterModelType,
   MarkerType,
 } from "./types";
 import {
@@ -421,45 +420,6 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   };
 
-  const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
-    const newChapterInfo: ChapterInfoType = {
-      chapterAudio: updatedChapterInfo.audio,
-      chapterId: updatedChapterInfo._id,
-      chapterNumber: updatedChapterInfo.chapterNumber,
-      chapterTranslated: updatedChapterInfo.isTranslated,
-      chapterIsCompleted: updatedChapterInfo.isCompleted,
-      chapterIsPublished: updatedChapterInfo.isPublished,
-      subBookId: updatedChapterInfo.subBook,
-      verses: activeChapterInfo.verses,
-    }
-
-    const updatedBookInfos = props.bookInfos.map((book) => ({
-      ...book,
-      subBooks: book.subBooks.map((subBook) => ({
-        ...subBook,
-        chapterInfos: subBook.chapterInfos.map((chapter) =>
-          chapter.chapterId === selectedChapter
-            ? { ...chapter, ...newChapterInfo }
-            : chapter
-        ),
-      })),
-    }));
-
-    props.dispatch({
-      type: actionTypes.SET_BOOKINFOS,
-      payload: {
-        bookInfos: updatedBookInfos
-      }
-    });
-
-    props.dispatch({
-      type: actionTypes.UPDATE_CHAPTERINFOS,
-      payload: {
-        chapterInfo: newChapterInfo,
-      }
-    })
-  };
-
   const updateReduxBookInfoWithSubBook = (updatedSubBookInfo: SubBookModelType) => {
     // Update book info with updated Chapter Information
     const updatedSubBookInfoInSubBookType: SubBookInfoType = {
@@ -488,95 +448,178 @@ function AudioOverview(props: AudioOverviewPropsType) {
   };
 
   // Update chapter with isCompleted
-  const handleTranslateComplete = async (isTranslateCompleted: boolean) => {
-    setIsComplete(isTranslateCompleted);
-    setIsPublish(isTranslateCompleted && isPublish);
-    setIsLoading(true);
+  const handleAudioComplete = async (isAudioCompleted: boolean) => {
+    const currentChapterInfo = props.chapterInfos?.find(chapter => chapter.chapterId == selectedChapter);
 
-    const chapterAudio = activeChapterInfo.chapterAudio;
+    const isAudioExists = currentChapterInfo?.chapterAudio?.some(audio => audio.language == selectedLanguage);
 
-    const updatedChapterAudio = [
-      ...chapterAudio,
-      {
-        language: selectedLanguage,
-        isCompleted: isTranslateCompleted,
-        isPublished: chapterAudio.find(audio => audio.language == selectedLanguage)?.isPublished ? true : false,
-        audio: chapterAudio.find(audio => audio.language == selectedLanguage)?.audio || '',
-      }
-    ];
+    if (currentChapterInfo && isAudioExists) {
+      setIsComplete(isAudioCompleted);
+      setIsPublish(isAudioCompleted && isPublish);
+      setIsLoading(true);
 
-    const newChapter = {
-      chapterNumber: activeChapterInfo.chapterNumber || 1,
-      subBook: activeChapterInfo.subBookId || '',
-      audio: updatedChapterAudio,
-      isTranslated: activeChapterInfo.chapterTranslated,
-      isCompleted: activeChapterInfo.chapterIsCompleted,
-      isPublished: activeChapterInfo.chapterIsPublished
-    };
+      const chapterAudio = currentChapterInfo?.chapterAudio;
 
-    bookService
-      .updateChapterInfo({
-        chapterId: selectedChapter,
-        newChapterInfo: newChapter
-      })
-      .then(updatedChapter => {
-        updateReduxBookInfoWithChapter(updatedChapter)
-        setIsLoading(false);
-      })
-      .catch(() => {
-        toast.error('Failed to complete the chapter', {
-          position: 'top-right',
-          draggable: true,
-          theme: 'colored',
-          transition: Bounce,
-          closeOnClick: true,
-          pauseOnHover: true,
-          hideProgressBar: false,
-          autoClose: 3000
-        });
-
-        setIsLoading(false);
+      const updatedChapterAudio = chapterAudio.map(audio => {
+        if (audio.language == selectedLanguage) {
+          return { ...audio, isCompleted: !isComplete, isPublished: isAudioCompleted && isPublish }
+        } else
+          return audio;
       });
+
+      const newChapter = {
+        chapterNumber: currentChapterInfo.chapterNumber || 1,
+        subBook: currentChapterInfo.subBookId || '',
+        audio: updatedChapterAudio,
+        isTranslated: currentChapterInfo.chapterTranslated,
+        isCompleted: currentChapterInfo.chapterIsCompleted,
+        isPublished: currentChapterInfo.chapterIsPublished
+      };
+
+      bookService
+        .updateChapterInfo({
+          chapterId: selectedChapter,
+          newChapterInfo: newChapter
+        })
+        .then(result => {
+          const updatedChapterInfo = {
+            chapterId: result._id,
+            chapterNumber: result.chapterNumber,
+            chapterTranslated: result.isTranslated,
+            chapterAudio: result.audio,
+            subBookId: result.subBook,
+            chapterIsCompleted: result.isCompleted,
+            chapterIsPublished: result.isPublished,
+            verses: result.verses
+          }
+
+          updateReduxChapterInfos(updatedChapterInfo);
+
+          toast.success(`Success to ${isAudioCompleted ? 'complete' : 'incomplete'} the audio`, {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
+          });
+          setIsLoading(false);
+        })
+        .catch(() => {
+          toast.error('Failed to complete the audio', {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
+          });
+
+          setIsLoading(false);
+        });
+    } else {
+      toast.error('Failed to complete the chapter because of no audio', {
+        position: 'top-right',
+        draggable: true,
+        theme: 'colored',
+        transition: Bounce,
+        closeOnClick: true,
+        pauseOnHover: true,
+        hideProgressBar: false,
+        autoClose: 3000
+      });
+    }
   };
 
   // Update chapter with isPublished
-  const handleTranslatePublish = async (isTranslatePublished: boolean) => {
-    setIsPublish(isTranslatePublished);
+  const handleAudioPublish = async (isAudioPublished: boolean) => {
+    const currentChapterInfo = props.chapterInfos?.find(chapter => chapter.chapterId == selectedChapter);
 
-    const newChapter = {
-      chapterNumber: activeChapterInfo.chapterNumber || 1,
-      subBook: activeChapterInfo.subBookId || '',
-      audio: activeChapterInfo.chapterAudio,
-      isTranslated: activeChapterInfo.chapterTranslated,
-      isCompleted: activeChapterInfo.chapterIsCompleted,
-      isPublished: {
-        ...activeChapterInfo.chapterIsPublished, [selectedLanguage]: isTranslatePublished
-      }
-    };
+    const isAudioExists = currentChapterInfo?.chapterAudio?.some(audio => audio.language == selectedLanguage);
 
-    bookService
-      .updateChapterInfo({
-        chapterId: selectedChapter,
-        newChapterInfo: newChapter
-      })
-      .then(updatedChapter => {
-        updateReduxBookInfoWithChapter(updatedChapter)
-        setIsLoading(false);
-      })
-      .catch(() => {
-        toast.error('Failed to publish the chapter', {
-          position: 'top-right',
-          draggable: true,
-          theme: 'colored',
-          transition: Bounce,
-          closeOnClick: true,
-          pauseOnHover: true,
-          hideProgressBar: false,
-          autoClose: 3000
-        });
+    if (currentChapterInfo && isAudioExists && isComplete) {
+      setIsPublish(isAudioPublished);
+      setIsLoading(true);
 
-        setIsLoading(false);
+      const chapterAudio = currentChapterInfo?.chapterAudio;
+
+      const updatedChapterAudio = chapterAudio.map(audio => {
+        if (audio.language == selectedLanguage) {
+          return { ...audio, isPublished: !isPublish }
+        } else
+          return audio;
       });
+
+      const newChapter = {
+        chapterNumber: currentChapterInfo.chapterNumber || 1,
+        subBook: currentChapterInfo.subBookId || '',
+        audio: updatedChapterAudio,
+        isTranslated: currentChapterInfo.chapterTranslated,
+        isCompleted: currentChapterInfo.chapterIsCompleted,
+        isPublished: currentChapterInfo.chapterIsPublished
+      };
+
+      bookService
+        .updateChapterInfo({
+          chapterId: selectedChapter,
+          newChapterInfo: newChapter
+        })
+        .then(result => {
+          const updatedChapterInfo = {
+            chapterId: result._id,
+            chapterNumber: result.chapterNumber,
+            chapterTranslated: result.isTranslated,
+            chapterAudio: result.audio,
+            subBookId: result.subBook,
+            chapterIsCompleted: result.isCompleted,
+            chapterIsPublished: result.isPublished,
+            verses: result.verses
+          }
+
+          updateReduxChapterInfos(updatedChapterInfo);
+
+          toast.success(`Success to ${isAudioPublished ? 'publish' : 'withhold'} the audio`, {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
+          });
+          setIsLoading(false);
+        })
+        .catch(() => {
+          toast.error('Failed to publish the audio', {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
+          });
+
+          setIsLoading(false);
+        });
+    } else {
+      toast.error('Failed to publish the chapter because of no audio', {
+        position: 'top-right',
+        draggable: true,
+        theme: 'colored',
+        transition: Bounce,
+        closeOnClick: true,
+        pauseOnHover: true,
+        hideProgressBar: false,
+        autoClose: 3000
+      });
+    }
   };
 
   // handle changing the chapter name (language)
@@ -676,8 +719,8 @@ function AudioOverview(props: AudioOverviewPropsType) {
         transliteration={inputTransliteration}
         currentChapterTitle={inputCurrentLanguageChapterName}
 
-        translateComplete={(value: boolean) => handleTranslateComplete(value)}
-        translatePublish={(value: boolean) => handleTranslatePublish(value)}
+        translateComplete={(value: boolean) => handleAudioComplete(value)}
+        translatePublish={(value: boolean) => handleAudioPublish(value)}
         handleCurrentChapterTitleChange={(value: string) => handleCurrentLanguageChapterNameChange(value)}
         handleArabicChapterTitleChange={(value: string) => handleArabicChapterNameChange(value)}
         handleTransliterationChapterTitleChange={(value: string) => setInputTransliteration(value)}
@@ -709,7 +752,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
     );
   };
 
-  const timecodeToSeconds = (timecode: string): number => {
+  const convertTimecode2Seconds = (timecode: string): number => {
     const parts = timecode.split(":");
     if (parts.length !== 4) throw new Error(`Invalid timecode format: ${timecode}`);
 
@@ -739,7 +782,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
       const markerMatch = line.match(/\|M:(.*?)(\s|$)/); // Handle end of line
       if (markerMatch && lastTime) {
         const markerName = markerMatch[1].trim();
-        const markerSeconds = timecodeToSeconds(lastTime) - 3600; // Adjust for offset
+        const markerSeconds = convertTimecode2Seconds(lastTime) - 3600; // Adjust for offset
         markers.push({ name: markerName, time: markerSeconds.toFixed(2) });
       }
     });
@@ -832,6 +875,20 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   }
 
+  const updateReduxChapterInfos = (chapterInfo: ChapterInfoType) => {
+    // Check if the chapter information is existing in redux store
+    if (props.chapterInfos?.some(chapter => chapter.chapterId == chapterInfo.chapterId)) {
+      props.dispatch({
+        type: actionTypes.UPDATE_CHAPTERINFOS,
+        payload: {
+          chapterInfo
+        }
+      });
+    } else {
+      console.log('No Chapter Info');
+    }
+  }
+
   const handleUploadAudio = useCallback(() => {
     const audioData = new FormData();
     if (audioFile) {
@@ -845,7 +902,20 @@ function AudioOverview(props: AudioOverviewPropsType) {
       audioService
         .uploadAudio(audioData)
         .then(res => {
-          console.log(res);
+          updateReduxChapterInfos(res);
+          setActiveChapterInfo(res);
+
+          toast.success('Success to complete the audio', {
+            position: 'top-right',
+            draggable: true,
+            theme: 'colored',
+            transition: Bounce,
+            closeOnClick: true,
+            pauseOnHover: true,
+            hideProgressBar: false,
+            autoClose: 3000
+          });
+
           setIsLoading(false);
         })
         .catch(error => {
@@ -856,15 +926,26 @@ function AudioOverview(props: AudioOverviewPropsType) {
   }, [audioFile, selectedLanguage, selectedSubBook, selectedChapter]);
 
   const handleUploadMarkers = useCallback(() => {
-    console.log(selectedChapter, jsonMarkerData, selectedLanguage)
     audioService
       .saveMarker({
         chapterId: selectedChapter,
         languageCode: selectedLanguage,
         markerData: jsonMarkerData
       })
-      .then(result =>
+      .then(result => {
         console.log(result)
+        setLanguageCountVerse(jsonMarkerData.length);
+        toast.success('Success to set time marker', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+      }
       )
       .catch(error => console.log(error))
   }, [jsonMarkerData, selectedChapter, selectedLanguage])

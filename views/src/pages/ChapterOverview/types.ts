@@ -2,7 +2,8 @@ import { Dispatch } from "redux";
 import {
   BookType,
   ChapterInfoType,
-  SubBookInfoType
+  SubBookInfoType,
+  VerseType
 } from "../BookOverview/types"
 import { UserType } from "../types";
 
@@ -44,6 +45,7 @@ type ChapterModelType = {
     en: boolean;
     [key: string]: boolean;
   };
+  verses?: VerseType[]
 }
 
 type SubBookModelType = {
