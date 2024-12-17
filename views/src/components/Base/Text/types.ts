@@ -1,5 +1,5 @@
 type TextProps = {
-  children?: string;
+  children?: string | JSX.Element;
   fontWeight?: string;
   fontSize?: number;
   fontStyle?: string;

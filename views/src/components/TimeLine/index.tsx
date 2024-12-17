@@ -37,7 +37,7 @@ function TimeLine(props: TimeLinePropsType) {
       {props.startTimes.map((startTime, index) => (
         <StyledRedBar
           key={index}
-          isactive={startTime === props.activeStartTime}
+          isactive={startTime === props.activeStartTime ? 'true' : 'false'}
           style={{
             left: `${(startTime / props.duration) * 100}%`, // Position the bar based on the startTime
           }}
