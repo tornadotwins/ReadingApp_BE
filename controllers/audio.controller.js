@@ -47,7 +47,7 @@ exports.uploadAudio = (req, res) => {
       req.body;
 
     // Save the audio data to database
-    const savedAudioPath = `/public/${req.file.filename}`;
+    const savedAudioPath = `/audios/${req.file.filename}`;
 
     const audioInfo = {
       language: languageCode,

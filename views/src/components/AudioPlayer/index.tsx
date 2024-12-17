@@ -20,8 +20,20 @@ function AudioPlayer(props: AudioPlayerPropsType) {
   // Update the audio source when props.src changes
   useEffect(() => {
     const audio = audioRef.current;
-    if (props.src) {
+
+    if (props.src && audio.src !== props.src) {
+      // If the src has changed, load the new audio
       audio.src = props.src;
+
+      // Ensure the audio is ready to play
+      audio.load();
+
+      // Reset audio state if src changes
+      audio.oncanplaythrough = () => {
+        if (props.isPlaying) {
+          audio.play();
+        }
+      };
     }
 
     const handleLoadedMetadata = () => {
@@ -46,7 +58,8 @@ function AudioPlayer(props: AudioPlayerPropsType) {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, [props.src, props.endTime]);
+  }, [props.src, props.isPlaying, props.startTime, props.endTime]);
+
 
   // Sync slider position with currentTime from AudioPlayer
   useEffect(() => {
@@ -62,7 +75,7 @@ function AudioPlayer(props: AudioPlayerPropsType) {
     } else {
       audio.pause();
     }
-  }, [props.isPlaying, props.startTime]);
+  }, [props.isPlaying, props.startTime, props.endTime]);
 
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     if (audioRef.current) {
