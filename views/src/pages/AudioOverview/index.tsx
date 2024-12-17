@@ -18,7 +18,7 @@ import {
   AudioOverviewPropsType,
   SelectOptionType,
   SubBookModelType,
-  // ChapterModelType,
+  ChapterModelType,
   MarkerType,
 } from "./types";
 import {
@@ -258,7 +258,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
       setChapterSelectOptions(newChapterOptions);
       setSelectedChapter(newChapterOptions[0].value);
     }
-  }, [selectedSubBook, props.currentBook, props.bookInfos]);
+  }, [selectedSubBook, props.currentBook]);
 
   // Chapter Effect
   useEffect(() => {
@@ -427,43 +427,43 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   };
 
-  // const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
-  //   const newChapterInfo: ChapterInfoType = {
-  //     chapterAudio: updatedChapterInfo.audio,
-  //     chapterId: updatedChapterInfo._id,
-  //     chapterNumber: updatedChapterInfo.chapterNumber,
-  //     chapterTranslated: updatedChapterInfo.isTranslated,
-  //     chapterIsCompleted: updatedChapterInfo.isCompleted,
-  //     chapterIsPublished: updatedChapterInfo.isPublished,
-  //     subBookId: updatedChapterInfo.subBook,
-  //   }
+  const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
+    const newChapterInfo: ChapterInfoType = {
+      chapterAudio: updatedChapterInfo.audio,
+      chapterId: updatedChapterInfo._id,
+      chapterNumber: updatedChapterInfo.chapterNumber,
+      chapterTranslated: updatedChapterInfo.isTranslated,
+      chapterIsCompleted: updatedChapterInfo.isCompleted,
+      chapterIsPublished: updatedChapterInfo.isPublished,
+      subBookId: updatedChapterInfo.subBook,
+    }
 
-  //   const updatedBookInfos = props.bookInfos.map((book) => ({
-  //     ...book,
-  //     subBooks: book.subBooks.map((subBook) => ({
-  //       ...subBook,
-  //       chapterInfos: subBook.chapterInfos.map((chapter) =>
-  //         chapter.chapterId === selectedChapter
-  //           ? { ...chapter, ...newChapterInfo }
-  //           : chapter
-  //       ),
-  //     })),
-  //   }));
+    const updatedBookInfos = props.bookInfos.map((book) => ({
+      ...book,
+      subBooks: book.subBooks.map((subBook) => ({
+        ...subBook,
+        chapterInfos: subBook.chapterInfos.map((chapter) =>
+          chapter.chapterId === selectedChapter
+            ? { ...chapter, ...newChapterInfo }
+            : chapter
+        ),
+      })),
+    }));
 
-  //   props.dispatch({
-  //     type: actionTypes.SET_BOOKINFOS,
-  //     payload: {
-  //       bookInfos: updatedBookInfos
-  //     }
-  //   });
+    props.dispatch({
+      type: actionTypes.SET_BOOKINFOS,
+      payload: {
+        bookInfos: updatedBookInfos
+      }
+    });
 
-  //   props.dispatch({
-  //     type: actionTypes.UPDATE_CHAPTERINFOS,
-  //     payload: {
-  //       chapterInfo: newChapterInfo,
-  //     }
-  //   })
-  // };
+    props.dispatch({
+      type: actionTypes.UPDATE_CHAPTERINFOS,
+      payload: {
+        chapterInfo: newChapterInfo,
+      }
+    })
+  };
 
   const updateReduxBookInfoWithSubBook = (updatedSubBookInfo: SubBookModelType) => {
     // Update book info with updated Chapter Information
@@ -538,7 +538,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
             verses: result.verses
           }
 
-          // updateReduxBookInfoWithChapter(result);
+          updateReduxBookInfoWithChapter(result);
           updateReduxChapterInfos(updatedChapterInfo);
 
           toast.success(`Success to ${isAudioCompleted ? 'complete' : 'incomplete'} the audio`, {
@@ -626,6 +626,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
             verses: result.verses
           }
 
+          updateReduxBookInfoWithChapter(result)
           updateReduxChapterInfos(updatedChapterInfo);
 
           toast.success(`Success to ${isAudioPublished ? 'publish' : 'withhold'} the audio`, {
