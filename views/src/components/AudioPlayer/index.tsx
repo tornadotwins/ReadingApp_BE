@@ -26,6 +26,7 @@ function AudioPlayer(props: AudioPlayerPropsType) {
 
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
+      props.setAudioDuration(audio.duration);
     };
 
     const handleTimeUpdate = () => {

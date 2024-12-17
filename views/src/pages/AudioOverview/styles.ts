@@ -176,6 +176,17 @@ const StyledTimeLineProgressContainer = styled(Box) ({
   cursor: 'pointer'
 });
 
+const StyledTimeLineSegment = styled(Box)({
+  position: 'absolute',
+  height: '100%',
+  cursor: 'pointer',
+  transition: 'background-color 0.3s',
+});
+
+const StyledDivider = styled(Box) ({
+  position: 'absolute'
+})
+
 const StyledAudioTableContainer = styled(Box) ({
   display: 'flex',
   boxSizing: 'border-box',
@@ -202,6 +213,8 @@ export {
   StyledAudioPlayerContainer,
   StyledAudioPlayer,
   StyledTimeLineProgressContainer,
+  StyledTimeLineSegment,
+  StyledDivider,
   StyledAudioTableContainer,
   StyledMarkTableContainer,
 }

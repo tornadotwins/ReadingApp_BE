@@ -40,7 +40,6 @@ import {
   StyledUploadButtonGroupContainer,
   StyledAudioPlayerContainer,
   StyledAudioPlayer,
-  StyledTimeLineProgressContainer,
   StyledAudioTableContainer,
   StyledMarkTableContainer,
 } from "./styles";
@@ -59,6 +58,7 @@ import Tools from "@/components/Tools";
 import audioService from "@/services/audio.services";
 import { TableRowType } from "@/components/Base/TablePanel/types";
 import AudioPlayer from "@/components/AudioPlayer";
+import TimeLine from "@/components/TimeLine";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -103,13 +103,14 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const [audioSrc, setAudioSrc] = useState('');
   const [edlFile, setEdlFile] = useState<File | null>(null);
   const [csvData, setCsvData] = useState<string>('');
-  const [jsonMarkerData, setJsonMarkerdata] = useState<object[]>([]);
+  const [jsonMarkerData, setJsonMarkerdata] = useState<MarkerType[]>([]);
 
   const [tableRows, setTableRows] = useState<TableRowType[]>([]);
 
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(0);
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
+  const [audioDuration, setAudioDuration] = useState(0);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const audioRef = useRef(new Audio());
 
@@ -1058,6 +1059,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
             setCurrentTime={(val: number) => setAudioCurrentTime(val)}
             setIsPlaying={(val: boolean) => setIsAudioPlaying(val)}
+            setAudioDuration={(val: number) => setAudioDuration(val)}
             onTimeChange={(val: number) => handleTimeChange(val)}
           />
         </StyledAudioPlayer>
@@ -1065,14 +1067,34 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   }
 
-  const _renderTimeLineProgress = () => {
-    return (
-      audioFile &&
-      <StyledTimeLineProgressContainer>
+  useEffect(() => {
+    // Get the next marker's time
+    const index = jsonMarkerData.findIndex(marker => Number(marker["Marker Time"]) == startTime);
+    let endTime = 0;
+    if (index < jsonMarkerData.length - 1)
+      endTime = Number(jsonMarkerData[index + 1]["Marker Time"]);
+    else
+      endTime = audioDuration;
 
-      </StyledTimeLineProgressContainer>
-    )
-  }
+    setEndTime(endTime);
+    setIsAudioPlaying(true);
+  }, [startTime, jsonMarkerData]);
+
+  const _renderTimeLineProgress = () => {
+    if (!jsonMarkerData || jsonMarkerData.length === 0) {
+      return null;
+    }
+
+    return (
+      <TimeLine
+        startTimes={jsonMarkerData.map(marker => Number(marker["Marker Time"]))}
+        duration={audioDuration}
+        activeStartTime={startTime}
+
+        setAudioStartTime={(val) => setStartTime(val)}
+      />
+    );
+  };
 
   const _renderAudioTable = () => {
     return (
