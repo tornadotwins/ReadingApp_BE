@@ -1,4 +1,4 @@
-import { TRANSLATION_STATUS_NONE } from "@/config";
+import { TRANSLATION_STATUS_COMPLETE, TRANSLATION_STATUS_NONE, TRANSLATION_STATUS_PUBLISH } from "@/config";
 import { Text } from "../Base";
 import ChapterAudioSquare from "../ChapterAudioSquare";
 import {
@@ -40,16 +40,32 @@ function SubBookAudio(props: SubBookAudioPropsType) {
           !props.isQuranOrZabur &&
           <StyledSubBookChapterGroupContainer>
             {
-              props.subBook && props.subBook.chapterInfos?.map((chapterInfo: ChapterInfoType, index: number) => (
-                <ChapterAudioSquare
-                  key={index}
-                  chapterNumber={chapterInfo.chapterNumber}
-                  chapterId={chapterInfo.chapterId}
-                  audioStatus={chapterInfo?.chapterAudio?.[props.languageCode] || TRANSLATION_STATUS_NONE}
-                  onClick={props.moveToAudioOverview}
-                />
-              ))
-            }
+              props.subBook &&
+              props.subBook.chapterInfos?.map((chapterInfo: ChapterInfoType, index: number) => {
+                const chapterAudioArray = Array.isArray(chapterInfo.chapterAudio)
+                  ? chapterInfo.chapterAudio
+                  : []; // Ensure chapterAudio is an array
+
+                const audioInfo = chapterAudioArray.find(
+                  (audioObj) => audioObj.language === props.languageCode
+                );
+
+                return (
+                  <ChapterAudioSquare
+                    key={index}
+                    chapterNumber={chapterInfo.chapterNumber}
+                    chapterId={chapterInfo.chapterId}
+                    audioStatus={
+                      audioInfo?.isPublished
+                        ? TRANSLATION_STATUS_PUBLISH
+                        : audioInfo?.isCompleted
+                          ? TRANSLATION_STATUS_COMPLETE
+                          : TRANSLATION_STATUS_NONE
+                    }
+                    onClick={props.moveToAudioOverview}
+                  />
+                );
+              })}
           </StyledSubBookChapterGroupContainer>
         }
 
@@ -57,15 +73,25 @@ function SubBookAudio(props: SubBookAudioPropsType) {
           props.isQuranOrZabur &&
           <StyledSubBookChapterGroupContainer>
             {
-              props.book && props.book.subBooks && props.book.subBooks.map((subBook: SubBookInfoType, index: number) => (
-                <ChapterAudioSquare
+              props.book && props.book.subBooks && props.book.subBooks.map((subBook: SubBookInfoType, index: number) => {
+                const chapterAudioArray = Array.isArray(subBook?.chapterInfos[0]?.chapterAudio)
+                  ? subBook?.chapterInfos[0].chapterAudio : [];
+                const audioInfo = chapterAudioArray.find(audioObj => audioObj.language == props.languageCode)
+                return <ChapterAudioSquare
                   key={index}
                   chapterNumber={subBook?.subBookNumber}
                   chapterId={subBook?.chapterInfos[0]?.chapterId}
-                  audioStatus={(subBook.chapterInfos && subBook.chapterInfos[0]?.chapterAudio?.[props.languageCode]) || TRANSLATION_STATUS_NONE}
+                  audioStatus={
+                    (audioInfo?.isPublished ?
+                      TRANSLATION_STATUS_PUBLISH :
+                      audioInfo?.isCompleted ?
+                        TRANSLATION_STATUS_COMPLETE :
+                        TRANSLATION_STATUS_NONE
+                    )
+                  }
                   onClick={props.moveToAudioOverview}
                 />
-              ))
+              })
             }
           </StyledSubBookChapterGroupContainer>
         }

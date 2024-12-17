@@ -10,7 +10,7 @@ const ChapterSquare = (props: ChapterSquarePropsType) => {
         TRANSLATION_STATUS_PUBLISH :
         props.isCompleted ?
           TRANSLATION_STATUS_COMPLETE :
-          props.chapterInfo && props.chapterInfo?.verses?.length > 0 ?
+          props.chapterInfo && !props.chapterInfo?.verses?.length ?
             CHAPTER_HAS_CONTENT :
             TRANSLATION_STATUS_NONE
       }

@@ -18,7 +18,7 @@ import {
   AudioOverviewPropsType,
   SelectOptionType,
   SubBookModelType,
-  // ChapterModelType,
+  ChapterModelType,
   MarkerType,
 } from "./types";
 import {
@@ -40,7 +40,6 @@ import {
   StyledUploadButtonGroupContainer,
   StyledAudioPlayerContainer,
   StyledAudioPlayer,
-  StyledTimeLineProgressContainer,
   StyledAudioTableContainer,
   StyledMarkTableContainer,
 } from "./styles";
@@ -59,6 +58,7 @@ import Tools from "@/components/Tools";
 import audioService from "@/services/audio.services";
 import { TableRowType } from "@/components/Base/TablePanel/types";
 import AudioPlayer from "@/components/AudioPlayer";
+import TimeLine from "@/components/TimeLine";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -103,13 +103,14 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const [audioSrc, setAudioSrc] = useState('');
   const [edlFile, setEdlFile] = useState<File | null>(null);
   const [csvData, setCsvData] = useState<string>('');
-  const [jsonMarkerData, setJsonMarkerdata] = useState<object[]>([]);
+  const [jsonMarkerData, setJsonMarkerdata] = useState<MarkerType[]>([]);
 
   const [tableRows, setTableRows] = useState<TableRowType[]>([]);
 
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(0);
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
+  const [audioDuration, setAudioDuration] = useState(0);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const audioRef = useRef(new Audio());
 
@@ -258,7 +259,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
       setChapterSelectOptions(newChapterOptions);
       setSelectedChapter(newChapterOptions[0].value);
     }
-  }, [selectedSubBook, props.currentBook, props.bookInfos]);
+  }, [selectedSubBook, props.currentBook]);
 
   // Chapter Effect
   useEffect(() => {
@@ -427,43 +428,43 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   };
 
-  // const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
-  //   const newChapterInfo: ChapterInfoType = {
-  //     chapterAudio: updatedChapterInfo.audio,
-  //     chapterId: updatedChapterInfo._id,
-  //     chapterNumber: updatedChapterInfo.chapterNumber,
-  //     chapterTranslated: updatedChapterInfo.isTranslated,
-  //     chapterIsCompleted: updatedChapterInfo.isCompleted,
-  //     chapterIsPublished: updatedChapterInfo.isPublished,
-  //     subBookId: updatedChapterInfo.subBook,
-  //   }
+  const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
+    const newChapterInfo: ChapterInfoType = {
+      chapterAudio: updatedChapterInfo.audio,
+      chapterId: updatedChapterInfo._id,
+      chapterNumber: updatedChapterInfo.chapterNumber,
+      chapterTranslated: updatedChapterInfo.isTranslated,
+      chapterIsCompleted: updatedChapterInfo.isCompleted,
+      chapterIsPublished: updatedChapterInfo.isPublished,
+      subBookId: updatedChapterInfo.subBook,
+    }
 
-  //   const updatedBookInfos = props.bookInfos.map((book) => ({
-  //     ...book,
-  //     subBooks: book.subBooks.map((subBook) => ({
-  //       ...subBook,
-  //       chapterInfos: subBook.chapterInfos.map((chapter) =>
-  //         chapter.chapterId === selectedChapter
-  //           ? { ...chapter, ...newChapterInfo }
-  //           : chapter
-  //       ),
-  //     })),
-  //   }));
+    const updatedBookInfos = props.bookInfos.map((book) => ({
+      ...book,
+      subBooks: book.subBooks.map((subBook) => ({
+        ...subBook,
+        chapterInfos: subBook.chapterInfos.map((chapter) =>
+          chapter.chapterId === selectedChapter
+            ? { ...chapter, ...newChapterInfo }
+            : chapter
+        ),
+      })),
+    }));
 
-  //   props.dispatch({
-  //     type: actionTypes.SET_BOOKINFOS,
-  //     payload: {
-  //       bookInfos: updatedBookInfos
-  //     }
-  //   });
+    props.dispatch({
+      type: actionTypes.SET_BOOKINFOS,
+      payload: {
+        bookInfos: updatedBookInfos
+      }
+    });
 
-  //   props.dispatch({
-  //     type: actionTypes.UPDATE_CHAPTERINFOS,
-  //     payload: {
-  //       chapterInfo: newChapterInfo,
-  //     }
-  //   })
-  // };
+    props.dispatch({
+      type: actionTypes.UPDATE_CHAPTERINFOS,
+      payload: {
+        chapterInfo: newChapterInfo,
+      }
+    })
+  };
 
   const updateReduxBookInfoWithSubBook = (updatedSubBookInfo: SubBookModelType) => {
     // Update book info with updated Chapter Information
@@ -538,7 +539,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
             verses: result.verses
           }
 
-          // updateReduxBookInfoWithChapter(result);
+          updateReduxBookInfoWithChapter(result);
           updateReduxChapterInfos(updatedChapterInfo);
 
           toast.success(`Success to ${isAudioCompleted ? 'complete' : 'incomplete'} the audio`, {
@@ -626,6 +627,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
             verses: result.verses
           }
 
+          updateReduxBookInfoWithChapter(result)
           updateReduxChapterInfos(updatedChapterInfo);
 
           toast.success(`Success to ${isAudioPublished ? 'publish' : 'withhold'} the audio`, {
@@ -1057,6 +1059,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
             setCurrentTime={(val: number) => setAudioCurrentTime(val)}
             setIsPlaying={(val: boolean) => setIsAudioPlaying(val)}
+            setAudioDuration={(val: number) => setAudioDuration(val)}
             onTimeChange={(val: number) => handleTimeChange(val)}
           />
         </StyledAudioPlayer>
@@ -1064,14 +1067,34 @@ function AudioOverview(props: AudioOverviewPropsType) {
     )
   }
 
-  const _renderTimeLineProgress = () => {
-    return (
-      audioFile &&
-      <StyledTimeLineProgressContainer>
+  useEffect(() => {
+    // Get the next marker's time
+    const index = jsonMarkerData.findIndex(marker => Number(marker["Marker Time"]) == startTime);
+    let endTime = 0;
+    if (index < jsonMarkerData.length - 1)
+      endTime = Number(jsonMarkerData[index + 1]["Marker Time"]);
+    else
+      endTime = audioDuration;
 
-      </StyledTimeLineProgressContainer>
-    )
-  }
+    setEndTime(endTime);
+    setIsAudioPlaying(true);
+  }, [startTime, jsonMarkerData]);
+
+  const _renderTimeLineProgress = () => {
+    if (!jsonMarkerData || jsonMarkerData.length === 0) {
+      return null;
+    }
+
+    return (
+      <TimeLine
+        startTimes={jsonMarkerData.map(marker => Number(marker["Marker Time"]))}
+        duration={audioDuration}
+        activeStartTime={startTime}
+
+        setAudioStartTime={(val) => setStartTime(val)}
+      />
+    );
+  };
 
   const _renderAudioTable = () => {
     return (
