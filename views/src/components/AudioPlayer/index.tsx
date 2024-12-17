@@ -60,7 +60,6 @@ function AudioPlayer(props: AudioPlayerPropsType) {
     };
   }, [props.src, props.isPlaying, props.startTime, props.endTime]);
 
-
   // Sync slider position with currentTime from AudioPlayer
   useEffect(() => {
     setThumbPosition(props.currentTime);
