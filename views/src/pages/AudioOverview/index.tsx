@@ -1093,7 +1093,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
     setEndTime(endTime);
     setIsAudioPlaying(true);
-  }, [startTime, endTime, jsonMarkerData]);
+  }, [startTime, endTime]);
 
   const _renderTimeLineProgress = () => {
     if (!jsonMarkerData || jsonMarkerData.length === 0) {
