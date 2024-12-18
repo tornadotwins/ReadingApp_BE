@@ -8,6 +8,7 @@ export const initialState: StateType = {
   chapterInfos: [],
   language: '',
   appTextPages: [],
+  currentAudioHandler: "",
 };
 
 //////////////////////////////////////////////////////////////////
