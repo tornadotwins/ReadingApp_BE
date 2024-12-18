@@ -782,6 +782,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
     if (audioFile) {
       const url = URL.createObjectURL(audioFile);
       setAudioSrc(url);
+      setIsAudioPlaying(false);
     }
   }, [audioFile]);
 
@@ -912,7 +913,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
       }
     }
     reader.readAsText(edlFile);
-  }, [edlFile]);
+  }, [edlFile, selectedChapter]);
 
   const _renderEDLImporter = () => {
     return (
