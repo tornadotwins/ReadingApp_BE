@@ -8,6 +8,7 @@ type StateType = {
   chapterInfos: ChapterInfoType[] | [];
   language: string | '';
   appTextPages: AppTextPageType[] | [];
+  currentAudioHandler: string | '';
 }
 
 type BookStateType = {
@@ -100,6 +101,13 @@ type AppTextPageActionType = {
   }
 }
 
+type CurrentAudioHandlerActionType = {
+  type: string,
+  payload: {
+    currentAudioHandler: string
+  }
+}
+
 type AppStateType = {
   user: {
     currentUser: UserType | null;
@@ -111,6 +119,7 @@ type AppStateType = {
     language: string,
   },
   translator: {
+    currentAudioHandler: string;
     appTextPages: AppTextPageType[];
   }
 };
@@ -130,5 +139,6 @@ export type {
   LanguageActionType,
   AppTextPagesActionType,
   AppTextPageActionType,
+  CurrentAudioHandlerActionType,
   AppStateType,
 }

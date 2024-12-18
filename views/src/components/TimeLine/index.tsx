@@ -29,6 +29,7 @@ function TimeLine(props: TimeLinePropsType) {
       }
     }
 
+    props.setCurrentAudioHandler('Time Line');
     // You can log or handle the clicked startTime here
     props.setAudioStartTime(clickedStartTime || 0);
   };

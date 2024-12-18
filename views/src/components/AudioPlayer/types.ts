@@ -10,6 +10,7 @@ type AudioPlayerPropsType = {
   setEndTime: (time: number) => void;
   setIsPlaying: (isPlay: boolean) => void;
   setAudioDuration: (duration: number) => void;
+  setCurrentAudioHandler: (handler: string) => void;
   onTimeChange: (time: number) => void;
 }
 

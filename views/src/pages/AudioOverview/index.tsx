@@ -40,7 +40,6 @@ import {
   StyledUploadButtonGroupContainer,
   StyledAudioPlayerContainer,
   StyledAudioPlayer,
-  StyledAudioTableContainer,
   StyledMarkTableContainer,
 } from "./styles";
 
@@ -898,7 +897,10 @@ function AudioOverview(props: AudioOverviewPropsType) {
                 <Button
                   label="Play"
                   disabled={!audioFile || !edlFile}
-                  onClick={() => handleAudioPlay(jsonCsv[index]['Marker Time'], index < jsonCsv.length - 1 ? jsonCsv[index + 1]['Marker Time'] : '')}
+                  onClick={() => {
+                    handleAudioPlay(jsonCsv[index]['Marker Time'], index < jsonCsv.length - 1 ? jsonCsv[index + 1]['Marker Time'] : '');
+                    handleCurrentAudioHandler('Time Line')
+                  }}
                 />
               </StyledButton>
             ),
@@ -1042,6 +1044,15 @@ function AudioOverview(props: AudioOverviewPropsType) {
     setAudioCurrentTime(newTime);
   };
 
+  const handleCurrentAudioHandler = (handler: string) => {
+    props.dispatch({
+      type: actionTypes.SET_CURRENT_AUDIO_HANDLER,
+      payload: {
+        currentAudioHandler: handler
+      }
+    })
+  }
+
   const _renderAudioPlayer = () => {
     return (
       audioFile &&
@@ -1063,6 +1074,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
             setEndTime={(val: number) => setEndTime(val)}
             setIsPlaying={(val: boolean) => setIsAudioPlaying(val)}
             setAudioDuration={(val: number) => setAudioDuration(val)}
+            setCurrentAudioHandler={(val: string) => handleCurrentAudioHandler(val)}
             onTimeChange={(val: number) => handleTimeChange(val)}
           />
         </StyledAudioPlayer>
@@ -1074,7 +1086,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
     // Get the next marker's time
     const index = jsonMarkerData.findIndex(marker => Number(marker["Marker Time"]) >= startTime);
     let endTime = 0;
-    if (index < jsonMarkerData.length - 1)
+    if (index < jsonMarkerData.length - 1 && props.currentAudioHandler == 'Time Line')
       endTime = Number(jsonMarkerData[index + 1]["Marker Time"]);
     else
       endTime = audioDuration;
@@ -1094,18 +1106,11 @@ function AudioOverview(props: AudioOverviewPropsType) {
         duration={audioDuration}
         activeStartTime={startTime}
 
+        setCurrentAudioHandler={(val) => handleCurrentAudioHandler(val)}
         setAudioStartTime={(val) => setStartTime(val)}
       />
     );
   };
-
-  const _renderAudioTable = () => {
-    return (
-      <StyledAudioTableContainer>
-
-      </StyledAudioTableContainer>
-    )
-  }
 
   const _renderMarkTable = () => {
     return (
@@ -1140,8 +1145,6 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
         {_renderTimeLineProgress()}
 
-        {_renderAudioTable()}
-
         {_renderMarkTable()}
       </StyledAudioOverviewContainer>
     )
@@ -1172,6 +1175,7 @@ function mapStateToProps(state: AppStateType) {
     chapterInfos: state.book.chapterInfos,
     currentLanguage: state.book.language,
     currentBook: state.book.book,
+    currentAudioHandler: state.translator.currentAudioHandler,
     appTextPages: state.translator.appTextPages,
   };
 }

@@ -90,6 +90,7 @@ function AudioPlayer(props: AudioPlayerPropsType) {
       props.setCurrentTime(newTime);
       props.setStartTime(newTime);
       props.onTimeChange(newTime);
+      props.setCurrentAudioHandler('Audio Player');
 
       // Always play the audio when a point is selected
       audio.play().catch((error) => {
@@ -112,7 +113,6 @@ function AudioPlayer(props: AudioPlayerPropsType) {
       console.error("Error resuming playback after dragging:", error);
     });
   };
-
 
   const formatDuration = (value: number) => {
     const minute = Math.floor(value / 60);

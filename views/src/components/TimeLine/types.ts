@@ -4,6 +4,7 @@ type TimeLinePropsType = {
   activeStartTime: number;
 
   setAudioStartTime: (val: number) => void;
+  setCurrentAudioHandler: (val: string) => void;
 }
 
 export type {

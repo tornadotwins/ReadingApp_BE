@@ -3,7 +3,8 @@ import Types from '../actions/actionTypes';
 import {
   AppTextPagesActionType,
   AppTextPageActionType,
-  StateType
+  StateType,
+  CurrentAudioHandlerActionType
 } from './types';
 
 export const initialState: StateType = {
@@ -12,6 +13,7 @@ export const initialState: StateType = {
   chapterInfos: [], // Empty array for chapter info
   language: '', // Default language is an empty string
   appTextPages: [], // Empty array for app text pages
+  currentAudioHandler: '',
 };
 
 //////////////////////////////////////////////////////////////////
@@ -41,6 +43,14 @@ const updateAppTextPages = (state: StateType, action: AppTextPageActionType) => 
 }
 
 //////////////////////////////////////////////////////////////////
+//////////////////// Set Current Audio Handler ///////////////////
+//////////////////////////////////////////////////////////////////
+const setCurrentAudioHandler = (state: StateType, action: CurrentAudioHandlerActionType) => {
+  const {currentAudioHandler} = action.payload;
+  return {...state, currentAudioHandler};
+}
+
+//////////////////////////////////////////////////////////////////
 ///////////////////////// Reset book info ////////////////////////
 //////////////////////////////////////////////////////////////////
 const resetBookInfo = () => ({
@@ -50,6 +60,8 @@ const resetBookInfo = () => ({
 const actionHandler = {
   [Types.SET_APP_TEXT_PAGES]: setAppTextPages,
   [Types.UPDATE_APP_TEXT_PAGES]: updateAppTextPages,
+  [Types.SET_CURRENT_AUDIO_HANDLER]: setCurrentAudioHandler,
+
   [Types.RESET_APP_TEXT_PAGES]: resetBookInfo
 }
 
