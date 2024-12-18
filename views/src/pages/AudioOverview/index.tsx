@@ -889,7 +889,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
         for (let index = 0; index < jsonCsv.length; index++) {
           const newRow = {
-            'Verse': verseInfos[index].verseText?.[selectedLanguage],
+            'Verse': verseInfos[index]?.verseText?.[selectedLanguage],
             'Marker Name': jsonCsv[index]['Marker Name'],
             'Marker Time': jsonCsv[index]['Marker Time'],
             'Action': (
@@ -1058,6 +1058,8 @@ function AudioOverview(props: AudioOverviewPropsType) {
             isPlaying={isAudioPlaying}
 
             setCurrentTime={(val: number) => setAudioCurrentTime(val)}
+            setStartTime={(val: number) => setStartTime(val)}
+            setEndTime={(val: number) => setEndTime(val)}
             setIsPlaying={(val: boolean) => setIsAudioPlaying(val)}
             setAudioDuration={(val: number) => setAudioDuration(val)}
             onTimeChange={(val: number) => handleTimeChange(val)}
@@ -1069,7 +1071,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   useEffect(() => {
     // Get the next marker's time
-    const index = jsonMarkerData.findIndex(marker => Number(marker["Marker Time"]) == startTime);
+    const index = jsonMarkerData.findIndex(marker => Number(marker["Marker Time"]) >= startTime);
     let endTime = 0;
     if (index < jsonMarkerData.length - 1)
       endTime = Number(jsonMarkerData[index + 1]["Marker Time"]);
@@ -1078,7 +1080,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
     setEndTime(endTime);
     setIsAudioPlaying(true);
-  }, [startTime, jsonMarkerData]);
+  }, [startTime, endTime, jsonMarkerData]);
 
   const _renderTimeLineProgress = () => {
     if (!jsonMarkerData || jsonMarkerData.length === 0) {

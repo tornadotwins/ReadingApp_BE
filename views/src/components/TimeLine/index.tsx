@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   StyledTimeLineProgressContainer,
   StyledRedBar
@@ -31,6 +32,10 @@ function TimeLine(props: TimeLinePropsType) {
     // You can log or handle the clicked startTime here
     props.setAudioStartTime(clickedStartTime || 0);
   };
+
+  useEffect(() => {
+    props.setAudioStartTime(props.activeStartTime);
+  }, [props.activeStartTime]);
 
   return (
     <StyledTimeLineProgressContainer onClick={handleClick}>

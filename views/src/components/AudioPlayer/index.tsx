@@ -65,6 +65,10 @@ function AudioPlayer(props: AudioPlayerPropsType) {
     setThumbPosition(props.currentTime);
   }, [props.currentTime]);
 
+  useEffect(() => {
+    props.setCurrentTime(thumbPosition);
+  }, [thumbPosition]);
+
   // Play/Pause behavior and handle startTime
   useEffect(() => {
     const audio = audioRef.current;
@@ -77,13 +81,38 @@ function AudioPlayer(props: AudioPlayerPropsType) {
   }, [props.isPlaying, props.startTime, props.endTime]);
 
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = Array.isArray(newValue) ? newValue[0] : newValue;
-      props.setCurrentTime(audioRef.current.currentTime);
-      setThumbPosition(newValue as number);
-      props.onTimeChange(newValue as number);
+    const audio = audioRef.current;
+
+    if (audio) {
+      const newTime = Array.isArray(newValue) ? newValue[0] : newValue;
+      audio.currentTime = newTime; // Update the audio's current time immediately
+      setThumbPosition(newTime);
+      props.setCurrentTime(newTime);
+      props.setStartTime(newTime);
+      props.onTimeChange(newTime);
+
+      // Always play the audio when a point is selected
+      audio.play().catch((error) => {
+        console.error("Error playing audio after selecting a point:", error);
+      });
+
+      // Ensure the playback state is consistent
+      props.setIsPlaying(true);
     }
   };
+
+  const handleDragStart = () => {
+    const audio = audioRef.current;
+    audio.pause();
+  };
+
+  const handleDragEnd = () => {
+    const audio = audioRef.current;
+    audio.play().catch((error) => {
+      console.error("Error resuming playback after dragging:", error);
+    });
+  };
+
 
   const formatDuration = (value: number) => {
     const minute = Math.floor(value / 60);
@@ -101,6 +130,9 @@ function AudioPlayer(props: AudioPlayerPropsType) {
           max={Math.floor(duration)}
           step={1}
           onChange={handleSliderChange}
+          onMouseDown={handleDragStart}
+          onMouseUp={handleDragEnd}
+
         />
         <StyledTimeContainer>
           <Text>{formatDuration(thumbPosition)}</Text>
