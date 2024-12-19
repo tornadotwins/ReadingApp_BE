@@ -311,6 +311,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
 
   const _renderUploadButtonForInjil = () => {
     return (
+      currentBookOverviewType == 'Text' &&
       <StyledUploadButtonContainer>
         <Button
           icon={<CloudUploadIcon />}
