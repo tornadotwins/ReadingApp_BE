@@ -56,6 +56,7 @@ import {
   BOOK_TAWRAT,
   BOOK_QURAN,
   BOOK_ZABUR,
+  API_URL
 } from "@/config";
 import { ERROR_SOMETHING_WRONG_FOR_SUBBOOK } from "@/config/error-messages";
 import Tools from "@/components/Tools";
@@ -157,6 +158,20 @@ function AudioOverview(props: AudioOverviewPropsType) {
       />
     )
   };
+
+  useEffect(() => {
+    setTableRows([]);
+    setAudioSrc('');
+    setEdlFile(null);
+    setAudioFile(null);
+    setJsonMarkerdata([]);
+    setCsvData('');
+    setStartTime(0);
+    setEndTime(0);
+    setAudioCurrentTime(0);
+    setAudioDuration(0);
+    setIsAudioPlaying(false);
+  }, [isImport]);
 
   // Fetch Chapter info by chapterId
   const fetchChapterInfoByChapterId = useCallback(async (chapterId: string) => {
@@ -273,11 +288,97 @@ function AudioOverview(props: AudioOverviewPropsType) {
     if (existingChapterInfo) {
       setActiveChapterInfo(existingChapterInfo);
       setVerseInfos(existingChapterInfo?.verses || []);
+
+      // set Audio path and Marker in database mode
+      if (!isImport) {
+        // Set Audio Path
+        const audios = existingChapterInfo.chapterAudio;
+        const audioObj = audios.find(audio => audio.language == selectedLanguage);
+        const audioSrc = audioObj?.audio;
+        audioSrc && setAudioSrc(API_URL + '/' + audioSrc);
+
+        const newRows: TableRowType[] = [];
+
+        if (existingChapterInfo.verses && existingChapterInfo.verses.length >= 1) {
+          for (let index = 0; index < (existingChapterInfo?.verses?.length || 1); index++) {
+            const verse = existingChapterInfo.verses[index];
+            const nextVerse = existingChapterInfo.verses[index + 1];
+            const newRow = {
+              'Verse': verse?.verseText?.[selectedLanguage],
+              'Marker Name': audioObj?.marker || '',
+              'Marker Time': verse.verseAudioStart?.[selectedLanguage]?.toString() || '',
+              'Action': (
+                <StyledButton isdisable={(audioFile || audioSrc) && (edlFile || tableRows) ? 'false' : 'true'}>
+                  <Button
+                    label="Play"
+                    disabled={!(audioFile || audioSrc) || !(edlFile || tableRows)}
+                    onClick={() => {
+                      handleAudioPlay(
+                        (verse.verseAudioStart?.[selectedLanguage] || 0).toString(),
+                        nextVerse ? nextVerse.verseAudioStart?.[selectedLanguage].toString() : ''
+                      );
+                      handleCurrentAudioHandler('Time Line')
+                    }}
+                  />
+                </StyledButton>
+              ),
+            };
+
+            verse.verseAudioStart?.[selectedLanguage] && newRows.push(newRow);
+          }
+
+          setTableRows(newRows);
+          setJsonMarkerdata(newRows as MarkerType[]);
+        }
+      }
     } else {
       fetchChapterInfoByChapterId(selectedChapter)
         .then((result) => {
           setActiveChapterInfo(result);
           setVerseInfos(result.verses || []);
+
+          // set Audio path and Marker in database mode
+          if (!isImport) {
+            // Set Audio Path
+            const audios = result.chapterAudio;
+            const audioObj = audios.find(audio => audio.language == selectedLanguage);
+            const audioSrc = audioObj?.audio;
+            audioSrc && setAudioSrc(API_URL + audioSrc);
+
+            const newRows: TableRowType[] = [];
+
+            if (result.verses && result.verses.length >= 1) {
+              for (let index = 0; index < (result?.verses?.length || 1); index++) {
+                const verse = result.verses[index];
+                const nextVerse = result.verses[index + 1];
+                const newRow = {
+                  'Verse': verseInfos[index]?.verseText?.[selectedLanguage],
+                  'Marker Name': audioObj?.marker || '',
+                  'Marker Time': verse.verseAudioStart?.[selectedLanguage].toString(),
+                  'Action': (
+                    <StyledButton isdisable={audioFile && edlFile ? 'false' : 'true'}>
+                      <Button
+                        label="Play"
+                        disabled={!audioFile || !edlFile}
+                        onClick={() => {
+                          handleAudioPlay(
+                            (verse.verseAudioStart?.[selectedLanguage] || 0).toString(),
+                            nextVerse ? nextVerse.verseAudioStart?.[selectedLanguage].toString() : ''
+                          );
+                          handleCurrentAudioHandler('Time Line')
+                        }}
+                      />
+                    </StyledButton>
+                  ),
+                };
+
+                verse.verseAudioStart?.[selectedLanguage] && newRows.push(newRow);
+              }
+
+              setJsonMarkerdata(newRows as MarkerType[]);
+              setTableRows(newRows);
+            }
+          }
 
           props.dispatch({
             type: actionTypes.ADD_CHAPTERINFO,
@@ -309,7 +410,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
     }
 
     locationState.chapterId = '';
-  }, [selectedChapter]);
+  }, [selectedChapter, isImport]);
 
   // Set the default values when render the page first
   useEffect(() => {
@@ -406,10 +507,6 @@ function AudioOverview(props: AudioOverviewPropsType) {
   const handleSelectLanguageChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const value = event.target.value as string;
     setSelectedLanguage(value);
-
-    // Reset table data to force re-render
-    // setTableHeaders([]);
-    // setTableRows([]);
 
     props.dispatch({
       type: actionTypes.SET_CURRENT_LANGUAGE,
@@ -1079,7 +1176,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
         </StyledUploadButtonGroupContainer>
       </StyledButtonGroupContainer>
     )
-  }
+  };
 
   const handleTimeChange = (newTime: number) => {
     audioRef.current.currentTime = newTime;
@@ -1093,16 +1190,12 @@ function AudioOverview(props: AudioOverviewPropsType) {
         currentAudioHandler: handler
       }
     })
-  }
+  };
 
   const _renderAudioPlayer = () => {
     return (
-      audioFile &&
+      (audioFile || audioSrc) &&
       <StyledAudioPlayerContainer>
-        <Text color="#155D74" fontFamily="'Baloo Da 2'">
-          {audioFile ? `Playing: ${audioFile?.name || 'Audio'}` : 'No audio file is selected'}
-        </Text>
-
         <StyledAudioPlayer>
           <AudioPlayer
             src={audioSrc}
@@ -1122,7 +1215,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
         </StyledAudioPlayer>
       </StyledAudioPlayerContainer>
     )
-  }
+  };
 
   useEffect(() => {
     // Get the next marker's time
@@ -1156,7 +1249,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   const _renderMarkTable = () => {
     return (
-      edlFile &&
+      (edlFile || (tableRows && tableRows.length > 0)) &&
       <StyledMarkTableContainer>
         <TablePanel
           headers={["Verse", "Marker Name", "Marker Time", "Action"]}
@@ -1164,7 +1257,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
         />
       </StyledMarkTableContainer>
     )
-  }
+  };
 
   const _renderBody = () => {
     return (

@@ -35,6 +35,7 @@ type AudioType = {
   isCompleted: boolean,
   isPublished: boolean,
   audio: string,
+  marker: string,
 }
 
 type ChapterModelType = {
@@ -64,6 +65,7 @@ type ParseDataType = {
 }
 
 type MarkerType = {
+  Verse?: string,
   'Marker Name': string,
   'Marker Time': string,
   'Action': JSX.Element,

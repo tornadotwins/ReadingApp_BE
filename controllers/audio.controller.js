@@ -112,7 +112,10 @@ exports.uploadAudio = (req, res) => {
       });
     });
 
-    updatedNewChapter = { ...updatedNewChapter, verses: updatedVerses };
+    updatedNewChapter = {
+      ...updatedNewChapter,
+      verses: updatedVerses,
+    };
 
     return res.status(200).json(updatedNewChapter);
   });
@@ -148,6 +151,7 @@ exports.saveMarker = async (req, res) => {
         verseAudioStartInfo = {
           ...verseAudioStartInfo,
           [languageCode]: verseMarker?.['Marker Time'],
+          marker: verseMarker?.['Marker Name'],
         };
 
         return Verse.findByIdAndUpdate(

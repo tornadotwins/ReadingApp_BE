@@ -37,6 +37,7 @@ type AudioType = {
   isCompleted: boolean,
   isPublished: boolean,
   audio: string,
+  marker: string,
 }
 
 type ChapterInfoType = {
