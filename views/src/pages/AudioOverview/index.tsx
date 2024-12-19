@@ -127,7 +127,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   // Scroll to top when page is rendered
   useEffect(() => {
-    window.scrollTo({ top: 0 })
+    window.scrollTo({ top: 0 });
   }, []);
 
   const onLogout = () => {
