@@ -5,6 +5,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { toast, Bounce, ToastContainer } from "material-react-toastify";
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+
 import Summary from "@/components/Summary";
 import Header from "@/components/Header";
 import BookSelector from "@/components/BookSelector";
@@ -32,6 +35,8 @@ import {
   StyledBookSelectorContainer,
   StyledAudioOverviewContainer,
   StyledSelectContainer,
+  StyledToggleContainer,
+  StyledToggleItemContainer,
   StyledBackContainer,
   StyledSelectGroupContainer,
   StyledFileImporterContainer,
@@ -75,6 +80,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
   };
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isImport, setIsImport] = useState(false);
 
   const [activeBookInfo, setActiveBookInfo] = useState<BookType | null>(null);
   const [activeSubBook, setActiveSubBook] = useState<SubBookInfoType>(locationState?.subBookInfo);
@@ -352,6 +358,38 @@ function AudioOverview(props: AudioOverviewPropsType) {
           selectedBook={selectedBook}
         />
       </StyledBookSelectorContainer>
+    )
+  };
+
+  // Handle Toggle (Database/Import)
+  const handleToggle = (value: boolean) => {
+    setIsImport(value);
+    setTableRows([]);
+  };
+
+  const _renderToggle = () => {
+    return (
+      <StyledToggleContainer>
+        <StyledToggleItemContainer
+          active={!isImport ? 'true' : 'false'}
+          onClick={() => handleToggle(false)}
+        >
+          <CloudDownloadIcon />
+          <Text fontFamily="'Baloo Da 2'">
+            Database
+          </Text>
+        </StyledToggleItemContainer>
+
+        <StyledToggleItemContainer
+          active={isImport ? 'true' : 'false'}
+          onClick={() => handleToggle(true)}
+        >
+          <CloudUploadIcon />
+          <Text fontFamily="'Baloo Da 2'">
+            Import
+          </Text>
+        </StyledToggleItemContainer>
+      </StyledToggleContainer>
     )
   };
 
@@ -752,6 +790,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   const _renderSummary = () => {
     return (
+      !isImport &&
       <Summary
         currentUser={props.currentUser}
         currentBook={props.currentBook}
@@ -787,6 +826,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   const _renderAudioImporter = () => {
     return (
+      isImport &&
       <StyledFileImporterContainer>
         <Text color="#155D74" fontFamily="'Baloo Da 2'" >
           Select Audio File:
@@ -919,6 +959,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   const _renderEDLImporter = () => {
     return (
+      isImport &&
       <StyledFileImporterContainer>
         <Text color="#155D74" fontFamily="'Baloo Da 2'">
           Select EDL File:
@@ -1009,6 +1050,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
 
   const _renderButtonGroup = () => {
     return (
+      isImport &&
       <StyledButtonGroupContainer>
         <StyledButton isdisable={edlFile ? 'false' : 'true'}>
           <Button
@@ -1130,6 +1172,8 @@ function AudioOverview(props: AudioOverviewPropsType) {
         <Tools tools={TOOLS} />
 
         {_renderBookSelector()}
+
+        {_renderToggle()}
 
         {_renderDetailSelector()}
 

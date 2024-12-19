@@ -18,6 +18,30 @@ const StyledBookSelectorContainer = styled(Box) ({
   margin: "20px 40px",
 });
 
+const StyledToggleContainer = styled(Box) ({
+  display: 'flex',
+  alignItems: 'center',
+  margin: '50px 40px 20px 40px',
+});
+
+const StyledToggleItemContainer = styled(Box)<{active: string}>(({active}) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '120px',
+  padding: '5px',
+  boxSizing: 'border-box',
+  border: '1px solid #474747',
+  backgroundColor: active == 'true' ? '#1B7695' : '#F0F5FB',
+  color: active == 'true' ? '#FFF' : '#474747',
+  cursor: 'pointer',
+
+  '& .MuiSvgIcon-root': {
+    fill: active == 'true' ? '#FFF' : '#474747',
+    marginRight: '10px',
+  }
+}));
+
 const StyledSelectContainer = styled(Box) ({
   margin: '20px 40px',
   display: 'flex',
@@ -205,6 +229,8 @@ export {
   StyledSelectContainer,
   StyledBackContainer,
   StyledSelectGroupContainer,
+  StyledToggleContainer,
+  StyledToggleItemContainer,
   StyledAudioOverviewContainer,
   StyledFileImporterContainer,
   StyledButtonGroupContainer,
