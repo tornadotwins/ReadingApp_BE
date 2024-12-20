@@ -14,11 +14,14 @@ import BookSelector from "@/components/BookSelector";
 import TitleBlock from "@/components/IntroBlock/TitleBlock";
 import TextBlock from "@/components/IntroBlock/TextBlock";
 import ImageBlock from "@/components/IntroBlock/ImageBlock";
+// import CollapsibleBlock from "@/components/IntroBlock/CollapsibleBlock";
 import useOrientation from "@/hooks/useOrientation";
 
 import { AppStateType } from "@/reducers/types";
 import { SubBookInfoType } from "../BookOverview/types";
 import {
+  BlockType,
+  ImageValType,
   IntroOverviewPropsType,
   SelectOptionType,
 } from "./types";
@@ -45,7 +48,6 @@ import {
   StyledBlockGroup,
 } from "./styles";
 import { getLanguageFromLanguageCode } from "@/utils";
-import CollapsibleBlock from "@/components/IntroBlock/CollapsibleBlock";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -64,6 +66,8 @@ function IntroOverview(props: IntroOverviewPropsType) {
   const [isPublished, setIsPublished] = useState(false);
 
   const [showPreview, setShowPreview] = useState(false);
+
+  const [blocks, setBlocks] = useState<BlockType[]>([]);
 
   const isPortrait = useOrientation();
   const navigate = useNavigate();
@@ -216,6 +220,24 @@ function IntroOverview(props: IntroOverviewPropsType) {
     )
   }
 
+  // Add Block
+  const handleAddBlock = (type: 'title' | 'text' | 'image' | 'collapsible') => {
+    const id = `${type}-${Date.now()}`;
+    const newBlock: BlockType = {
+      id,
+      type: type,
+      value: type == 'image' ? { image: '', alt: '' } : ''
+    };
+
+    setBlocks([...blocks, newBlock]);
+  }
+
+  // Delete a block
+  const handleDeleteBlock = (id: string) => {
+    const newBlocks = blocks.filter(block => block.id !== id);
+    setBlocks(newBlocks);
+  }
+
   // Render Intro Controller Button Group
   const _renderIntroControlButtonGroup = () => {
     return (
@@ -223,29 +245,29 @@ function IntroOverview(props: IntroOverviewPropsType) {
         <StyledButtonGroupContainer>
           <StyledIntroControlButtonContainer>
             <Button
-              label="Add Text"
-              onClick={() => { }}
+              label="Add Title"
+              onClick={() => handleAddBlock('title')}
             />
           </StyledIntroControlButtonContainer>
 
           <StyledIntroControlButtonContainer>
             <Button
-              label="Add Title"
-              onClick={() => { }}
+              label="Add Text"
+              onClick={() => handleAddBlock('text')}
             />
           </StyledIntroControlButtonContainer>
 
           <StyledIntroControlButtonContainer>
             <Button
               label="Add Image"
-              onClick={() => { }}
+              onClick={() => handleAddBlock('image')}
             />
           </StyledIntroControlButtonContainer>
 
           <StyledIntroControlButtonContainer>
             <Button
               label="Add Collapsible"
-              onClick={() => { }}
+              onClick={() => handleAddBlock('collapsible')}
             />
           </StyledIntroControlButtonContainer>
         </StyledButtonGroupContainer>
@@ -260,39 +282,102 @@ function IntroOverview(props: IntroOverviewPropsType) {
     )
   }
 
+  const handleInputChange = (id: string, value: string) => {
+    console.log(id, value)
+    setBlocks(blocks.map(block => block.id == id ? { ...block, value } : block));
+  }
+
+  const updateImageBlock = (id: string, newData: object) => {
+    console.log(newData)
+    setBlocks((prevBlocks) =>
+      prevBlocks.map((block) =>
+        block.id === id ?
+          {
+            ...block,
+            value: { ...(block.value as ImageValType), ...newData }
+          } :
+          block
+      )
+    );
+  };
+
+  // const _renderBlocks = () => {
+  //   return (
+  //     <StyledBlockGroup>
+  //       <TitleBlock
+  //         language={getLanguageFromLanguageCode(selectedLanguage)}
+  //         inputVal=""
+
+  //         onInputChange={() => { }}
+  //         onDelete={() => { }}
+  //       />
+
+  //       <TextBlock
+  //         language={getLanguageFromLanguageCode(selectedLanguage)}
+  //         inputVal=""
+
+  //         onInputChange={() => { }}
+  //         onDelete={() => { }}
+  //       />
+
+  //       <ImageBlock
+  //         image=""
+  //         alt=""
+
+  //         onImageInputChange={() => { }}
+  //         onAltInputChange={() => { }}
+  //         onDelete={() => { }}
+  //       />
+
+  //       <CollapsibleBlock
+  //         language={getLanguageFromLanguageCode(selectedLanguage)}
+
+  //         onDelete={() => { }}
+  //       />
+  //     </StyledBlockGroup>
+  //   )
+  // }
+
   const _renderBlocks = () => {
     return (
       <StyledBlockGroup>
-        <TitleBlock
-          language={getLanguageFromLanguageCode(selectedLanguage)}
-          inputVal=""
-
-          onInputChange={() => { }}
-          onDelete={() => { }}
-        />
-
-        <TextBlock
-          language={getLanguageFromLanguageCode(selectedLanguage)}
-          inputVal=""
-
-          onInputChange={() => { }}
-          onDelete={() => { }}
-        />
-
-        <ImageBlock
-          image=""
-          alt=""
-
-          onImageInputChange={() => { }}
-          onAltInputChange={() => { }}
-          onDelete={() => { }}
-        />
-
-        <CollapsibleBlock
-          language={getLanguageFromLanguageCode(selectedLanguage)}
-          
-          onDelete={() => { }}
-        />
+        {blocks.map((block) => {
+          if (block.type === "title") {
+            return (
+              <TitleBlock
+                key={block.id}
+                language={getLanguageFromLanguageCode(selectedLanguage)}
+                inputVal={block.value as string}
+                onInputChange={(val) => handleInputChange(block.id, val)}
+                onDelete={() => handleDeleteBlock(block.id)}
+              />
+            );
+          }
+          if (block.type === "text") {
+            return (
+              <TextBlock
+                key={block.id}
+                language={getLanguageFromLanguageCode(selectedLanguage)}
+                inputVal={block.value as string}
+                onInputChange={(val) => handleInputChange(block.id, val)}
+                onDelete={() => handleDeleteBlock(block.id)}
+              />
+            );
+          }
+          if (block.type === "image") {
+            return (
+              <ImageBlock
+                key={block.id}
+                image={((block.value) as ImageValType).image}
+                alt={((block.value) as ImageValType).alt}
+                onImageInputChange={(val) => updateImageBlock(block.id, { image: val })}
+                onAltInputChange={(val) => updateImageBlock(block.id, { alt: val })}
+                onDelete={() => handleDeleteBlock(block.id)}
+              />
+            );
+          }
+          return null;
+        })}
       </StyledBlockGroup>
     )
   }

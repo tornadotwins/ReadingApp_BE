@@ -83,7 +83,7 @@ const StyledInputContainer = styled(Box)<{hastextarea?: string}>(({hastextarea})
   fontSize: '16px',
   lineHeight: '24px',
   fontWeight: '500',
-  color: '#155D74',
+  color: '#000',
   outline: 'none',
 
   '& .MuiBox-root': {
@@ -101,11 +101,15 @@ const StyledInputContainer = styled(Box)<{hastextarea?: string}>(({hastextarea})
   },
 
   '& .MuiFormControl-root': {
-    width: '100%',
+    width: '100% !important',
     borderRadius: '4px',
 
     '& .MuiInputBase-input': {
       fontFamily: 'Inter',
+    },
+
+    "& .MuiInputBase-root.Mui-disabled": {
+      color: "rgba(0, 0, 0, 0.6)" // (default alpha is 0.38)
     }
   },
 
@@ -118,6 +122,17 @@ const StyledSubTitleContainer = styled(Box)({
   margin: '20px 0px 10px 0px'
 });
 
+const StyledImagePreview = styled(Box)({
+  marginTop: '16px',
+  '& img': {
+    maxWidth: '100%', // Ensure the image scales appropriately
+    maxHeight: '200px', // Limit the height of the preview
+    objectFit: 'contain', // Maintain aspect ratio
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+  }
+})
+
 export {
   StyledContainer,
   StyledBlockHeaderContainer,
@@ -127,4 +142,5 @@ export {
   StyledLabel,
   StyledInputContainer,
   StyledSubTitleContainer,
+  StyledImagePreview,
 }
