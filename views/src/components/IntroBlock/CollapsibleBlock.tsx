@@ -14,7 +14,11 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
     <StyledContainer>
       <BlockHeader
         title='Collapsible Block'
+        blockIndex={props.blockIndex}
+        
         onDelete={props.onDelete}
+        onMoveUp={props.onMoveUp}
+        onMoveDown={props.onMoveDown}
       />
 
       <StyledSubTitleContainer>

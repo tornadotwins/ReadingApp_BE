@@ -29,7 +29,14 @@ function ImageBlock(props: ImageBlockPropsType) {
 
   return (
     <StyledContainer>
-      <BlockHeader title="Image Block" onDelete={props.onDelete} />
+      <BlockHeader
+        title="Image Block"
+        blockIndex={props.blockIndex}
+
+        onDelete={props.onDelete}
+        onMoveUp={props.onMoveUp}
+        onMoveDown={props.onMoveDown}
+      />
 
       <StyledContentRow>
         <StyledLabel>
@@ -49,7 +56,7 @@ function ImageBlock(props: ImageBlockPropsType) {
             value={imageUrl} // Display the image URL
             placeholder="Image URL"
             disable
-            
+
             onChange={() => { }}
           />
 

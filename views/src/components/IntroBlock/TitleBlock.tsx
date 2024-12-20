@@ -13,7 +13,11 @@ function TitleBlock(props: TitleBlockPropsType) {
     <StyledContainer>
       <BlockHeader
         title='Title Block'
+        blockIndex={props.blockIndex}
+
         onDelete={props.onDelete}
+        onMoveUp={props.onMoveUp}
+        onMoveDown={props.onMoveDown}
       />
 
       <StyledContentRow>

@@ -283,12 +283,10 @@ function IntroOverview(props: IntroOverviewPropsType) {
   }
 
   const handleInputChange = (id: string, value: string) => {
-    console.log(id, value)
     setBlocks(blocks.map(block => block.id == id ? { ...block, value } : block));
   }
 
   const updateImageBlock = (id: string, newData: object) => {
-    console.log(newData)
     setBlocks((prevBlocks) =>
       prevBlocks.map((block) =>
         block.id === id ?
@@ -338,18 +336,35 @@ function IntroOverview(props: IntroOverviewPropsType) {
   //   )
   // }
 
+  const reorderBlocks = (index: number, direction: 'up' | 'down') => {
+    setBlocks((prevBlocks) => {
+      const newBlocks = [...prevBlocks];
+      if (direction === "up" && index > 0) {
+        [newBlocks[index], newBlocks[index - 1]] = [newBlocks[index - 1], newBlocks[index]];
+      }
+      if (direction === "down" && index < newBlocks.length - 1) {
+        [newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]];
+      }
+      return newBlocks;
+    });
+  }
+
   const _renderBlocks = () => {
     return (
       <StyledBlockGroup>
-        {blocks.map((block) => {
+        {blocks.map((block, index) => {
           if (block.type === "title") {
             return (
               <TitleBlock
                 key={block.id}
                 language={getLanguageFromLanguageCode(selectedLanguage)}
                 inputVal={block.value as string}
+                blockIndex={index}
+
                 onInputChange={(val) => handleInputChange(block.id, val)}
                 onDelete={() => handleDeleteBlock(block.id)}
+                onMoveUp={() => reorderBlocks(index, "up")}
+                onMoveDown={() => reorderBlocks(index, "down")}
               />
             );
           }
@@ -359,8 +374,12 @@ function IntroOverview(props: IntroOverviewPropsType) {
                 key={block.id}
                 language={getLanguageFromLanguageCode(selectedLanguage)}
                 inputVal={block.value as string}
+                blockIndex={index}
+                
                 onInputChange={(val) => handleInputChange(block.id, val)}
                 onDelete={() => handleDeleteBlock(block.id)}
+                onMoveUp={() => reorderBlocks(index, "up")}
+                onMoveDown={() => reorderBlocks(index, "down")}
               />
             );
           }
@@ -370,9 +389,13 @@ function IntroOverview(props: IntroOverviewPropsType) {
                 key={block.id}
                 image={((block.value) as ImageValType).image}
                 alt={((block.value) as ImageValType).alt}
+                blockIndex={index}
+
                 onImageInputChange={(val) => updateImageBlock(block.id, { image: val })}
                 onAltInputChange={(val) => updateImageBlock(block.id, { alt: val })}
                 onDelete={() => handleDeleteBlock(block.id)}
+                onMoveUp={() => reorderBlocks(index, "up")}
+                onMoveDown={() => reorderBlocks(index, "down")}
               />
             );
           }
