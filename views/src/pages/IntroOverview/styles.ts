@@ -175,6 +175,15 @@ const StyledPreviewControlButtonContainer = styled(Box)({
   }
 });
 
+const StyledBlockGroup = styled(Box)({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  margin: '20px 40px',
+  boxSizing: 'border-box',
+});
+
 export {
   StyledContainer,
   StyledIntroOverviewContainer,
@@ -187,4 +196,5 @@ export {
   StyledButtonGroupContainer,
   StyledIntroControlButtonContainer,
   StyledPreviewControlButtonContainer,
+  StyledBlockGroup,
 }

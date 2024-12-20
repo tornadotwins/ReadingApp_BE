@@ -17,6 +17,7 @@ import Switch from './Switch';
 import UserTablePanel from './UserTablePanel';
 import TablePanel from './TablePanel';
 import Text from './Text';
+import TextArea from './TextArea';
 import Navbar from './Navbar';
 import CustomToast from './CustomToast';
 
@@ -40,6 +41,7 @@ export {
   UserTablePanel,
   TablePanel,
   Text,
+  TextArea,
   Navbar,
   CustomToast,
 };

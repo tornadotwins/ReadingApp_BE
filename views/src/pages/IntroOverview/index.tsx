@@ -39,7 +39,11 @@ import {
   StyledButtonGroupContainer,
   StyledIntroControlButtonContainer,
   StyledPreviewControlButtonContainer,
+  StyledBlockGroup,
 } from "./styles";
+import TitleBlock from "@/components/IntroBlock/TitleBlock";
+import TextBlock from "@/components/IntroBlock/TextBlock";
+import { getLanguageFromLanguageCode } from "@/utils";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -254,6 +258,26 @@ function IntroOverview(props: IntroOverviewPropsType) {
     )
   }
 
+  const _renderBlocks = () => {
+    return (
+      <StyledBlockGroup>
+        <TitleBlock
+          language={getLanguageFromLanguageCode(selectedLanguage)}
+
+          onInputChange={() => { }}
+          onDelete={() => { }}
+        />
+
+        <TextBlock
+          language={getLanguageFromLanguageCode(selectedLanguage)}
+
+          onInputChange={() => { }}
+          onDelete={() => { }}
+        />
+      </StyledBlockGroup>
+    )
+  }
+
   const _renderBody = () => {
     return (
       <StyledIntroOverviewContainer>
@@ -266,6 +290,8 @@ function IntroOverview(props: IntroOverviewPropsType) {
         {_renderStatusManager()}
 
         {_renderIntroControlButtonGroup()}
+
+        {_renderBlocks()}
       </StyledIntroOverviewContainer>
     )
   }
