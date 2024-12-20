@@ -112,7 +112,11 @@ const StyledInputContainer = styled(Box)<{hastextarea?: string}>(({hastextarea})
   '& input[type="file"]': {
     cursor: 'pointer',
   }
-}))
+}));
+
+const StyledSubTitleContainer = styled(Box)({
+  margin: '20px 0px 10px 0px'
+});
 
 export {
   StyledContainer,
@@ -121,5 +125,6 @@ export {
   StyledBlockControlButtonContainer,
   StyledContentRow,
   StyledLabel,
-  StyledInputContainer
+  StyledInputContainer,
+  StyledSubTitleContainer,
 }

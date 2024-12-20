@@ -45,6 +45,7 @@ import {
   StyledBlockGroup,
 } from "./styles";
 import { getLanguageFromLanguageCode } from "@/utils";
+import CollapsibleBlock from "@/components/IntroBlock/CollapsibleBlock";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -284,6 +285,12 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
           onImageInputChange={() => { }}
           onAltInputChange={() => { }}
+          onDelete={() => { }}
+        />
+
+        <CollapsibleBlock
+          language={getLanguageFromLanguageCode(selectedLanguage)}
+          
           onDelete={() => { }}
         />
       </StyledBlockGroup>

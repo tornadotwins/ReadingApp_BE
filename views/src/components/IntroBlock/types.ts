@@ -24,6 +24,8 @@ type ImageBlockPropsType = {
 }
 
 type CollapsibleBlockPropsType = {
+  language: string;
+  
   onDelete: () => void;
 }
 
