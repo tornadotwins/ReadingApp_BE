@@ -9,6 +9,7 @@ type InputType = {
   placeholder?: string;
   error?: string;
   name?: string;
+  disable?: boolean;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;

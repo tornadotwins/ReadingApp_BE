@@ -41,7 +41,7 @@ function TitleBlock(props: TextBlockPropsType) {
         <StyledInputContainer hastextarea="true">
           <TextArea
             placeholder="Enter Text"
-            value={'hello'}
+            value={props.inputVal}
             minLength={3}
 
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => props.onInputChange(e.target.value)}

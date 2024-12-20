@@ -22,6 +22,8 @@ function Input(props: InputType) {
           value={props.value}
           inputRef={props.reference}
           placeholder={props.placeholder}
+          disabled={props.disable}
+
           onKeyDown={handleKeyDown}
           onChange={props.onChange}
         />

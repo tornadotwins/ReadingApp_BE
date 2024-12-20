@@ -11,6 +11,9 @@ import {
 import Header from "@/components/Header";
 import Tools from "@/components/Tools";
 import BookSelector from "@/components/BookSelector";
+import TitleBlock from "@/components/IntroBlock/TitleBlock";
+import TextBlock from "@/components/IntroBlock/TextBlock";
+import ImageBlock from "@/components/IntroBlock/ImageBlock";
 import useOrientation from "@/hooks/useOrientation";
 
 import { AppStateType } from "@/reducers/types";
@@ -41,8 +44,6 @@ import {
   StyledPreviewControlButtonContainer,
   StyledBlockGroup,
 } from "./styles";
-import TitleBlock from "@/components/IntroBlock/TitleBlock";
-import TextBlock from "@/components/IntroBlock/TextBlock";
 import { getLanguageFromLanguageCode } from "@/utils";
 
 const TOOLS = [
@@ -263,6 +264,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
       <StyledBlockGroup>
         <TitleBlock
           language={getLanguageFromLanguageCode(selectedLanguage)}
+          inputVal=""
 
           onInputChange={() => { }}
           onDelete={() => { }}
@@ -270,8 +272,18 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
         <TextBlock
           language={getLanguageFromLanguageCode(selectedLanguage)}
+          inputVal=""
 
           onInputChange={() => { }}
+          onDelete={() => { }}
+        />
+
+        <ImageBlock
+          image=""
+          alt=""
+
+          onImageInputChange={() => { }}
+          onAltInputChange={() => { }}
           onDelete={() => { }}
         />
       </StyledBlockGroup>

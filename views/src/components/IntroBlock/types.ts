@@ -1,5 +1,6 @@
 type TitleBlockPropsType = {
   language: string;
+  inputVal: string;
 
   onInputChange: (val: string) => void;
   onDelete: () => void;
@@ -7,12 +8,18 @@ type TitleBlockPropsType = {
 
 type TextBlockPropsType = {
   language: string;
+  inputVal: string;
 
   onInputChange: (val: string) => void;
   onDelete: () => void;
 }
 
 type ImageBlockPropsType = {
+  image: string;
+  alt: string;
+
+  onImageInputChange: (val: string) => void;
+  onAltInputChange: (val: string) => void;
   onDelete: () => void;
 }
 

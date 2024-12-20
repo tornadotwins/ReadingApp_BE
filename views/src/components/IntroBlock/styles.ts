@@ -50,13 +50,22 @@ const StyledBlockControlButtonContainer = styled(Box) ({
 
 const StyledContentRow = styled(Box)({
   display: 'flex',
-  alignItems: 'start'
+  alignItems: 'start',
+  marginTop: '10px',
 });
 
 const StyledLabel = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   marginRight: '15px',
+  minWidth: '100px',
+
+  '& .MuiBox-root': {
+    clear: 'both',
+    display: 'inline-block',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap'
+  },
 
   '& > .MuiBox-root: first-of-type': {
     marginRight: '5px'
@@ -64,6 +73,7 @@ const StyledLabel = styled(Box)({
 });
 
 const StyledInputContainer = styled(Box)<{hastextarea?: string}>(({hastextarea}) => ({
+  display: 'flex',
   width: '100%',
   boxSizing: 'border-box',
   border: hastextarea == 'true' ? 'none' : '1px solid #155D74',
@@ -97,6 +107,10 @@ const StyledInputContainer = styled(Box)<{hastextarea?: string}>(({hastextarea})
     '& .MuiInputBase-input': {
       fontFamily: 'Inter',
     }
+  },
+
+  '& input[type="file"]': {
+    cursor: 'pointer',
   }
 }))
 
