@@ -11,6 +11,7 @@ enum Pages {
   ChapterOverview,
   AppTextOverview,
   AudioOverview,
+  IntroOverview,
   Page2,
   Page3,
   Page4,

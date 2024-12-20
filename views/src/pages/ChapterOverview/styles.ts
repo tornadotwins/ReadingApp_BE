@@ -184,7 +184,7 @@ const StyledExportButtonContainer = styled(Box) <{isdisable: string}> (({isdisab
 
     '&:hover': {
       backgroundColor: isdisable == 'true' ? '#FFAA5D' : '#EE994C',
-  },
+    },
   }
 }));
 

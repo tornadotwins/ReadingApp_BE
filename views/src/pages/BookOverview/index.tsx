@@ -199,6 +199,8 @@ const BookOverview = (props: BookOverviewPropsType) => {
 
     const chapterInfo = subBookInfo?.chapterInfos.find((chapterInfo: ChapterInfoType) => chapterInfo.chapterId == chapterId);
 
+    const chapterNumber = chapterInfo?.chapterNumber || 0;
+
     const passData = {
       chapterId,
       isImport,
@@ -207,7 +209,9 @@ const BookOverview = (props: BookOverviewPropsType) => {
       languages: languages
     };
 
-    navigate('/admin/chapteroverview', { state: passData });
+    chapterNumber ?
+      navigate('/admin/chapteroverview', { state: passData }) :
+      navigate('/admin/introoverview', { state: passData });
   }
 
   const moveToAppTextoverview = () => {
