@@ -131,7 +131,47 @@ const StyledImagePreview = styled(Box)({
     border: '1px solid #ccc',
     borderRadius: '4px',
   }
-})
+});
+
+const StyledCollapsibleButtonGroup = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  boxSizing: 'border-box',
+});
+
+const StyledCollapsibleAddButtonContainer = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+});
+
+const StyledCollapsibleControlButtonContainer = styled(Box) ({
+  display: 'flex',
+  alignItems: 'center',
+});
+
+const StyledCollapsibleButtonContainer = styled(Box) ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  boxSizing: 'border-box',
+  border: '1px solid #155D74',
+  borderRadius: '4px',
+  marginRight: '5px',
+
+  '& .MuiBox-root': {
+    textTransform: 'capitalize'
+  },
+
+  '&:hover': {
+    cursor: 'pointer',
+    backgroundColor: '#155D74',
+
+    '& .MuiBox-root': {
+      color: '#FFF !important'
+    }
+  },
+});
 
 export {
   StyledContainer,
@@ -143,4 +183,8 @@ export {
   StyledInputContainer,
   StyledSubTitleContainer,
   StyledImagePreview,
+  StyledCollapsibleButtonGroup,
+  StyledCollapsibleAddButtonContainer,
+  StyledCollapsibleControlButtonContainer,
+  StyledCollapsibleButtonContainer,
 }

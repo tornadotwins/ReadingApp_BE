@@ -23,7 +23,7 @@ function SubBookText(props: SubBookTextPropsType) {
       <StyledSubBookContentContainer>
         <StyledSubBookIntroChapterContainer>
           {
-            props.subBook && !!props.subBook.noChapter && props.subBook?.chapterInfos[0]?.chapterNumber == 0 &&
+            props.subBook && !props.subBook.noChapter && props.subBook?.chapterInfos[0]?.chapterNumber == 0 &&
             <ChapterSquare
               chapterInfo={props.subBook.chapterInfos[0]}
               isCompleted={props.subBook.chapterInfos[0]?.chapterIsCompleted?.[props.languageCode]}
@@ -38,6 +38,7 @@ function SubBookText(props: SubBookTextPropsType) {
           <StyledSubBookChapterGroupContainer>
             {
               props.subBook && props.subBook.chapterInfos?.map((chapterInfo: ChapterInfoType, index: number) => (
+                chapterInfo?.chapterNumber !== 0 &&
                 <ChapterSquare
                   key={index}
                   subBookInfo={props.subBook}

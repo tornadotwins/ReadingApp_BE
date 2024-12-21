@@ -24,10 +24,7 @@ function BlockHeader(props: BlockHeaderPropsType) {
       </Text>
 
       <StyledBlockControlContainer>
-        <StyledBlockControlButtonContainer onClick={() => {
-          props.onMoveUp(props.blockIndex)
-          console.log(props.blockIndex)
-        }}>
+        <StyledBlockControlButtonContainer onClick={() => props.onMoveUp(props.blockIndex)}>
           <ArrowUpwardIcon />
         </StyledBlockControlButtonContainer>
 

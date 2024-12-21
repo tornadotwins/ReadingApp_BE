@@ -48,6 +48,7 @@ import {
   StyledBlockGroup,
 } from "./styles";
 import { getLanguageFromLanguageCode } from "@/utils";
+import CollapsibleBlock from "@/components/IntroBlock/CollapsibleBlock";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -286,7 +287,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
     setBlocks(blocks.map(block => block.id == id ? { ...block, value } : block));
   }
 
-  const updateImageBlock = (id: string, newData: object) => {
+  const handleUpdateImageBlock = (id: string, newData: object) => {
     setBlocks((prevBlocks) =>
       prevBlocks.map((block) =>
         block.id === id ?
@@ -336,7 +337,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
   //   )
   // }
 
-  const reorderBlocks = (index: number, direction: 'up' | 'down') => {
+  const handleReorderBlocks = (index: number, direction: 'up' | 'down') => {
     setBlocks((prevBlocks) => {
       const newBlocks = [...prevBlocks];
       if (direction === "up" && index > 0) {
@@ -363,8 +364,8 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
                 onInputChange={(val) => handleInputChange(block.id, val)}
                 onDelete={() => handleDeleteBlock(block.id)}
-                onMoveUp={() => reorderBlocks(index, "up")}
-                onMoveDown={() => reorderBlocks(index, "down")}
+                onMoveUp={() => handleReorderBlocks(index, "up")}
+                onMoveDown={() => handleReorderBlocks(index, "down")}
               />
             );
           }
@@ -378,8 +379,8 @@ function IntroOverview(props: IntroOverviewPropsType) {
                 
                 onInputChange={(val) => handleInputChange(block.id, val)}
                 onDelete={() => handleDeleteBlock(block.id)}
-                onMoveUp={() => reorderBlocks(index, "up")}
-                onMoveDown={() => reorderBlocks(index, "down")}
+                onMoveUp={() => handleReorderBlocks(index, "up")}
+                onMoveDown={() => handleReorderBlocks(index, "down")}
               />
             );
           }
@@ -391,16 +392,24 @@ function IntroOverview(props: IntroOverviewPropsType) {
                 alt={((block.value) as ImageValType).alt}
                 blockIndex={index}
 
-                onImageInputChange={(val) => updateImageBlock(block.id, { image: val })}
-                onAltInputChange={(val) => updateImageBlock(block.id, { alt: val })}
+                onImageInputChange={(val) => handleUpdateImageBlock(block.id, { image: val })}
+                onAltInputChange={(val) => handleUpdateImageBlock(block.id, { alt: val })}
                 onDelete={() => handleDeleteBlock(block.id)}
-                onMoveUp={() => reorderBlocks(index, "up")}
-                onMoveDown={() => reorderBlocks(index, "down")}
+                onMoveUp={() => handleReorderBlocks(index, "up")}
+                onMoveDown={() => handleReorderBlocks(index, "down")}
               />
             );
           }
           return null;
         })}
+        <CollapsibleBlock
+          language={getLanguageFromLanguageCode(selectedLanguage)}
+          blockIndex={blocks.length}
+
+          onDelete={() => handleDeleteBlock}
+          onMoveUp={() => { }}
+          onMoveDown={() => { }}
+        />
       </StyledBlockGroup>
     )
   }

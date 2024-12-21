@@ -25,7 +25,7 @@ function TextArea(props: TextAreaType) {
           type={props.type}
           value={props.value}
           minRows={props.minLength}
-          inputRef={props.reference}
+          inputref={props.reference}
           placeholder={props.placeholder}
           
           onKeyDown={handleKeyDown}

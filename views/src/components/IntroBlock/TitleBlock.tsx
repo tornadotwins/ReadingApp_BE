@@ -47,6 +47,7 @@ function TitleBlock(props: TitleBlockPropsType) {
             type="text"
             placeholder="Enter Title"
             value={props.inputVal}
+            
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => props.onInputChange(e.target.value)}
           />
         </StyledInputContainer>
