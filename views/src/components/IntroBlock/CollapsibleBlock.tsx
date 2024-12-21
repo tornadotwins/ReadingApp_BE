@@ -1,8 +1,9 @@
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { useState, } from 'react';
 
 import { Button, Input, Text } from "../Base";
 import BlockHeader from "./BlockHeader";
+import TextBlock from "./TextBlock";
+import ImageBlock from "./ImageBlock";
 import {
   StyledContainer,
   StyledContentRow,
@@ -12,13 +13,15 @@ import {
   StyledCollapsibleButtonContainer,
   StyledCollapsibleButtonGroup,
   StyledCollapsibleAddButtonContainer,
-  StyledCollapsibleControlButtonContainer,
-  StyledBlockControlContainer,
-  StyledBlockControlButtonContainer,
+  StyledCollapsibleBlockGroup,
 } from "./styles";
+
 import { CollapsibleBlockPropsType } from "./types";
+import { BlockType, ImageValType } from '@/pages/IntroOverview/types';
 
 function CollapsibleBlock(props: CollapsibleBlockPropsType) {
+  const [blocks, setBlocks] = useState<BlockType[]>([]);
+
   const _renderHeader = () => {
     return (
       <BlockHeader
@@ -48,6 +51,24 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
     )
   }
 
+  // Add Block
+  const handleAddBlock = (type: 'title' | 'text' | 'image' | 'collapsible') => {
+    const id = `${type}-${Date.now()}`;
+    const newBlock: BlockType = {
+      id,
+      type: type,
+      value: type == 'image' ? { image: '', alt: '' } : ''
+    };
+
+    setBlocks([...blocks, newBlock]);
+  }
+
+  // Delete a block
+  const handleDeleteBlock = (id: string) => {
+    const newBlocks = blocks.filter(block => block.id !== id);
+    setBlocks(newBlocks);
+  }
+
   const _renderButtonGroup = () => {
     return (
       <StyledCollapsibleButtonGroup>
@@ -55,34 +76,89 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
           <StyledCollapsibleButtonContainer>
             <Button
               label="Add Text"
-              onClick={() => { }}
+              onClick={() => handleAddBlock('text')}
             />
           </StyledCollapsibleButtonContainer>
 
           <StyledCollapsibleButtonContainer>
             <Button
               label="Add Image"
-              onClick={() => { }}
+              onClick={() => handleAddBlock('image')}
             />
           </StyledCollapsibleButtonContainer>
         </StyledCollapsibleAddButtonContainer>
-
-        <StyledCollapsibleControlButtonContainer>
-          <StyledBlockControlContainer>
-            <StyledBlockControlButtonContainer onClick={() => props.onMoveUp(props.blockIndex)}>
-              <ArrowUpwardIcon />
-            </StyledBlockControlButtonContainer>
-
-            <StyledBlockControlButtonContainer onClick={() => props.onMoveDown(props.blockIndex)}>
-              <ArrowDownwardIcon />
-            </StyledBlockControlButtonContainer>
-
-            <StyledBlockControlButtonContainer onClick={props.onDelete}>
-              <Text>Delete</Text>
-            </StyledBlockControlButtonContainer>
-          </StyledBlockControlContainer>
-        </StyledCollapsibleControlButtonContainer>
       </StyledCollapsibleButtonGroup>
+    )
+  }
+
+  const handleInputChange = (id: string, value: string) => {
+    setBlocks(blocks.map(block => block.id == id ? { ...block, value } : block));
+  }
+
+  const handleUpdateImageBlock = (id: string, newData: object) => {
+    setBlocks((prevBlocks) =>
+      prevBlocks.map((block) =>
+        block.id === id ?
+          {
+            ...block,
+            value: { ...(block.value as ImageValType), ...newData }
+          } :
+          block
+      )
+    );
+  };
+
+  const handleReorderBlocks = (index: number, direction: 'up' | 'down') => {
+    setBlocks((prevBlocks) => {
+      const newBlocks = [...prevBlocks];
+      if (direction === "up" && index > 0) {
+        [newBlocks[index], newBlocks[index - 1]] = [newBlocks[index - 1], newBlocks[index]];
+      }
+      if (direction === "down" && index < newBlocks.length - 1) {
+        [newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]];
+      }
+      return newBlocks;
+    });
+  }
+
+  const _renderBlocks = () => {
+    return (
+      <StyledCollapsibleBlockGroup>
+        {blocks.map((block, index) => {
+          if (block.type === "text") {
+            return (
+              <TextBlock
+                key={block.id}
+                language={props.language}
+                inputVal={block.value as string}
+                blockIndex={index}
+
+                onInputChange={(val) => handleInputChange(block.id, val)}
+                onDelete={() => handleDeleteBlock(block.id)}
+                onMoveUp={() => handleReorderBlocks(index, "up")}
+                onMoveDown={() => handleReorderBlocks(index, "down")}
+              />
+            );
+          }
+          if (block.type === "image") {
+            return (
+              <ImageBlock
+                key={block.id}
+                image={((block.value) as ImageValType).image}
+                alt={((block.value) as ImageValType).alt}
+                blockIndex={index}
+
+                onImageInputChange={(val) => handleUpdateImageBlock(block.id, { image: val })}
+                onAltInputChange={(val) => handleUpdateImageBlock(block.id, { alt: val })}
+                onDelete={() => handleDeleteBlock(block.id)}
+                onMoveUp={() => handleReorderBlocks(index, "up")}
+                onMoveDown={() => handleReorderBlocks(index, "down")}
+              />
+            );
+          }
+          return null;
+        })}
+      </StyledCollapsibleBlockGroup>
     )
   }
 
@@ -129,7 +205,7 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
 
       {_renderButtonGroup()}
 
-      
+      {_renderBlocks()}
     </StyledContainer>
   );
 }

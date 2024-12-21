@@ -145,11 +145,6 @@ const StyledCollapsibleAddButtonContainer = styled(Box)({
   alignItems: 'center',
 });
 
-const StyledCollapsibleControlButtonContainer = styled(Box) ({
-  display: 'flex',
-  alignItems: 'center',
-});
-
 const StyledCollapsibleButtonContainer = styled(Box) ({
   display: 'flex',
   alignItems: 'center',
@@ -173,6 +168,13 @@ const StyledCollapsibleButtonContainer = styled(Box) ({
   },
 });
 
+const StyledCollapsibleBlockGroup = styled(Box) ({
+  display: 'flex',
+  flexDirection: 'column',
+  boxSizing: 'border-box',
+  marginTop: '10px',
+});
+
 export {
   StyledContainer,
   StyledBlockHeaderContainer,
@@ -185,6 +187,6 @@ export {
   StyledImagePreview,
   StyledCollapsibleButtonGroup,
   StyledCollapsibleAddButtonContainer,
-  StyledCollapsibleControlButtonContainer,
   StyledCollapsibleButtonContainer,
+  StyledCollapsibleBlockGroup,
 }

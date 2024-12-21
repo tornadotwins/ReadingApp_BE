@@ -14,7 +14,7 @@ import BookSelector from "@/components/BookSelector";
 import TitleBlock from "@/components/IntroBlock/TitleBlock";
 import TextBlock from "@/components/IntroBlock/TextBlock";
 import ImageBlock from "@/components/IntroBlock/ImageBlock";
-// import CollapsibleBlock from "@/components/IntroBlock/CollapsibleBlock";
+import CollapsibleBlock from "@/components/IntroBlock/CollapsibleBlock";
 import useOrientation from "@/hooks/useOrientation";
 
 import { AppStateType } from "@/reducers/types";
@@ -48,7 +48,6 @@ import {
   StyledBlockGroup,
 } from "./styles";
 import { getLanguageFromLanguageCode } from "@/utils";
-import CollapsibleBlock from "@/components/IntroBlock/CollapsibleBlock";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
