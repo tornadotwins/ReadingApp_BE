@@ -1,4 +1,4 @@
-import { useState, } from 'react';
+import { useEffect, useState, } from 'react';
 
 import { Button, Input, Text } from "../Base";
 import BlockHeader from "./BlockHeader";
@@ -20,7 +20,15 @@ import { CollapsibleBlockPropsType } from "./types";
 import { BlockType, ImageValType } from '@/pages/IntroOverview/types';
 
 function CollapsibleBlock(props: CollapsibleBlockPropsType) {
-  const [blocks, setBlocks] = useState<BlockType[]>([]);
+  const [blocks, setBlocks] = useState<BlockType[]>([
+    { id: `title-${Date.now()}`, type: 'title', value: '' },
+  ]);
+  const [title, setTitle] = useState('');
+
+  useEffect(() => {
+    props.onChange(blocks)
+    // console.log(blocks)
+  }, [blocks]);
 
   const _renderHeader = () => {
     return (
@@ -52,7 +60,7 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
   }
 
   // Add Block
-  const handleAddBlock = (type: 'title' | 'text' | 'image' | 'collapsible') => {
+  const handleAddBlock = (type: 'text' | 'image') => {
     const id = `${type}-${Date.now()}`;
     const newBlock: BlockType = {
       id,
@@ -162,6 +170,11 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
     )
   }
 
+  const handleTitleChange = (title: string) => {
+    setTitle(title);
+    setBlocks(blocks.map(block => block.type == 'title' ? { ...block, value: title } : block));
+  }
+
   return (
     <StyledContainer>
       {_renderHeader()}
@@ -194,9 +207,9 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
           <Input
             type="text"
             placeholder="Enter Title"
-            value="hello"
+            value={title}
 
-            onChange={() => { }}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e.target.value)}
           />
         </StyledInputContainer>
       </StyledContentRow>

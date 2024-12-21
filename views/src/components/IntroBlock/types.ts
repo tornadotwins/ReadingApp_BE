@@ -1,3 +1,5 @@
+import { BlockType } from "@/pages/IntroOverview/types";
+
 type TitleBlockPropsType = {
   language: string;
   inputVal: string;
@@ -36,6 +38,7 @@ type CollapsibleBlockPropsType = {
   language: string;
   blockIndex: number
 
+  onChange: (val: BlockType[]) => void;
   onDelete: () => void;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;

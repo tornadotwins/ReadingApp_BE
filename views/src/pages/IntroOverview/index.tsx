@@ -21,6 +21,7 @@ import { AppStateType } from "@/reducers/types";
 import { SubBookInfoType } from "../BookOverview/types";
 import {
   BlockType,
+  CollapsibleValType,
   ImageValType,
   IntroOverviewPropsType,
   SelectOptionType,
@@ -282,6 +283,10 @@ function IntroOverview(props: IntroOverviewPropsType) {
     )
   }
 
+  useEffect(() => {
+    console.log(blocks)
+  }, [blocks]);
+
   const handleInputChange = (id: string, value: string) => {
     setBlocks(blocks.map(block => block.id == id ? { ...block, value } : block));
   }
@@ -299,42 +304,13 @@ function IntroOverview(props: IntroOverviewPropsType) {
     );
   };
 
-  // const _renderBlocks = () => {
-  //   return (
-  //     <StyledBlockGroup>
-  //       <TitleBlock
-  //         language={getLanguageFromLanguageCode(selectedLanguage)}
-  //         inputVal=""
-
-  //         onInputChange={() => { }}
-  //         onDelete={() => { }}
-  //       />
-
-  //       <TextBlock
-  //         language={getLanguageFromLanguageCode(selectedLanguage)}
-  //         inputVal=""
-
-  //         onInputChange={() => { }}
-  //         onDelete={() => { }}
-  //       />
-
-  //       <ImageBlock
-  //         image=""
-  //         alt=""
-
-  //         onImageInputChange={() => { }}
-  //         onAltInputChange={() => { }}
-  //         onDelete={() => { }}
-  //       />
-
-  //       <CollapsibleBlock
-  //         language={getLanguageFromLanguageCode(selectedLanguage)}
-
-  //         onDelete={() => { }}
-  //       />
-  //     </StyledBlockGroup>
-  //   )
-  // }
+  const handleCollapsibleBlockChange = (id: string, newValue: object) => {
+    setBlocks((prevBlocks) =>
+      prevBlocks.map(block =>
+        block.id == id ? { ...block, value: { ...block.value as CollapsibleValType, ...newValue } } : block
+      )
+    )
+  }
 
   const handleReorderBlocks = (index: number, direction: 'up' | 'down') => {
     setBlocks((prevBlocks) => {
@@ -353,62 +329,71 @@ function IntroOverview(props: IntroOverviewPropsType) {
     return (
       <StyledBlockGroup>
         {blocks.map((block, index) => {
-          if (block.type === "title") {
-            return (
-              <TitleBlock
-                key={block.id}
-                language={getLanguageFromLanguageCode(selectedLanguage)}
-                inputVal={block.value as string}
-                blockIndex={index}
+          switch (block.type) {
+            case 'title':
+              return (
+                <TitleBlock
+                  key={block.id}
+                  language={getLanguageFromLanguageCode(selectedLanguage)}
+                  inputVal={block.value as string}
+                  blockIndex={index}
 
-                onInputChange={(val) => handleInputChange(block.id, val)}
-                onDelete={() => handleDeleteBlock(block.id)}
-                onMoveUp={() => handleReorderBlocks(index, "up")}
-                onMoveDown={() => handleReorderBlocks(index, "down")}
-              />
-            );
-          }
-          if (block.type === "text") {
-            return (
-              <TextBlock
-                key={block.id}
-                language={getLanguageFromLanguageCode(selectedLanguage)}
-                inputVal={block.value as string}
-                blockIndex={index}
-                
-                onInputChange={(val) => handleInputChange(block.id, val)}
-                onDelete={() => handleDeleteBlock(block.id)}
-                onMoveUp={() => handleReorderBlocks(index, "up")}
-                onMoveDown={() => handleReorderBlocks(index, "down")}
-              />
-            );
-          }
-          if (block.type === "image") {
-            return (
-              <ImageBlock
-                key={block.id}
-                image={((block.value) as ImageValType).image}
-                alt={((block.value) as ImageValType).alt}
-                blockIndex={index}
+                  onInputChange={(val) => handleInputChange(block.id, val)}
+                  onDelete={() => handleDeleteBlock(block.id)}
+                  onMoveUp={() => handleReorderBlocks(index, "up")}
+                  onMoveDown={() => handleReorderBlocks(index, "down")}
+                />
+              );
 
-                onImageInputChange={(val) => handleUpdateImageBlock(block.id, { image: val })}
-                onAltInputChange={(val) => handleUpdateImageBlock(block.id, { alt: val })}
-                onDelete={() => handleDeleteBlock(block.id)}
-                onMoveUp={() => handleReorderBlocks(index, "up")}
-                onMoveDown={() => handleReorderBlocks(index, "down")}
-              />
-            );
+            case 'text':
+              return (
+                <TextBlock
+                  key={block.id}
+                  language={getLanguageFromLanguageCode(selectedLanguage)}
+                  inputVal={block.value as string}
+                  blockIndex={index}
+
+                  onInputChange={(val) => handleInputChange(block.id, val)}
+                  onDelete={() => handleDeleteBlock(block.id)}
+                  onMoveUp={() => handleReorderBlocks(index, "up")}
+                  onMoveDown={() => handleReorderBlocks(index, "down")}
+                />
+              );
+
+            case 'image':
+              return (
+                <ImageBlock
+                  key={block.id}
+                  image={((block.value) as ImageValType).image}
+                  alt={((block.value) as ImageValType).alt}
+                  blockIndex={index}
+
+                  onImageInputChange={(val) => handleUpdateImageBlock(block.id, { image: val })}
+                  onAltInputChange={(val) => handleUpdateImageBlock(block.id, { alt: val })}
+                  onDelete={() => handleDeleteBlock(block.id)}
+                  onMoveUp={() => handleReorderBlocks(index, "up")}
+                  onMoveDown={() => handleReorderBlocks(index, "down")}
+                />
+              );
+
+            case 'collapsible':
+              return (
+                <CollapsibleBlock
+                  key={block.id}
+                  language={getLanguageFromLanguageCode(selectedLanguage)}
+                  blockIndex={index}
+
+                  onChange={(val) => handleCollapsibleBlockChange(block.id, val)}
+                  onDelete={() => handleDeleteBlock(block.id)}
+                  onMoveUp={() => handleReorderBlocks(index, "up")}
+                  onMoveDown={() => handleReorderBlocks(index, "down")}
+                />
+              );
+
+            default:
+              return null;
           }
-          return null;
         })}
-        <CollapsibleBlock
-          language={getLanguageFromLanguageCode(selectedLanguage)}
-          blockIndex={blocks.length}
-
-          onDelete={() => handleDeleteBlock}
-          onMoveUp={() => { }}
-          onMoveDown={() => { }}
-        />
       </StyledBlockGroup>
     )
   }
