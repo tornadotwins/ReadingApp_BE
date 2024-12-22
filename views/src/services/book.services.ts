@@ -5,7 +5,7 @@ import {
   BookType,
   ChapterInfoType
 } from '@/pages/BookOverview/types';
-import { UpdateChapterRequestType, UpdateSubBookRequestType } from './types';
+import { IntroRequestType, UpdateChapterRequestType, UpdateSubBookRequestType } from './types';
 import { ChapterModelType, SubBookModelType } from '@/pages/ChapterOverview/types';
 
 class BookService {
@@ -77,6 +77,28 @@ class BookService {
         .then((response) => {
           if(response.data) {
             resolve(response.data);
+          } else {
+            reject(response.data.error);
+          }
+        })
+        .catch((error) => {
+          reject(error);
+        })
+    })
+  }
+
+  // Update Intro Information
+  updateIntroData = (data: IntroRequestType) => {
+    return new Promise((resolve, reject) => {
+      const url = API_URL + '/books/updateIntro';
+
+      console.log({url, data})
+
+      axios
+        .put(url, data)
+        .then((response) => {
+          if(response.data) {
+            resolve(response.data)
           } else {
             reject(response.data.error);
           }

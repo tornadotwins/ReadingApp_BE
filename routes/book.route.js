@@ -37,5 +37,6 @@ router.get(
 
 router.put('/chapter', BookController.updateChapterInfo);
 router.put('/subbook', BookController.updateSubBookInfo);
+router.put('/updateIntro', BookController.updateIntro);
 
 module.exports = router;

@@ -81,7 +81,7 @@ const StyledButtonContainer = styled(Box) <{isdisable: string}> (({isdisable}) =
   padding: '5px 10px',
   boxSizing: 'border-box',
   border: '1px solid #474747',
-  backgroundColor: '#FFAA5D',
+  backgroundColor: isdisable == 'true' ? '#A1A1A1' : '#FFAA5D',
   cursor: isdisable == 'true' ? 'not-allowed' : 'pointer',
 
   'button': {
@@ -89,7 +89,7 @@ const StyledButtonContainer = styled(Box) <{isdisable: string}> (({isdisable}) =
   },
 
   '&:hover': {
-    backgroundColor: isdisable == 'true' ? '#FFAA5D' : '#EE994C',
+    backgroundColor: isdisable == 'true' ? '#A1A1A1' : '#EE994C',
   },
 
   '& .MuiBox-root': {
@@ -98,7 +98,7 @@ const StyledButtonContainer = styled(Box) <{isdisable: string}> (({isdisable}) =
     textTransform: 'none',
 
     '&:hover': {
-      backgroundColor: isdisable == 'true' ? '#FFAA5D' : '#EE994C',
+      backgroundColor: isdisable == 'true' ? '#A1A1A1' : '#EE994C',
     },
   }
 }));

@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
 import {
   Button,
+  LoadingOverlay,
   SelectBox,
   Switch
 } from "@/components/Base";
@@ -24,6 +25,7 @@ import {
   CollapsibleValType,
   ImageValType,
   IntroOverviewPropsType,
+  IntroType,
   SelectOptionType,
 } from "./types";
 
@@ -49,6 +51,7 @@ import {
   StyledBlockGroup,
 } from "./styles";
 import { getLanguageFromLanguageCode } from "@/utils";
+import bookService from "@/services/book.services";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -57,8 +60,12 @@ const TOOLS = [
 
 function IntroOverview(props: IntroOverviewPropsType) {
   const location = useLocation();
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [selectedBook, setSelectedBook] = useState(props.currentBook);
-  const [selectedSubBook, setSelectedSubBook] = useState('')
+  const [selectedSubBook, setSelectedSubBook] = useState('');
+  const [currentChapter, setCurrentChapter] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState(props.currentLanguage);
 
   const [subBookSelectOptions, setSubBookSelectOptions] = useState<SelectOptionType[]>([]);
@@ -70,10 +77,21 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
   const [blocks, setBlocks] = useState<BlockType[]>([]);
 
+  const [enableSaveBtn, setEnableSaveBtn] = useState(false);
+
   const isPortrait = useOrientation();
   const navigate = useNavigate();
 
   const languages = useMemo(() => location.state.languages, [location]);
+
+  // Get current intro chapter info
+  useEffect(() => {
+    const currentBookInfo = props.bookInfos.find(book => book.bookTitle.en == props.currentBook);
+    const currentSubBookInfo = currentBookInfo?.subBooks?.find(subBook => subBook.subBookId == selectedSubBook);
+    const currentChapterId = currentSubBookInfo?.chapterInfos[0]?.chapterId || '';
+
+    setCurrentChapter(currentChapterId);
+  }, [selectedSubBook]);
 
   // Log out
   const onLogout = () => {
@@ -195,6 +213,154 @@ function IntroOverview(props: IntroOverviewPropsType) {
     )
   }
 
+  const handleSave = useCallback(() => {
+    setIsLoading(true);
+    const introResult: IntroType[] = [];
+
+    blocks.map((block, index) => {
+      switch (block.type) {
+        case 'title': {
+          const title = block.value as string;
+          const introObj: IntroType = {
+            chapter: currentChapter,
+            title: {
+              [selectedLanguage]: title,
+            },
+            text: {},
+            image: {},
+            number: index + 1,
+            isCollapse: false,
+            content: []
+          }
+
+          introResult.push(introObj);
+
+          break;
+        }
+
+        case 'text': {
+          const text = block.value as string;
+          const introObj: IntroType = {
+            chapter: currentChapter,
+            title: {},
+            text: {
+              [selectedLanguage]: text,
+            },
+            image: {},
+            number: index + 1,
+            isCollapse: false,
+            content: [],
+          };
+
+          introResult.push(introObj);
+
+          break;
+        }
+
+        case 'image': {
+          const imageObj = block.value as ImageValType;
+          const imageUrl = imageObj.image;
+          const imageAlt = imageObj.alt;
+
+          const introObj: IntroType = {
+            chapter: currentChapter,
+            title: {},
+            text: {},
+            image: {
+              url: imageUrl,
+              alt: imageAlt,
+            },
+            number: index + 1,
+            isCollapse: false,
+            content: [],
+          };
+
+          introResult.push(introObj);
+
+          break;
+        }
+
+        case 'collapsible': {
+          let introObj: IntroType = {
+            chapter: currentChapter,
+            title: {},
+            text: {},
+            image: {},
+            number: index + 1,
+            isCollapse: true,
+            content: [],
+          }
+          const collapseResult = [];
+          const collapseObj = block.value as CollapsibleValType;
+
+          const collapseTitle = collapseObj['0'].value;
+          introObj = {
+            ...introObj,
+            title:
+            {
+              [selectedLanguage]:
+                collapseTitle
+            }
+          };
+
+          for (const key in collapseObj) {
+            const contentObj = collapseObj[key];
+            if (contentObj.type == 'text') {
+              const obj = {
+                [selectedLanguage]: contentObj.value
+              };
+
+              collapseResult.push(obj);
+            } else if (contentObj.type == 'image') {
+              const imageVal = contentObj.value as ImageValType;
+              const obj = {
+                image: imageVal.image,
+                alt: imageVal.alt,
+              };
+
+              collapseResult.push(obj);
+            }
+          }
+
+          introObj = {
+            ...introObj,
+            content: collapseResult
+          }
+
+          introResult.push(introObj);
+
+          break;
+        }
+      }
+    });
+
+    const requestData = {
+      languageCode: selectedLanguage,
+      subBookId: selectedSubBook,
+      chapterId: currentChapter,
+      isCompleted: {
+        [selectedLanguage]: isCompleted,
+      },
+      isPublished: {
+        [selectedLanguage]: isPublished,
+      },
+      verses: introResult
+    };
+
+    bookService
+      .updateIntroData(requestData)
+      .then(result => {
+        console.log(result);
+
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.log(error);
+
+        setIsLoading(false);
+      });
+  }, [blocks]);
+
   // Render Status Manager component
   const _renderStatusManager = () => {
     return (
@@ -211,10 +377,12 @@ function IntroOverview(props: IntroOverviewPropsType) {
           onChange={() => setIsPublished(!isPublished)}
         />
 
-        <StyledButtonContainer isdisable={"false"}>
+        <StyledButtonContainer isdisable={!enableSaveBtn ? 'true' : 'false'}>
           <Button
             label="Save Changes"
-            onClick={() => { }}
+            disabled={!enableSaveBtn}
+
+            onClick={handleSave}
           />
         </StyledButtonContainer>
       </StyledStatusManagerContainer>
@@ -226,16 +394,20 @@ function IntroOverview(props: IntroOverviewPropsType) {
     const id = `${type}-${Date.now()}`;
     const newBlock: BlockType = {
       id,
+      blockIndex: blocks.length,
       type: type,
       value: type == 'image' ? { image: '', alt: '' } : ''
     };
 
+    setEnableSaveBtn(true);
     setBlocks([...blocks, newBlock]);
   }
 
   // Delete a block
   const handleDeleteBlock = (id: string) => {
     const newBlocks = blocks.filter(block => block.id !== id);
+
+    setEnableSaveBtn(true);
     setBlocks(newBlocks);
   }
 
@@ -283,15 +455,13 @@ function IntroOverview(props: IntroOverviewPropsType) {
     )
   }
 
-  useEffect(() => {
-    console.log(blocks)
-  }, [blocks]);
-
   const handleInputChange = (id: string, value: string) => {
+    setEnableSaveBtn(true);
     setBlocks(blocks.map(block => block.id == id ? { ...block, value } : block));
   }
 
   const handleUpdateImageBlock = (id: string, newData: object) => {
+    setEnableSaveBtn(true);
     setBlocks((prevBlocks) =>
       prevBlocks.map((block) =>
         block.id === id ?
@@ -305,6 +475,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
   };
 
   const handleCollapsibleBlockChange = (id: string, newValue: object) => {
+    setEnableSaveBtn(true);
     setBlocks((prevBlocks) =>
       prevBlocks.map(block =>
         block.id == id ? { ...block, value: { ...block.value as CollapsibleValType, ...newValue } } : block
@@ -313,6 +484,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
   }
 
   const handleReorderBlocks = (index: number, direction: 'up' | 'down') => {
+    setEnableSaveBtn(true);
     setBlocks((prevBlocks) => {
       const newBlocks = [...prevBlocks];
       if (direction === "up" && index > 0) {
@@ -423,6 +595,8 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
         {_renderBody()}
       </StyledContainer>
+
+      {isLoading && <LoadingOverlay />}
     </>
   )
 }

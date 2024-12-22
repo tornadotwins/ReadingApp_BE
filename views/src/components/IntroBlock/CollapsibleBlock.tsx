@@ -21,7 +21,7 @@ import { BlockType, ImageValType } from '@/pages/IntroOverview/types';
 
 function CollapsibleBlock(props: CollapsibleBlockPropsType) {
   const [blocks, setBlocks] = useState<BlockType[]>([
-    { id: `title-${Date.now()}`, type: 'title', value: '' },
+    { id: `title-${Date.now()}`, blockIndex: 1, type: 'title', value: '' },
   ]);
   const [title, setTitle] = useState('');
 
@@ -64,6 +64,7 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
     const id = `${type}-${Date.now()}`;
     const newBlock: BlockType = {
       id,
+      blockIndex: blocks.length + 1,
       type: type,
       value: type == 'image' ? { image: '', alt: '' } : ''
     };

@@ -900,6 +900,29 @@ exports.updateSubBookInfo = async (req, res) => {
   }
 };
 
+/////////////////////////////////////////////////////////////////////////
+//////////////////////// Update Intro Information ///////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.updateIntro = async (req, res) => {
+  const {
+    chapterId,
+    isCompleted,
+    isPublished,
+    languageCode,
+    subBookId,
+    verses,
+  } = req.data;
+
+  console.log({
+    chapterId,
+    isCompleted,
+    isPublished,
+    languageCode,
+    subBookId,
+    verses,
+  });
+};
+
 // Check if the book already exists in DB. If it doesn't exist, save it
 const getSavedBookId = async (languageCode, title) => {
   try {

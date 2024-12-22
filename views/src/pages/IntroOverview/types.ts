@@ -23,15 +23,33 @@ type ImageValType = {
   alt: string;
 }
 
+type CollapsibleContentType = {
+  id: string;
+  blockIndex: number;
+  type: 'title' | 'text' | 'image';
+  value: string | ImageValType;
+}
+
 type CollapsibleValType = {
-  title: string;
-  content: string;
+  [key: string]: CollapsibleContentType
 }
 
 type BlockType = {
   id: string;
+  blockIndex: number;
   type: 'title' | 'text' | 'image' | 'collapsible';
   value: string | ImageValType | CollapsibleValType;
+}
+
+type IntroType = {
+  id?: string;
+  chapter: string;
+  title: object;
+  text: object;
+  image: object;
+  number: number;
+  isCollapse: boolean;
+  content: any[];
 }
 
 export type {
@@ -40,4 +58,5 @@ export type {
   ImageValType, 
   CollapsibleValType,
   BlockType,
+  IntroType,
 }
