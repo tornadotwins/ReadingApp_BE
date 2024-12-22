@@ -88,7 +88,7 @@ class BookService {
   }
 
   // Update Intro Information
-  updateIntroData = (data: IntroRequestType) => {
+  updateIntroData = (data: IntroRequestType): Promise<ChapterModelType> => {
     return new Promise((resolve, reject) => {
       const url = API_URL + '/books/updateIntro';
 

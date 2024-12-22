@@ -1036,8 +1036,18 @@ exports.updateIntro = async (req, res) => {
     }
   }
 
+  const updatedIntroChapter = {
+    _id: updatedChapter._id,
+    subBook: subBookId,
+    chapterNumber: 0,
+    isTranslated: updatedChapter.isTranslated,
+    isCompleted: updatedChapter.isCompleted,
+    isPublished: updatedChapter.isPublished,
+    verses: updatedIntroVerses
+  }
+
   // Return the updated chapter information in the response
-  return res.status(200).json(updatedIntroVerses);
+  return res.status(200).json(updatedIntroChapter);
 };
 
 // exports.updateIntro = async (req, res) => {

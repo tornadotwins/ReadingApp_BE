@@ -18,7 +18,8 @@ function SubBookText(props: SubBookTextPropsType) {
           <Text color="#155D74" fontFamily="'Baloo Da 2'" fontWeight="400">
             {props.subBook.subBookTitle?.[props.languageCode]}
           </Text>
-        </StyledSubBookTitleContainer>}
+        </StyledSubBookTitleContainer>
+      }
 
       <StyledSubBookContentContainer>
         <StyledSubBookIntroChapterContainer>
@@ -28,6 +29,17 @@ function SubBookText(props: SubBookTextPropsType) {
               chapterInfo={props.subBook.chapterInfos[0]}
               isCompleted={props.subBook.chapterInfos[0]?.chapterIsCompleted?.[props.languageCode]}
               isPublished={props.subBook.chapterInfos[0]?.chapterIsPublished?.[props.languageCode]}
+
+              onClick={props.onChapterClick}
+            />
+          }
+          {
+            props.isQuranOrZabur && props.book &&
+            <ChapterSquare
+              chapterInfo={props.book?.subBooks[0]?.chapterInfos[0]}
+              isCompleted={props.book?.subBooks[0].chapterInfos[0]?.chapterIsCompleted?.[props.languageCode] || false}
+              isPublished={props.book?.subBooks[0].chapterInfos[0]?.chapterIsPublished?.[props.languageCode] || false}
+
               onClick={props.onChapterClick}
             />
           }
@@ -57,6 +69,7 @@ function SubBookText(props: SubBookTextPropsType) {
           <StyledSubBookChapterGroupContainer>
             {
               props.book && props.book.subBooks && props.book.subBooks.map((subBook: SubBookInfoType, index: number) => (
+                subBook.chapterInfos[0]?.chapterNumber !== 0 &&
                 <ChapterSquare
                   key={index}
                   subBookInfo={subBook}

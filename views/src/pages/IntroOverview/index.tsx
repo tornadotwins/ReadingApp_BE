@@ -29,6 +29,8 @@ import {
   IntroType,
   SelectOptionType,
 } from "./types";
+import { ChapterInfoType } from "../BookOverview/types";
+import { ChapterModelType } from "../ChapterOverview/types";
 
 import actionTypes from "@/actions/actionTypes";
 import {
@@ -48,7 +50,7 @@ import {
   StyledIntroControlButtonGroup,
   StyledButtonGroupContainer,
   StyledIntroControlButtonContainer,
-  StyledPreviewControlButtonContainer,
+  // StyledPreviewControlButtonContainer,
   StyledBlockGroup,
 } from "./styles";
 import { getLanguageFromLanguageCode } from "@/utils";
@@ -65,16 +67,15 @@ function IntroOverview(props: IntroOverviewPropsType) {
   const [isLoading, setIsLoading] = useState(false);
 
   const [selectedBook, setSelectedBook] = useState(props.currentBook);
-  const [selectedSubBook, setSelectedSubBook] = useState('');
-  const [currentChapter, setCurrentChapter] = useState('');
+  const [selectedSubBook, setSelectedSubBook] = useState(location.state.subBookInfo?.subBookId);
+  const [currentChapter, setCurrentChapter] = useState(location.state.chapterId);
   const [selectedLanguage, setSelectedLanguage] = useState(props.currentLanguage);
 
   const [subBookSelectOptions, setSubBookSelectOptions] = useState<SelectOptionType[]>([]);
+  const [isCompleted, setIsCompleted] = useState(location.state.subBookInfo.chapterInfos[0].chapterIsCompleted?.[selectedLanguage] || false);
+  const [isPublished, setIsPublished] = useState(location.state.subBookInfo.chapterInfos[0].chapterIsPublished?.[selectedLanguage] || false);
 
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [isPublished, setIsPublished] = useState(false);
-
-  const [showPreview, setShowPreview] = useState(false);
+  // const [showPreview, setShowPreview] = useState(false);
 
   const [blocks, setBlocks] = useState<BlockType[]>([]);
 
@@ -98,6 +99,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
   // Get Intro verses
   useEffect(() => {
     setIsLoading(true);
+    setBlocks([]);
     bookService
       .getIntroVerses(currentChapter)
       .then(result => {
@@ -153,7 +155,8 @@ function IntroOverview(props: IntroOverviewPropsType) {
         setIsLoading(false);
       })
       .catch(error => {
-        toast.error(error.message, {
+        console.log('warning/error while getting intro information: \n', error);
+        toast.warning('No introduction information for the chapter.', {
           position: 'top-right',
           draggable: true,
           theme: 'colored',
@@ -241,7 +244,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
       }));
 
       setSubBookSelectOptions(newSubBookOptions);
-      setSelectedSubBook(newSubBookOptions[0].value);
+      setSelectedSubBook(location.state.subBookInfo?.subBookId || newSubBookOptions[0].value);
     }
   }, [props.currentBook]);
 
@@ -293,6 +296,37 @@ function IntroOverview(props: IntroOverviewPropsType) {
     isCompleted && setIsPublished(isPublished);
     !isCompleted && setIsPublished(false);
   }
+
+  const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
+    const newChapterInfo: ChapterInfoType = {
+      chapterAudio: updatedChapterInfo.audio,
+      chapterId: updatedChapterInfo._id,
+      chapterNumber: updatedChapterInfo.chapterNumber,
+      chapterTranslated: updatedChapterInfo.isTranslated,
+      chapterIsCompleted: updatedChapterInfo.isCompleted,
+      chapterIsPublished: updatedChapterInfo.isPublished,
+      subBookId: updatedChapterInfo.subBook,
+    }
+
+    const updatedBookInfos = props.bookInfos.map((book) => ({
+      ...book,
+      subBooks: book.subBooks.map((subBook) => ({
+        ...subBook,
+        chapterInfos: subBook.chapterInfos.map((chapter) =>
+          chapter.chapterId === currentChapter
+            ? { ...chapter, ...newChapterInfo }
+            : chapter
+        ),
+      })),
+    }));
+
+    props.dispatch({
+      type: actionTypes.SET_BOOKINFOS,
+      payload: {
+        bookInfos: updatedBookInfos
+      }
+    });
+  };
 
   const handleSave = useCallback(() => {
     // setIsLoading(true);
@@ -373,9 +407,8 @@ function IntroOverview(props: IntroOverviewPropsType) {
           }
           const collapseResult = [];
           const collapseObj = block.value as CollapsibleValType;
-          console.log(collapseObj)
 
-          const collapseTitle = collapseObj['0'].value;
+          const collapseTitle = collapseObj['0']?.value;
           introObj = {
             ...introObj,
             title:
@@ -431,7 +464,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
     bookService
       .updateIntroData(requestData)
       .then(result => {
-        console.log(result);
+        updateReduxBookInfoWithChapter(result);
 
         toast.success('Successfully updated.', {
           position: 'top-right',
@@ -458,7 +491,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
         });
         setIsLoading(false);
       });
-  }, [blocks]);
+  }, [blocks, isCompleted, isPublished]);
 
   // Render Status Manager component
   const _renderStatusManager = () => {
@@ -467,6 +500,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
         <Switch
           label="Complete"
           value={isCompleted}
+          disable={blocks.length == 0}
           onChange={() => handleChapterStatus(!isCompleted, isPublished)}
         />
 
@@ -544,13 +578,13 @@ function IntroOverview(props: IntroOverviewPropsType) {
             />
           </StyledIntroControlButtonContainer>
         </StyledButtonGroupContainer>
-
+        {/* 
         <StyledPreviewControlButtonContainer>
           <Button
             label={showPreview ? 'Hide Preview' : 'Show Preview'}
             onClick={() => setShowPreview(!showPreview)}
           />
-        </StyledPreviewControlButtonContainer>
+        </StyledPreviewControlButtonContainer> */}
       </StyledIntroControlButtonGroup>
     )
   }

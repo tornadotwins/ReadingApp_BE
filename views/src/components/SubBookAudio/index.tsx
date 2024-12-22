@@ -25,15 +25,6 @@ function SubBookAudio(props: SubBookAudioPropsType) {
 
       <StyledSubBookContentContainer>
         <StyledSubBookIntroChapterContainer>
-          {
-            props.subBook && !!props.subBook.noChapter && props.subBook.chapterInfos[0].chapterNumber == 0 &&
-            <ChapterAudioSquare
-              chapterNumber={0}
-              chapterId={props.subBook.chapterInfos[0].chapterId}
-              onClick={props.moveToAudioOverview}
-              audioStatus={TRANSLATION_STATUS_NONE}
-            />
-          }
         </StyledSubBookIntroChapterContainer>
 
         {
@@ -51,6 +42,7 @@ function SubBookAudio(props: SubBookAudioPropsType) {
                 );
 
                 return (
+                  chapterInfo.chapterNumber !== 0 &&
                   <ChapterAudioSquare
                     key={index}
                     chapterNumber={chapterInfo.chapterNumber}
@@ -77,20 +69,23 @@ function SubBookAudio(props: SubBookAudioPropsType) {
                 const chapterAudioArray = Array.isArray(subBook?.chapterInfos[0]?.chapterAudio)
                   ? subBook?.chapterInfos[0].chapterAudio : [];
                 const audioInfo = chapterAudioArray.find(audioObj => audioObj.language == props.languageCode)
-                return <ChapterAudioSquare
-                  key={index}
-                  chapterNumber={subBook?.subBookNumber}
-                  chapterId={subBook?.chapterInfos[0]?.chapterId}
-                  audioStatus={
-                    (audioInfo?.isPublished ?
-                      TRANSLATION_STATUS_PUBLISH :
-                      audioInfo?.isCompleted ?
-                        TRANSLATION_STATUS_COMPLETE :
-                        TRANSLATION_STATUS_NONE
-                    )
-                  }
-                  onClick={props.moveToAudioOverview}
-                />
+                return (
+                  subBook.chapterInfos[0].chapterNumber != 0 &&
+                  <ChapterAudioSquare
+                    key={index}
+                    chapterNumber={subBook?.subBookNumber}
+                    chapterId={subBook?.chapterInfos[0]?.chapterId}
+                    audioStatus={
+                      (audioInfo?.isPublished ?
+                        TRANSLATION_STATUS_PUBLISH :
+                        audioInfo?.isCompleted ?
+                          TRANSLATION_STATUS_COMPLETE :
+                          TRANSLATION_STATUS_NONE
+                      )
+                    }
+                    onClick={props.moveToAudioOverview}
+                  />
+                )
               })
             }
           </StyledSubBookChapterGroupContainer>
