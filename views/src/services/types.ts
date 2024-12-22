@@ -1,4 +1,5 @@
 import { SubBookModelType } from "@/pages/ChapterOverview/types";
+import { IntroType } from "@/pages/IntroOverview/types";
 import { ParseDataType } from "@/pages/Translator/types";
 import { AppTextType } from "@/pages/types";
 
@@ -49,6 +50,15 @@ type SaveMarkerRequestType = {
   markerData: object[],
 }
 
+type IntroRequestType = {
+  languageCode: string;
+  subBookId: string;
+  chapterId: string;
+  isCompleted: object,
+  isPublished: object,
+  verses: IntroType[],
+}
+
 export type {
   UserRequestType,
   TranslatorRequestType,
@@ -57,4 +67,5 @@ export type {
   UpdateAppTextRequestType,
   UpdateSubBookRequestType,
   SaveMarkerRequestType,
+  IntroRequestType,
 }

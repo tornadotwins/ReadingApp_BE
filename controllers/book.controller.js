@@ -900,6 +900,273 @@ exports.updateSubBookInfo = async (req, res) => {
   }
 };
 
+/////////////////////////////////////////////////////////////////////////
+//////////////////////// Update Intro Information ///////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.updateIntro = async (req, res) => {
+  // Destructure required fields from the request body
+  const {
+    chapterId, // ID of the chapter to update
+    isCompleted, // Completion status for each language
+    isPublished, // Publication status for each language
+    languageCode, // Current language code for the update
+    subBookId, // SubBook ID associated with the chapter
+    verses, // Array of verses to update or create
+  } = req.body;
+
+  // Step 1: Update Chapter (isCompleted, isPublished, isTranslated)
+  const existingChapterInfo = await Chapter.findById(chapterId); // Fetch the chapter by ID
+
+  // Merge existing completion status with the new value for the current language
+  const updatedIsCompleted = {
+    ...existingChapterInfo.isCompleted,
+    [languageCode]: isCompleted[languageCode],
+  };
+
+  // Merge existing publication status with the new value for the current language
+  const updatedIsPublished = {
+    ...existingChapterInfo.isPublished,
+    [languageCode]: isPublished[languageCode],
+  };
+
+  // Mark the chapter as translated for the current language
+  const updatedIsTranslated = {
+    ...existingChapterInfo.isTranslated,
+    [languageCode]: true,
+  };
+
+  // Prepare the updated chapter object with new information
+  const updatedChapterInfo = {
+    chapterNumber: 0, // Static value as per the original logic
+    subBook: subBookId, // Update SubBook ID
+    isTranslated: updatedIsTranslated, // Updated translation status
+    isCompleted: updatedIsCompleted, // Updated completion status
+    isPublished: updatedIsPublished, // Updated publication status
+    createdAt: existingChapterInfo.createdAt, // Retain original creation timestamp
+    updatedAt: Date.now(), // Set current timestamp for update
+  };
+
+  // Update the chapter document in the database
+  const updatedChapter = await Chapter.findByIdAndUpdate(
+    chapterId, // Find the chapter by ID
+    updatedChapterInfo, // Apply the updates
+    {
+      new: true, // Return the updated document
+      runValidators: true, // Enforce schema validation
+    },
+  );
+
+  // Step 2: Update Verses in the Introduction collection
+  let updatedIntroVerses = []; // Array to hold the updated verse objects
+
+  // Loop through each verse in the input array
+  for (const verse of verses) {
+    // Check if a verse with the given chapter and number exists in the database
+    const existingVerse = await Introduction.findOne({
+      chapter: chapterId,
+      number: verse.number,
+    });
+
+    if (!existingVerse) {
+      // If the verse does not exist, create a new Introduction document
+      const introductionObj = new Introduction({
+        chapter: chapterId,
+        text: verse.text,
+        image: verse.image,
+        number: verse.number,
+        isCollapse: verse.isCollapse,
+        title: verse.title,
+        content: verse.content,
+      });
+
+      // Save the new Introduction document and add it to the array
+      const newIntroductionObj = introductionObj.save();
+      updatedIntroVerses.push(newIntroductionObj);
+    } else {
+      // If the verse exists, update its fields
+      existingVerse.title = {
+        ...existingVerse.title, // Retain existing title
+        ...verse.title, // Merge with new title
+      };
+
+      existingVerse.text = {
+        ...existingVerse.text, // Retain existing text
+        ...verse.text, // Merge with new text
+      };
+
+      existingVerse.image = {
+        ...existingVerse.image, // Retain existing image
+        ...verse.image, // Merge with new image
+      };
+
+      // Update other fields directly
+      existingVerse.isCollapse = verse.isCollapse;
+      existingVerse.updatedAt = Date.now(); // Update the timestamp
+
+      // Step 3: Update the content array
+      const updatedContent = [...verse.content]; // Copy the existing content array
+
+      // Iterate through each new content item
+      updatedContent.forEach((newContentItem) => {
+        // Check if the language or image already exists in the content array
+        const existingIndex = updatedContent.findIndex(
+          (item) =>
+            item?.[languageCode] === newContentItem?.[languageCode] || // Match language
+            item.image === newContentItem.image, // Match image
+        );
+
+        if (existingIndex !== -1) {
+          // If exists, merge the new content with the existing content
+          updatedContent[existingIndex] = {
+            ...updatedContent[existingIndex],
+            ...newContentItem,
+          };
+        } else {
+          // If not exists, add the new content item to the array
+          updatedContent.push(newContentItem);
+        }
+      });
+
+      // Update the content field in the Introduction document
+      existingVerse.content = updatedContent;
+
+      // Save the updated Introduction document
+      const updatedVerse = await existingVerse.save();
+      updatedIntroVerses.push(updatedVerse);
+    }
+  }
+
+  const updatedIntroChapter = {
+    _id: updatedChapter._id,
+    subBook: subBookId,
+    chapterNumber: 0,
+    isTranslated: updatedChapter.isTranslated,
+    isCompleted: updatedChapter.isCompleted,
+    isPublished: updatedChapter.isPublished,
+    verses: updatedIntroVerses
+  }
+
+  // Return the updated chapter information in the response
+  return res.status(200).json(updatedIntroChapter);
+};
+
+// exports.updateIntro = async (req, res) => {
+//   const {
+//     chapterId,
+//     isCompleted,
+//     isPublished,
+//     languageCode,
+//     subBookId,
+//     verses,
+//   } = req.body;
+
+//   // Update chapter(isCompleted/isPublished)
+//   const existingChapterInfo = await Chapter.findById(chapterId);
+//   const updatedIsCompleted = {
+//     ...existingChapterInfo.isCompleted,
+//     [languageCode]: isCompleted[languageCode],
+//   };
+
+//   const updatedIsPublished = {
+//     ...existingChapterInfo.isPublished,
+//     [languageCode]: isPublished[languageCode],
+//   };
+
+//   const updatedIsTranslated = {
+//     ...existingChapterInfo.isTranslated,
+//     [languageCode]: true,
+//   };
+
+//   const updatedChapterInfo = {
+//     chapterNumber: 0,
+//     subBook: subBookId,
+//     isTranslated: updatedIsTranslated,
+//     isCompleted: updatedIsCompleted,
+//     isPublished: updatedIsPublished,
+//     createdAt: existingChapterInfo.createdAt,
+//     updatedAt: Date.now(),
+//   };
+
+//   const updatedChapter = await Chapter.findByIdAndUpdate(
+//     chapterId,
+//     updatedChapterInfo,
+//     {
+//       new: true,
+//       runValidators: true,
+//     },
+//   );
+
+//   // Update Verses //
+//   // Check if the Introduction verses are existing
+//   let updatedIntroVerses = [];
+
+//   for (const verse of verses) {
+//     const existingVerse = await Introduction.findOne({
+//       chapter: chapterId,
+//       number: verse.number,
+//     });
+
+//     if (!existingVerse) {
+//       const introductionObj = new Introduction({
+//         chapter: chapterId,
+//         text: verse.text,
+//         image: verse.image,
+//         number: verse.number,
+//         isCollapse: verse.isCollapse,
+//         title: verse.title,
+//         content: verse.content,
+//       });
+
+//       const newIntroductionObj = introductionObj.save();
+//       updatedIntroVerses.push(newIntroductionObj);
+//     } else {
+//       existingVerse.title = {
+//         ...existingVerse.title,
+//         ...verse.title,
+//       };
+
+//       existingVerse.text = { ...existingVerse.text, ...verse.text };
+//       existingVerse.image = {
+//         ...existingVerse.image,
+//         ...verse.image,
+//       };
+//       existingVerse.isCollapse = verse.isCollapse;
+//       existingVerse.updatedAt = Date.now();
+
+//       // update content field
+//       const updatedContent = [...existingVerse.content];
+
+//       updatedContent.forEach((newContentItem) => {
+//         // Check if a language already exists in the content
+//         const existingIndex = updatedContent.findIndex(
+//           (item) =>
+//             item?.[languageCode] === newContentItem?.[languageCode] ||
+//             item.image === newContentItem.image,
+//         );
+
+//         if (existingIndex !== -1) {
+//           // If exists, update the existing content item
+//           updatedContent[existingIndex] = {
+//             ...updatedContent[existingIndex],
+//             ...newContentItem,
+//           };
+//         } else {
+//           // If not, add the new content item
+//           updatedContent.push(newContentItem);
+//         }
+//       });
+
+//       console.log({ updatedContent });
+
+//       existingVerse.content = updatedContent;
+
+//       await existingVerse.save();
+//     }
+//   }
+
+//   return res.status(200).json(updatedChapter);
+// };
+
 // Check if the book already exists in DB. If it doesn't exist, save it
 const getSavedBookId = async (languageCode, title) => {
   try {

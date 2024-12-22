@@ -47,6 +47,11 @@ const routes: Routes = {
     path: '/admin/audiooverview',
     title: 'Audio Overview',
   },
+  [Pages.IntroOverview]: {
+    component: asyncComponentLoader(() => import('@/pages/IntroOverview')),
+    path: '/admin/introoverview',
+    title: 'Intro Overview',
+  },
   [Pages.Page2]: {
     component: asyncComponentLoader(() => import('@/pages/Page2')),
     path: '/page-2',

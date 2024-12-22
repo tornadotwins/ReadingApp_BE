@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const IntroductionSchema = new Schema({
   chapter: { type: Schema.Types.ObjectId, ref: 'Chapter' },
   text: { type: Object },
-  image: { type: String },
+  image: { type: Object },
   number: { type: Number },
   isCollapse: { type: Boolean },
   title: { type: Object },
