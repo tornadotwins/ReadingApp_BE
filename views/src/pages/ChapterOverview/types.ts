@@ -6,6 +6,7 @@ import {
   VerseType
 } from "../BookOverview/types"
 import { UserType } from "../types";
+import { IntroType } from "../IntroOverview/types";
 
 type ChapterOverviewPropsType = {
   chapterInfo?: ChapterInfoType;
@@ -48,6 +49,29 @@ type ChapterModelType = {
   verses?: VerseType[]
 }
 
+type ChapterIntroModelType = {
+  _id: string;
+  subBook: string;
+  chapterNumber: number;
+  isTranslated: {
+    ar: boolean;
+    en: boolean;
+    [key: string]: boolean;
+  };
+  audio: AudioType[];
+  isCompleted: {
+    ar: boolean;
+    en: boolean;
+    [key: string]: boolean;
+  };
+  isPublished: {
+    ar: boolean;
+    en: boolean;
+    [key: string]: boolean;
+  };
+  verses?: IntroType[]
+}
+
 type SubBookModelType = {
   number: number,
   title: {
@@ -71,6 +95,7 @@ type ParseDataType = {
 export type {
   ChapterOverviewPropsType,
   ChapterModelType,
+  ChapterIntroModelType,
   SubBookModelType,
   SelectOptionType,
   ParseDataType,

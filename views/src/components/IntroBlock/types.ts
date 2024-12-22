@@ -1,4 +1,4 @@
-import { BlockType } from "@/pages/IntroOverview/types";
+import { BlockType, IntroType } from "@/pages/IntroOverview/types";
 
 type TitleBlockPropsType = {
   language: string;
@@ -34,9 +34,22 @@ type ImageBlockPropsType = {
   onMoveDown: (index: number) => void;
 }
 
+type CommonType = {
+  [key: string]: string;
+}
+
+type BlockValType = {
+  id: string;
+  isCollpase: boolean;
+  number: number;
+  title: CommonType;
+  content: CommonType[];
+}
+
 type CollapsibleBlockPropsType = {
   language: string;
-  blockIndex: number
+  blockIndex: number;
+  value?: IntroType;
 
   onChange: (val: BlockType[]) => void;
   onDelete: () => void;
@@ -57,6 +70,7 @@ export type {
   TitleBlockPropsType,
   TextBlockPropsType,
   ImageBlockPropsType,
+  BlockValType,
   CollapsibleBlockPropsType,
   BlockHeaderPropsType,
 }

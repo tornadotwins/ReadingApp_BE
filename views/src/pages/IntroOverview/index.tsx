@@ -102,25 +102,58 @@ function IntroOverview(props: IntroOverviewPropsType) {
       .getIntroVerses(currentChapter)
       .then(result => {
         // Set complete/publish
-        setIsCompleted(result.isCompleted?.[selectedLanguage]);
-        setIsPublished(result.isPublished?.[selectedLanguage]);
+        setIsCompleted(result.isCompleted?.[selectedLanguage] || false);
+        setIsPublished(result.isPublished?.[selectedLanguage] || false);
 
-        toast.success('Fetched introduction successfully.', {
-          position: 'top-right',
-          draggable: true,
-          theme: 'colored',
-          transition: Bounce,
-          closeOnClick: true,
-          pauseOnHover: true,
-          hideProgressBar: false,
-          autoClose: 3000
-        });
+        const blocks: BlockType[] = [];
+        if (result.verses && result.verses.length > 0) {
+          result.verses?.map((verse: IntroType) => {
+            const verseNumber = verse.number;
+            if (!verse.isCollapse && verse.title) {
+              const block: BlockType = {
+                id: verse.id || Date.now().toString(),
+                type: 'title',
+                blockIndex: verseNumber,
+                value: verse.title?.[selectedLanguage]
+              };
+
+              blocks.push(block);
+            } else if (!verse.isCollapse && verse.text) {
+              const block: BlockType = {
+                id: verse.id || Date.now().toString(),
+                type: 'text',
+                blockIndex: verseNumber,
+                value: verse.text?.[selectedLanguage]
+              };
+
+              blocks.push(block);
+            } else if (!verse.isCollapse && verse.image) {
+              const block: BlockType = {
+                id: verse.id || Date.now().toString(),
+                type: 'image',
+                blockIndex: verseNumber,
+                value: verse.image as ImageValType
+              };
+
+              blocks.push(block);
+            } else if (verse.isCollapse) {
+              const block: BlockType = {
+                id: verse.id || Date.now().toString(),
+                type: 'collapsible',
+                blockIndex: verseNumber,
+                value: verse
+              };
+
+              blocks.push(block);
+            }
+          });
+        }
+
+        setBlocks(blocks);
         setIsLoading(false);
       })
       .catch(error => {
-        console.log(error);
-
-        toast.error(error, {
+        toast.error(error.message, {
           position: 'top-right',
           draggable: true,
           theme: 'colored',
@@ -132,7 +165,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
         });
         setIsLoading(false);
       })
-  }, [currentChapter]);
+  }, [currentChapter, selectedLanguage]);
 
   // Log out
   const onLogout = () => {
@@ -254,6 +287,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
     )
   }
 
+  // handle complete/publish switch
   const handleChapterStatus = (isCompleted: boolean, isPublished: boolean) => {
     setIsCompleted(isCompleted);
     isCompleted && setIsPublished(isPublished);
@@ -261,7 +295,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
   }
 
   const handleSave = useCallback(() => {
-    setIsLoading(true);
+    // setIsLoading(true);
     const introResult: IntroType[] = [];
 
     blocks.map((block, index) => {
@@ -306,7 +340,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
         case 'image': {
           const imageObj = block.value as ImageValType;
-          const imageUrl = imageObj.image;
+          const imageUrl = imageObj.url;
           const imageAlt = imageObj.alt;
 
           const introObj: IntroType = {
@@ -339,14 +373,14 @@ function IntroOverview(props: IntroOverviewPropsType) {
           }
           const collapseResult = [];
           const collapseObj = block.value as CollapsibleValType;
+          console.log(collapseObj)
 
           const collapseTitle = collapseObj['0'].value;
           introObj = {
             ...introObj,
             title:
             {
-              [selectedLanguage]:
-                collapseTitle
+              [selectedLanguage]: collapseTitle as string
             }
           };
 
@@ -361,7 +395,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
             } else if (contentObj.type == 'image') {
               const imageVal = contentObj.value as ImageValType;
               const obj = {
-                image: imageVal.image,
+                image: imageVal.url,
                 alt: imageVal.alt,
               };
 
@@ -399,11 +433,29 @@ function IntroOverview(props: IntroOverviewPropsType) {
       .then(result => {
         console.log(result);
 
+        toast.success('Successfully updated.', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
         setIsLoading(false);
       })
       .catch(error => {
-        console.log(error);
-
+        toast.error(error.message, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
         setIsLoading(false);
       });
   }, [blocks]);
@@ -444,7 +496,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
       id,
       blockIndex: blocks.length,
       type: type,
-      value: type == 'image' ? { image: '', alt: '' } : ''
+      value: type == 'image' ? { url: '', alt: '' } : ''
     };
 
     setEnableSaveBtn(true);
@@ -584,7 +636,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
               return (
                 <ImageBlock
                   key={block.id}
-                  image={((block.value) as ImageValType).image}
+                  image={((block.value) as ImageValType).url}
                   alt={((block.value) as ImageValType).alt}
                   blockIndex={index}
 
@@ -602,6 +654,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
                   key={block.id}
                   language={getLanguageFromLanguageCode(selectedLanguage)}
                   blockIndex={index}
+                  value={block.value as IntroType}
 
                   onChange={(val) => handleCollapsibleBlockChange(block.id, val)}
                   onDelete={() => handleDeleteBlock(block.id)}

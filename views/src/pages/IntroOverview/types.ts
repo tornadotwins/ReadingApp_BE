@@ -2,6 +2,7 @@ import { Dispatch } from "redux";
 
 import { UserType } from "../types";
 import { BookType, SubBookInfoType } from "../BookOverview/types";
+// import { BlockValType } from "@/components/IntroBlock/types";
 
 type IntroOverviewPropsType = {
   subBookInfo: SubBookInfoType,
@@ -19,7 +20,7 @@ type SelectOptionType = {
 }
 
 type ImageValType = {
-  image: string;
+  url: string;
   alt: string;
 }
 
@@ -38,15 +39,19 @@ type BlockType = {
   id: string;
   blockIndex: number;
   type: 'title' | 'text' | 'image' | 'collapsible';
-  value: string | ImageValType | CollapsibleValType;
+  value: string | ImageValType | CollapsibleValType | IntroType;
+}
+
+type IntroInnerObjType = {
+  [key: string]: string;
 }
 
 type IntroType = {
   id?: string;
   chapter: string;
-  title: object;
-  text: object;
-  image: object;
+  title: IntroInnerObjType;
+  text: IntroInnerObjType;
+  image: IntroInnerObjType;
   number: number;
   isCollapse: boolean;
   content: any[];

@@ -18,16 +18,48 @@ import {
 
 import { CollapsibleBlockPropsType } from "./types";
 import { BlockType, ImageValType } from '@/pages/IntroOverview/types';
+import { getLanguageCodeFromLanguage } from '@/utils';
 
 function CollapsibleBlock(props: CollapsibleBlockPropsType) {
+  const languageCode = getLanguageCodeFromLanguage(props.language);
   const [blocks, setBlocks] = useState<BlockType[]>([
     { id: `title-${Date.now()}`, blockIndex: 1, type: 'title', value: '' },
   ]);
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(props.value?.title?.[languageCode] || '');
+
+  useEffect(() => {
+    const blocks: BlockType[] = [];
+    const valueContents = props.value?.content;
+    valueContents?.map((content, index) => {
+      if (content.image) {
+        const block: BlockType = {
+          id: `image-${Date.now()}`,
+          blockIndex: index,
+          type: 'image',
+          value: {
+            url: content.image,
+            alt: content.alt
+          }
+        };
+
+        blocks.push(block);
+      } else {
+        const block: BlockType = {
+          id: `text-${Date.now()}`,
+          blockIndex: index,
+          type: 'text',
+          value: content?.[languageCode] as string
+        };
+
+        blocks.push(block);
+      }
+    });
+
+    setBlocks(blocks);
+  }, []);
 
   useEffect(() => {
     props.onChange(blocks)
-    // console.log(blocks)
   }, [blocks]);
 
   const _renderHeader = () => {
@@ -66,7 +98,7 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
       id,
       blockIndex: blocks.length + 1,
       type: type,
-      value: type == 'image' ? { image: '', alt: '' } : ''
+      value: type == 'image' ? { url: '', alt: '' } : ''
     };
 
     setBlocks([...blocks, newBlock]);
@@ -153,7 +185,7 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
             return (
               <ImageBlock
                 key={block.id}
-                image={((block.value) as ImageValType).image}
+                image={((block.value) as ImageValType).url}
                 alt={((block.value) as ImageValType).alt}
                 blockIndex={index}
 

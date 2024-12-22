@@ -6,7 +6,7 @@ import {
   ChapterInfoType,
 } from '@/pages/BookOverview/types';
 import { IntroRequestType, UpdateChapterRequestType, UpdateSubBookRequestType } from './types';
-import { ChapterModelType, SubBookModelType } from '@/pages/ChapterOverview/types';
+import { ChapterIntroModelType, ChapterModelType, SubBookModelType } from '@/pages/ChapterOverview/types';
 
 class BookService {
   // Get Book information by en title
@@ -108,7 +108,7 @@ class BookService {
   }
 
   // Get Intro Verses
-  getIntroVerses = (chapterId: string): Promise<ChapterModelType> => {
+  getIntroVerses = (chapterId: string): Promise<ChapterIntroModelType> => {
     return new Promise((resolve, reject) => {
       const url = API_URL + `/books/${chapterId}/intro`;
 
