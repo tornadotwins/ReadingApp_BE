@@ -72,7 +72,7 @@ const StyledLabel = styled(Box)({
   }
 });
 
-const StyledInputContainer = styled(Box)<{hastextarea?: string}>(({hastextarea}) => ({
+const StyledInputContainer = styled(Box)<{hastextarea?: string, isdisabled?: string}>(({hastextarea, isdisabled}) => ({
   display: 'flex',
   width: '100%',
   boxSizing: 'border-box',
@@ -106,6 +106,12 @@ const StyledInputContainer = styled(Box)<{hastextarea?: string}>(({hastextarea})
 
     '& .MuiInputBase-input': {
       fontFamily: 'Inter',
+
+      '&[type="text"]': {
+        all: isdisabled == 'true' && 'unset',
+        paddingLeft: '10px',
+        paddingRight: '10px',
+      }
     },
 
     "& .MuiInputBase-root.Mui-disabled": {

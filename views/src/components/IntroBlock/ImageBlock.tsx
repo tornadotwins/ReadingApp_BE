@@ -51,7 +51,7 @@ function ImageBlock(props: ImageBlockPropsType) {
           </Text>
         </StyledLabel>
 
-        <StyledInputContainer>
+        <StyledInputContainer isdisabled={'true'}>
           <Input
             value={imageUrl} // Display the image URL
             placeholder="Image URL"
@@ -61,7 +61,7 @@ function ImageBlock(props: ImageBlockPropsType) {
           />
 
           <FilePicker
-            type=".png, .jpg, .jpeg, .svg, .gif, .webp, .bmp, .tiff, .ico"
+            type=".png, .jpg, .jpeg"
             onChange={handleFileChange}
           />
         </StyledInputContainer>
