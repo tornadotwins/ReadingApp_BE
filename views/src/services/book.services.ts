@@ -92,8 +92,6 @@ class BookService {
     return new Promise((resolve, reject) => {
       const url = API_URL + '/books/updateIntro';
 
-      console.log({url, data})
-
       axios
         .put(url, data)
         .then((response) => {
