@@ -88,7 +88,9 @@ function IntroOverview(props: IntroOverviewPropsType) {
   useEffect(() => {
     const currentBookInfo = props.bookInfos.find(book => book.bookTitle.en == props.currentBook);
     const currentSubBookInfo = currentBookInfo?.subBooks?.find(subBook => subBook.subBookId == selectedSubBook);
-    const currentChapterId = currentSubBookInfo?.chapterInfos[0]?.chapterId || '';
+    const currentChapterId = currentSubBookInfo?.chapterInfos && currentSubBookInfo?.chapterInfos[0].chapterNumber == 0 &&
+      currentSubBookInfo?.chapterInfos[0]?.chapterId || '';
+    console.log({ currentChapterId })
 
     setCurrentChapter(currentChapterId);
   }, [selectedSubBook]);
