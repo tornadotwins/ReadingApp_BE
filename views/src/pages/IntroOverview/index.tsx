@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
+import { toast, Bounce, ToastContainer } from "material-react-toastify";
 
 import {
   Button,
@@ -90,10 +91,48 @@ function IntroOverview(props: IntroOverviewPropsType) {
     const currentSubBookInfo = currentBookInfo?.subBooks?.find(subBook => subBook.subBookId == selectedSubBook);
     const currentChapterId = currentSubBookInfo?.chapterInfos && currentSubBookInfo?.chapterInfos[0].chapterNumber == 0 &&
       currentSubBookInfo?.chapterInfos[0]?.chapterId || '';
-    console.log({ currentChapterId })
 
     setCurrentChapter(currentChapterId);
   }, [selectedSubBook]);
+
+  // Get Intro verses
+  useEffect(() => {
+    setIsLoading(true);
+    bookService
+      .getIntroVerses(currentChapter)
+      .then(result => {
+        // Set complete/publish
+        setIsCompleted(result.isCompleted?.[selectedLanguage]);
+        setIsPublished(result.isPublished?.[selectedLanguage]);
+
+        toast.success('Fetched introduction successfully.', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.log(error);
+
+        toast.error(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+        setIsLoading(false);
+      })
+  }, [currentChapter]);
 
   // Log out
   const onLogout = () => {
@@ -213,6 +252,12 @@ function IntroOverview(props: IntroOverviewPropsType) {
         </StyledSelectGroupContainer>
       </StyledSelectContainer>
     )
+  }
+
+  const handleChapterStatus = (isCompleted: boolean, isPublished: boolean) => {
+    setIsCompleted(isCompleted);
+    isCompleted && setIsPublished(isPublished);
+    !isCompleted && setIsPublished(false);
   }
 
   const handleSave = useCallback(() => {
@@ -370,13 +415,14 @@ function IntroOverview(props: IntroOverviewPropsType) {
         <Switch
           label="Complete"
           value={isCompleted}
-          onChange={() => setIsCompleted(!isCompleted)}
+          onChange={() => handleChapterStatus(!isCompleted, isPublished)}
         />
 
         <Switch
           label="Publish"
           value={isPublished}
-          onChange={() => setIsPublished(!isPublished)}
+          disable={!isCompleted}
+          onChange={() => handleChapterStatus(isCompleted, !isPublished)}
         />
 
         <StyledButtonContainer isdisable={!enableSaveBtn ? 'true' : 'false'}>
@@ -599,6 +645,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
       </StyledContainer>
 
       {isLoading && <LoadingOverlay />}
+      <ToastContainer />
     </>
   )
 }

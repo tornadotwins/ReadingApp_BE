@@ -3,7 +3,7 @@ import axios from 'axios';
 import {API_URL} from '../config'
 import {
   BookType,
-  ChapterInfoType
+  ChapterInfoType,
 } from '@/pages/BookOverview/types';
 import { IntroRequestType, UpdateChapterRequestType, UpdateSubBookRequestType } from './types';
 import { ChapterModelType, SubBookModelType } from '@/pages/ChapterOverview/types';
@@ -100,6 +100,22 @@ class BookService {
           } else {
             reject(response.data.error);
           }
+        })
+        .catch((error) => {
+          reject(error);
+        })
+    })
+  }
+
+  // Get Intro Verses
+  getIntroVerses = (chapterId: string): Promise<ChapterModelType> => {
+    return new Promise((resolve, reject) => {
+      const url = API_URL + `/books/${chapterId}/intro`;
+
+      axios
+        .get(url)
+        .then((response) => {
+          resolve(response.data);
         })
         .catch((error) => {
           reject(error);
