@@ -184,6 +184,53 @@ const StyledBlockGroup = styled(Box)({
   boxSizing: 'border-box',
 });
 
+const StyledPreviewContainer = styled(Box) ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  margin: '20px 40px',
+  boxSizing: 'border-box',
+  border: '1px solid #155D74',
+  backgroundColor: '#F0F5FB',
+  padding: '10px'
+});
+
+const StyledPreviewTitleContainer = styled(Box) ({
+  display: 'flex',
+  alignItems: 'center',
+  boxSizing: 'border-box',
+  padding: '0px 10px',
+  marginBottom: '10px'
+});
+
+const StyledPreviewTextContainer = styled(Box) ({
+  display: 'flex',
+  alignSelf: 'start',
+  boxSizing: 'border-box',
+  padding: '0px 10px',
+  marginBottom: '10px'
+});
+
+const StyledPreviewImageContainer = styled(Box) ({
+  display: 'flex',
+  alignSelf: 'start',
+  boxSizing: 'border-box',
+  padding: '0px 10px',
+  marginBottom: '10px',
+});
+
+const StyledPreviewImage = styled('img') ({
+  width: '250px',
+});
+
+const StyledPreviewCollapseContainer = styled(Box) ({
+  display: 'flex',
+  alignSelf: 'start',
+  boxSizing: 'border-box',
+  padding: '0px 10px',
+  marginBottom: '10px',
+})
+
 export {
   StyledContainer,
   StyledIntroOverviewContainer,
@@ -197,4 +244,10 @@ export {
   StyledIntroControlButtonContainer,
   StyledPreviewControlButtonContainer,
   StyledBlockGroup,
+  StyledPreviewContainer,
+  StyledPreviewTitleContainer,
+  StyledPreviewTextContainer,
+  StyledPreviewImageContainer,
+  StyledPreviewImage,
+  StyledPreviewCollapseContainer,
 }

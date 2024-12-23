@@ -23,7 +23,7 @@ type TextBlockPropsType = {
 }
 
 type ImageBlockPropsType = {
-  image: string;
+  url: string;
   alt: string;
   blockIndex: number;
 

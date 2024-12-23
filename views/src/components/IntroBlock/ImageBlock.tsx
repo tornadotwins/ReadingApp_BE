@@ -12,7 +12,7 @@ import { ImageBlockPropsType } from "./types";
 
 function ImageBlock(props: ImageBlockPropsType) {
   // Local state to store the image URL
-  const [imageUrl, setImageUrl] = useState(props.image || "");
+  const [imageUrl, setImageUrl] = useState(props.url || "");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
