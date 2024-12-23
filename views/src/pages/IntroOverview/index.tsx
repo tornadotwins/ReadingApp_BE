@@ -727,8 +727,8 @@ function IntroOverview(props: IntroOverviewPropsType) {
     return (
       blocks && blocks.length > 0 && showPreview &&
       <StyledPreviewContainer>
-        <Text color="#155D74" fontSize={18} fontWeight="bold" textAlign="left" fontFamily="Inter" hasUnderline>
-          PREVIEW
+        <Text color="#155D74" fontSize={18} fontWeight="bold" textAlign="left" fontFamily="Inter">
+          PREVIEW:
         </Text>
         {
           blocks.map((block, index) => {
