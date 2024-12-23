@@ -628,6 +628,11 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
   const handleCollapsibleBlockChange = (id: string, newValue: object) => {
     setEnableSaveBtn(true);
+
+    // Disable Save button when collapsible title is blank
+    if (!Object.values(newValue)[0]?.value)
+      setEnableSaveBtn(false)
+
     setBlocks((prevBlocks) =>
       prevBlocks.map(block =>
         block.id == id ? { ...block, value: { ...block.value as CollapsibleValType, ...newValue } } : block
