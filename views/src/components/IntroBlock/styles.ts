@@ -151,7 +151,7 @@ const StyledCollapsibleAddButtonContainer = styled(Box)({
   alignItems: 'center',
 });
 
-const StyledCollapsibleButtonContainer = styled(Box) ({
+const StyledCollapsibleButtonContainer = styled(Box) <{isdisabled?: string}> (({isdisabled}) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -159,6 +159,8 @@ const StyledCollapsibleButtonContainer = styled(Box) ({
   border: '1px solid #155D74',
   borderRadius: '4px',
   marginRight: '5px',
+  backgroundColor: isdisabled == 'true' ? '#A1A1A1' : '#FFAA5D',
+  cursor: isdisabled == 'true' ? 'not-allowed !important' : 'pointer',
 
   '& .MuiBox-root': {
     textTransform: 'capitalize'
@@ -166,19 +168,29 @@ const StyledCollapsibleButtonContainer = styled(Box) ({
 
   '&:hover': {
     cursor: 'pointer',
-    backgroundColor: '#155D74',
+    backgroundColor: isdisabled == 'true' ? '#A1A1A1' : '#EE994C',
 
     '& .MuiBox-root': {
-      color: '#FFF !important'
+      color: isdisabled == 'true' ? '#474747' : '#FFF !important',
+      backgroundColor: isdisabled == 'true' ? '#A1A1A1' : '#EE994C',
     }
   },
-});
+}));
 
 const StyledCollapsibleBlockGroup = styled(Box) ({
   display: 'flex',
   flexDirection: 'column',
   boxSizing: 'border-box',
   marginTop: '10px',
+});
+
+const StyledPreviewCollapsibleBlockContainer = styled(Box) ({
+  display: 'flex',
+  flexDirection: 'column',
+  boxSizing: 'border-box',
+  border: '1px solid #155D74',
+  borderRadius: '4px',
+  width: '100%'
 });
 
 export {
@@ -195,4 +207,5 @@ export {
   StyledCollapsibleAddButtonContainer,
   StyledCollapsibleButtonContainer,
   StyledCollapsibleBlockGroup,
+  StyledPreviewCollapsibleBlockContainer,
 }

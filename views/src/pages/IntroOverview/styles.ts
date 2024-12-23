@@ -110,11 +110,20 @@ const StyledIntroControlButtonGroup = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+
+  '@media screen and (max-width: 800px)': {
+    flexDirection: 'column',
+  }
 });
 
 const StyledButtonGroupContainer = styled(Box) ({
   display: 'flex',
   alignItems: 'center',
+
+  '@media screen and (max-width: 800px)': {
+    flexDirection: 'column',
+    width: '100%'
+  }
 })
 
 const StyledIntroControlButtonContainer = styled(Box)({
@@ -143,6 +152,12 @@ const StyledIntroControlButtonContainer = styled(Box)({
     '&:hover': {
       backgroundColor: '#EE994C',
     },
+  },
+
+  '@media screen and (max-width: 800px)': {
+    width: '100%',
+    marginRight: '0px !important',
+    marginBottom: '10px'
   }
 });
 
@@ -172,16 +187,91 @@ const StyledPreviewControlButtonContainer = styled(Box)({
     '&:hover': {
       backgroundColor: '#EE994C',
     },
+  },
+
+  '@media screen and (max-width: 800px)': {
+    width: '100%'
   }
 });
 
-const StyledBlockGroup = styled(Box)({
+const StyledDynamicBlockGroup = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+  boxSizing: 'border-box',
+  width: '100%'
+});
+
+const StyledPreviewContainer = styled(Box) ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  boxSizing: 'border-box',
+  border: '1px solid #155D74',
+  borderRadius: '4px',
+  backgroundColor: '#F0F5FB',
+  padding: '10px',
+  width: '300px',
+  marginBottom: '10px',
+
+  '& > .MuiBox-root: first-of-type': {
+    marginBottom: '20px',
+
+  },
+
+  '@media screen and (max-width: 700px)': {
+    width: '100%'
+  },
+});
+
+const StyledPreviewTitleContainer = styled(Box) ({
+  display: 'flex',
+  alignItems: 'center',
+  boxSizing: 'border-box',
+  padding: '0px 10px',
+  marginBottom: '10px'
+});
+
+const StyledPreviewTextContainer = styled(Box) ({
+  display: 'flex',
+  alignSelf: 'start',
+  boxSizing: 'border-box',
+  padding: '0px 10px',
+  marginBottom: '10px'
+});
+
+const StyledPreviewImageContainer = styled(Box) ({
+  display: 'flex',
+  alignSelf: 'start',
+  boxSizing: 'border-box',
+  padding: '0px 10px',
+  marginBottom: '10px',
+});
+
+const StyledPreviewImage = styled('img') ({
+  width: '250px',
+});
+
+const StyledPreviewCollapseContainer = styled(Box) ({
+  display: 'flex',
+  alignSelf: 'start',
+  boxSizing: 'border-box',
+  padding: '0px 10px',
+  marginBottom: '10px',
+  width: '100%',
+});
+
+const StyledBlockGroupContainer = styled(Box) ({
+  display: 'flex',
   margin: '20px 40px',
   boxSizing: 'border-box',
+  justifyContent: 'space-between',
+  gap: '20px',
+
+  '@media screen and (max-width: 700px)': {
+    flexDirection: 'column',
+  }
 });
 
 export {
@@ -196,5 +286,12 @@ export {
   StyledButtonGroupContainer,
   StyledIntroControlButtonContainer,
   StyledPreviewControlButtonContainer,
-  StyledBlockGroup,
+  StyledDynamicBlockGroup,
+  StyledPreviewContainer,
+  StyledPreviewTitleContainer,
+  StyledPreviewTextContainer,
+  StyledPreviewImageContainer,
+  StyledPreviewImage,
+  StyledPreviewCollapseContainer,
+  StyledBlockGroupContainer,
 }

@@ -1,14 +1,11 @@
 import { useEffect, useState, } from 'react';
 
-import { Button, Input, Text } from "../Base";
+import { Button, Text } from "../Base";
 import BlockHeader from "./BlockHeader";
 import TextBlock from "./TextBlock";
 import ImageBlock from "./ImageBlock";
 import {
   StyledContainer,
-  StyledContentRow,
-  StyledLabel,
-  StyledInputContainer,
   StyledSubTitleContainer,
   StyledCollapsibleButtonContainer,
   StyledCollapsibleButtonGroup,
@@ -19,34 +16,52 @@ import {
 import { CollapsibleBlockPropsType } from "./types";
 import { BlockType, ImageValType } from '@/pages/IntroOverview/types';
 import { getLanguageCodeFromLanguage } from '@/utils';
+import TitleBlock from './TitleBlock';
 
 function CollapsibleBlock(props: CollapsibleBlockPropsType) {
   const languageCode = getLanguageCodeFromLanguage(props.language);
-  const [blocks, setBlocks] = useState<BlockType[]>([
-    { id: `title-${Date.now()}`, blockIndex: 1, type: 'title', value: '' },
-  ]);
-  const [title, setTitle] = useState(props.value?.title?.[languageCode] || '');
+  const [blocks, setBlocks] = useState<BlockType[]>([]);
 
   useEffect(() => {
     const blocks: BlockType[] = [];
     const valueContents = props.value?.content;
+    if (props.value?.title) {
+      const block: BlockType = {
+        id: `title-${Date.now()}-${Math.random()}`,
+        blockIndex: 1,
+        type: 'title',
+        value: props.value?.title?.[languageCode]
+      };
+
+      blocks.push(block);
+    }
+
     valueContents?.map((content, index) => {
-      if (content.image) {
+      if (content.url) {
         const block: BlockType = {
-          id: `image-${Date.now()}`,
-          blockIndex: index,
+          id: `image-${Date.now()}-${Math.random()}`,
+          blockIndex: index + 2,
           type: 'image',
           value: {
-            url: content.image,
+            url: content.url,
             alt: content.alt
           }
         };
 
         blocks.push(block);
+      } else if (content.isTitle) {
+        const block: BlockType = {
+          id: `title-${Date.now()}-${Math.random()}`,
+          blockIndex: index + 2,
+          type: 'title',
+          value: content?.[languageCode] as string
+        };
+
+        blocks.push(block);
       } else {
         const block: BlockType = {
-          id: `text-${Date.now()}`,
-          blockIndex: index,
+          id: `text-${Date.now()}-${Math.random()}`,
+          blockIndex: index + 2,
           type: 'text',
           value: content?.[languageCode] as string
         };
@@ -92,8 +107,8 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
   }
 
   // Add Block
-  const handleAddBlock = (type: 'text' | 'image') => {
-    const id = `${type}-${Date.now()}`;
+  const handleAddBlock = (type: 'title' | 'text' | 'image') => {
+    const id = `${type}-${Date.now()}-${Math.random()}`;
     const newBlock: BlockType = {
       id,
       blockIndex: blocks.length + 1,
@@ -116,14 +131,25 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
         <StyledCollapsibleAddButtonContainer>
           <StyledCollapsibleButtonContainer>
             <Button
+              label="Add Title"
+              onClick={() => handleAddBlock('title')}
+            />
+          </StyledCollapsibleButtonContainer>
+
+          <StyledCollapsibleButtonContainer isdisabled={blocks.length == 0 ? 'true' : 'false'}>
+            <Button
               label="Add Text"
+              disabled={!blocks || blocks.length == 0}
+
               onClick={() => handleAddBlock('text')}
             />
           </StyledCollapsibleButtonContainer>
 
-          <StyledCollapsibleButtonContainer>
+          <StyledCollapsibleButtonContainer isdisabled={blocks.length == 0 ? 'true' : 'false'}>
             <Button
               label="Add Image"
+              disabled={!blocks || blocks.length == 0}
+
               onClick={() => handleAddBlock('image')}
             />
           </StyledCollapsibleButtonContainer>
@@ -166,36 +192,50 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
     return (
       <StyledCollapsibleBlockGroup>
         {blocks.map((block, index) => {
-          if (block.type === "text") {
-            return (
-              <TextBlock
-                key={block.id}
-                language={props.language}
-                inputVal={block.value as string}
-                blockIndex={index}
+          switch (block.type) {
+            case 'title':
+              return (
+                <TitleBlock
+                  key={index}
+                  language={props.language}
+                  inputVal={block.value as string}
+                  blockIndex={index}
 
-                onInputChange={(val) => handleInputChange(block.id, val)}
-                onDelete={() => handleDeleteBlock(block.id)}
-                onMoveUp={() => handleReorderBlocks(index, "up")}
-                onMoveDown={() => handleReorderBlocks(index, "down")}
-              />
-            );
-          }
-          if (block.type === "image") {
-            return (
-              <ImageBlock
-                key={block.id}
-                image={((block.value) as ImageValType).url}
-                alt={((block.value) as ImageValType).alt}
-                blockIndex={index}
+                  onInputChange={(val) => handleInputChange(block.id, val)}
+                  onDelete={() => handleDeleteBlock(block.id)}
+                  onMoveUp={() => handleReorderBlocks(index, "up")}
+                  onMoveDown={() => handleReorderBlocks(index, "down")}
+                />
+              );
+            case 'text':
+              return (
+                <TextBlock
+                  key={index}
+                  language={props.language}
+                  inputVal={block.value as string}
+                  blockIndex={index}
 
-                onImageInputChange={(val) => handleUpdateImageBlock(block.id, { image: val })}
-                onAltInputChange={(val) => handleUpdateImageBlock(block.id, { alt: val })}
-                onDelete={() => handleDeleteBlock(block.id)}
-                onMoveUp={() => handleReorderBlocks(index, "up")}
-                onMoveDown={() => handleReorderBlocks(index, "down")}
-              />
-            );
+                  onInputChange={(val) => handleInputChange(block.id, val)}
+                  onDelete={() => handleDeleteBlock(block.id)}
+                  onMoveUp={() => handleReorderBlocks(index, "up")}
+                  onMoveDown={() => handleReorderBlocks(index, "down")}
+                />
+              );
+            case 'image':
+              return (
+                <ImageBlock
+                  key={index}
+                  url={((block.value) as ImageValType).url}
+                  alt={((block.value) as ImageValType).alt}
+                  blockIndex={index}
+
+                  onImageInputChange={(val) => handleUpdateImageBlock(block.id, { url: val })}
+                  onAltInputChange={(val) => handleUpdateImageBlock(block.id, { alt: val })}
+                  onDelete={() => handleDeleteBlock(block.id)}
+                  onMoveUp={() => handleReorderBlocks(index, "up")}
+                  onMoveDown={() => handleReorderBlocks(index, "down")}
+                />
+              );
           }
           return null;
         })}
@@ -203,49 +243,11 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
     )
   }
 
-  const handleTitleChange = (title: string) => {
-    setTitle(title);
-    setBlocks(blocks.map(block => block.type == 'title' ? { ...block, value: title } : block));
-  }
-
   return (
     <StyledContainer>
       {_renderHeader()}
 
       {_renderSubTitle('Title: ')}
-
-      <StyledContentRow>
-        <StyledLabel>
-          <Text
-            color='#155D74'
-            fontFamily='Inter'
-            fontSize={16}
-            lineHeight={24}
-            fontWeight='500'
-          >
-            {props.language}
-          </Text>
-          <Text
-            color='#155D74'
-            fontFamily='Inter'
-            fontSize={16}
-            lineHeight={24}
-            fontWeight='500'
-          >
-            Title:
-          </Text>
-        </StyledLabel>
-
-        <StyledInputContainer>
-          <Input
-            type="text"
-            placeholder="Enter Title"
-            value={title}
-
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e.target.value)}
-          />
-        </StyledInputContainer>
-      </StyledContentRow>
 
       {_renderSubTitle('Content Items: ')}
 
