@@ -628,6 +628,11 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
   const handleCollapsibleBlockChange = (id: string, newValue: object) => {
     setEnableSaveBtn(true);
+
+    // Disable Save button when collapsible title is blank
+    if (!Object.values(newValue)[0]?.value)
+      setEnableSaveBtn(false)
+
     setBlocks((prevBlocks) =>
       prevBlocks.map(block =>
         block.id == id ? { ...block, value: { ...block.value as CollapsibleValType, ...newValue } } : block
@@ -727,8 +732,8 @@ function IntroOverview(props: IntroOverviewPropsType) {
     return (
       blocks && blocks.length > 0 && showPreview &&
       <StyledPreviewContainer>
-        <Text color="#155D74" fontSize={18} fontWeight="bold" textAlign="left" fontFamily="Inter" hasUnderline>
-          PREVIEW
+        <Text color="#155D74" fontSize={18} fontWeight="bold" textAlign="left" fontFamily="Inter">
+          PREVIEW:
         </Text>
         {
           blocks.map((block, index) => {

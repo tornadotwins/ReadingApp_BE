@@ -53,6 +53,13 @@ const StyledContentRow = styled(Box)({
   display: 'flex',
   alignItems: 'start',
   marginTop: '10px',
+
+  '@media screen and (max-width: 480px)': {
+    '& .MuiBox-root': {
+      fontSize: '12px !important'
+    },
+    flexDirection: 'column'
+  }
 });
 
 const StyledLabel = styled(Box)({
@@ -69,6 +76,11 @@ const StyledLabel = styled(Box)({
   },
 
   '& > .MuiBox-root: first-of-type': {
+    marginRight: '5px'
+  },
+
+  '@media screen and (max-width: 480px)': {
+    minWidth: '70px',
     marginRight: '5px'
   }
 });
@@ -122,6 +134,24 @@ const StyledInputContainer = styled(Box)<{hastextarea?: string, isdisabled?: str
 
   '& input[type="file"]': {
     cursor: 'pointer',
+    minWidth: '50px'
+  },
+
+  '& p': {
+    display: 'none'
+  },
+
+  '@media screen and (max-width: 600px)': {
+    flexDirection: 'column'
+  },
+
+  '@media screen and (max-width: 460px)': {
+    '& .MuiInputBase-root input': {
+      // minWidth: '150px',
+      textOverflow: 'ellipsis',
+      overflow: 'hiddeon',
+      whiteSpace: 'nowrap',
+    }
   }
 }));
 

@@ -55,17 +55,17 @@ function ImageBlock(props: ImageBlockPropsType) {
         </StyledLabel>
 
         <StyledInputContainer isdisabled={'true'}>
+          <FilePicker
+            type=".png, .jpg, .jpeg"
+            onChange={handleFileChange}
+          />
+
           <Input
             value={imageUrl} // Display the image URL
             placeholder="Image URL"
             disable
 
             onChange={() => { }}
-          />
-
-          <FilePicker
-            type=".png, .jpg, .jpeg"
-            onChange={handleFileChange}
           />
         </StyledInputContainer>
       </StyledContentRow>
