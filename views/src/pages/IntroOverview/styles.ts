@@ -110,11 +110,20 @@ const StyledIntroControlButtonGroup = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+
+  '@media screen and (max-width: 800px)': {
+    flexDirection: 'column',
+  }
 });
 
 const StyledButtonGroupContainer = styled(Box) ({
   display: 'flex',
   alignItems: 'center',
+
+  '@media screen and (max-width: 800px)': {
+    flexDirection: 'column',
+    width: '100%'
+  }
 })
 
 const StyledIntroControlButtonContainer = styled(Box)({
@@ -143,6 +152,12 @@ const StyledIntroControlButtonContainer = styled(Box)({
     '&:hover': {
       backgroundColor: '#EE994C',
     },
+  },
+
+  '@media screen and (max-width: 800px)': {
+    width: '100%',
+    marginRight: '0px !important',
+    marginBottom: '10px'
   }
 });
 
@@ -172,6 +187,10 @@ const StyledPreviewControlButtonContainer = styled(Box)({
     '&:hover': {
       backgroundColor: '#EE994C',
     },
+  },
+
+  '@media screen and (max-width: 800px)': {
+    width: '100%'
   }
 });
 
@@ -197,7 +216,7 @@ const StyledPreviewContainer = styled(Box) ({
 
   '& > .MuiBox-root: first-of-type': {
     marginBottom: '20px',
-    
+
   },
 
   '@media screen and (max-width: 700px)': {
