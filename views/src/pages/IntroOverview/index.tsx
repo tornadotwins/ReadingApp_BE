@@ -304,6 +304,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
     setIsCompleted(isCompleted);
     isCompleted && setIsPublished(isPublished);
     !isCompleted && setIsPublished(false);
+    setEnableSaveBtn(true);
   };
 
   const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
@@ -727,7 +728,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
       blocks && blocks.length > 0 && showPreview &&
       <StyledPreviewContainer>
         <Text color="#155D74" fontSize={18} fontWeight="bold" textAlign="left" fontFamily="Inter" hasUnderline>
-          PREVIEW 
+          PREVIEW
         </Text>
         {
           blocks.map((block, index) => {
@@ -740,6 +741,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
                     </Text>
                   </StyledPreviewTitleContainer>
                 );
+
               case "text":
                 return (
                   <StyledPreviewTextContainer key={index}>
@@ -759,13 +761,25 @@ function IntroOverview(props: IntroOverviewPropsType) {
                   </StyledPreviewImageContainer>
                 );
 
-              case "collapsible":
+              case "collapsible": {
+                // const title = block.value['0']?.value;
+                // const valuesWithoutFirst = Object.keys(block.value)
+                //   .filter(key => key !== "0") // Exclude the first key
+                //   .map(key => ({[selectedLanguage]: block.value[key].value, isTitle: block.value[key]?.type === 'title'}));
+
+                // const contents: any[] = [];
+                // valuesWithoutFirst?.map(valueWithoutFirst => 
+                //   contents.push(valueWithoutFirst.value)
+                // );
+
                 return (
                   <StyledPreviewCollapseContainer key={index}>
                     <PreviewCollapsibleBlock
                       language={selectedLanguage}
                       blockIndex={block.blockIndex}
                       value={block.value as IntroType}
+                      // title={title}
+                      // contents={contents}
 
                       onChange={() => { }}
                       onDelete={() => { }}
@@ -774,6 +788,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
                     />
                   </StyledPreviewCollapseContainer>
                 )
+              }
             }
           })
         }
