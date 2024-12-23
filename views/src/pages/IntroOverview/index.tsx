@@ -52,13 +52,14 @@ import {
   StyledButtonGroupContainer,
   StyledIntroControlButtonContainer,
   StyledPreviewControlButtonContainer,
-  StyledBlockGroup,
+  StyledDynamicBlockGroup,
   StyledPreviewContainer,
   StyledPreviewTitleContainer,
   StyledPreviewTextContainer,
   StyledPreviewImageContainer,
   StyledPreviewImage,
   StyledPreviewCollapseContainer,
+  StyledBlockGroupContainer,
 } from "./styles";
 import { getLanguageFromLanguageCode } from "@/utils";
 import bookService from "@/services/book.services";
@@ -259,12 +260,12 @@ function IntroOverview(props: IntroOverviewPropsType) {
   const handleSelectSubBookChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const value = event.target.value as string;
     setSelectedSubBook(value);
-  }
+  };
 
   const handleSelectLanguageChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const value = event.target.value as string;
     setSelectedLanguage(value);
-  }
+  };
 
   // Render Detailed Select box (language & sub book)
   const _renderDetailSelector = () => {
@@ -296,14 +297,14 @@ function IntroOverview(props: IntroOverviewPropsType) {
         </StyledSelectGroupContainer>
       </StyledSelectContainer>
     )
-  }
+  };
 
   // handle complete/publish switch
   const handleChapterStatus = (isCompleted: boolean, isPublished: boolean) => {
     setIsCompleted(isCompleted);
     isCompleted && setIsPublished(isPublished);
     !isCompleted && setIsPublished(false);
-  }
+  };
 
   const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
     const newChapterInfo: ChapterInfoType = {
@@ -537,7 +538,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
         </StyledButtonContainer>
       </StyledStatusManagerContainer>
     )
-  }
+  };
 
   // Add Block
   const handleAddBlock = (type: 'title' | 'text' | 'image' | 'collapsible') => {
@@ -551,7 +552,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
     setEnableSaveBtn(true);
     setBlocks([...blocks, newBlock]);
-  }
+  };
 
   // Delete a block
   const handleDeleteBlock = (id: string) => {
@@ -559,7 +560,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
     setEnableSaveBtn(true);
     setBlocks(newBlocks);
-  }
+  };
 
   // Render Intro Controller Button Group
   const _renderIntroControlButtonGroup = () => {
@@ -603,12 +604,12 @@ function IntroOverview(props: IntroOverviewPropsType) {
         </StyledPreviewControlButtonContainer>
       </StyledIntroControlButtonGroup>
     )
-  }
+  };
 
   const handleInputChange = (id: string, value: string) => {
     setEnableSaveBtn(true);
     setBlocks(blocks.map(block => block.id == id ? { ...block, value } : block));
-  }
+  };
 
   const handleUpdateImageBlock = (id: string, newData: object) => {
     setEnableSaveBtn(true);
@@ -631,7 +632,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
         block.id == id ? { ...block, value: { ...block.value as CollapsibleValType, ...newValue } } : block
       )
     )
-  }
+  };
 
   const handleReorderBlocks = (index: number, direction: 'up' | 'down') => {
     setEnableSaveBtn(true);
@@ -645,11 +646,11 @@ function IntroOverview(props: IntroOverviewPropsType) {
       }
       return newBlocks;
     });
-  }
+  };
 
-  const _renderBlocks = () => {
+  const _renderDynamicBlocks = () => {
     return (
-      <StyledBlockGroup>
+      <StyledDynamicBlockGroup>
         {blocks.map((block, index) => {
           switch (block.type) {
             case 'title':
@@ -717,21 +718,24 @@ function IntroOverview(props: IntroOverviewPropsType) {
               return null;
           }
         })}
-      </StyledBlockGroup>
+      </StyledDynamicBlockGroup>
     )
-  }
+  };
 
   const _renderPreview = () => {
     return (
-      blocks && blocks.length > 0 &&
+      blocks && blocks.length > 0 && showPreview &&
       <StyledPreviewContainer>
+        <Text color="#155D74" fontSize={18} fontWeight="bold" textAlign="left" fontFamily="Inter" hasUnderline>
+          PREVIEW 
+        </Text>
         {
           blocks.map((block, index) => {
             switch (block.type) {
               case "title":
                 return (
                   <StyledPreviewTitleContainer key={index}>
-                    <Text color='black' fontWeight="bold" textAlign="left">
+                    <Text color='black' fontWeight="bold" textAlign="left" fontFamily="Inter">
                       {block.value as string}
                     </Text>
                   </StyledPreviewTitleContainer>
@@ -739,7 +743,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
               case "text":
                 return (
                   <StyledPreviewTextContainer key={index}>
-                    <Text color='black' fontSize={16} fontWeight="400">
+                    <Text color='black' fontSize={16} fontWeight="400" fontFamily="Inter">
                       {block.value as string}
                     </Text>
                   </StyledPreviewTextContainer>
@@ -775,6 +779,16 @@ function IntroOverview(props: IntroOverviewPropsType) {
         }
       </StyledPreviewContainer>
     )
+  };
+
+  const _renderBlockGroup = () => {
+    return (
+      <StyledBlockGroupContainer>
+        {_renderDynamicBlocks()}
+
+        {_renderPreview()}
+      </StyledBlockGroupContainer>
+    )
   }
 
   const _renderBody = () => {
@@ -790,12 +804,10 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
         {_renderIntroControlButtonGroup()}
 
-        {_renderBlocks()}
-
-        {_renderPreview()}
+        {_renderBlockGroup()}
       </StyledIntroOverviewContainer>
     )
-  }
+  };
 
   return (
     <>

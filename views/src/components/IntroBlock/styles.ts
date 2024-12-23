@@ -187,8 +187,11 @@ const StyledCollapsibleBlockGroup = styled(Box) ({
 const StyledPreviewCollapsibleBlockContainer = styled(Box) ({
   display: 'flex',
   flexDirection: 'column',
-  boxSizing: 'border-box'
-})
+  boxSizing: 'border-box',
+  border: '1px solid #155D74',
+  borderRadius: '4px',
+  width: '100%'
+});
 
 export {
   StyledContainer,

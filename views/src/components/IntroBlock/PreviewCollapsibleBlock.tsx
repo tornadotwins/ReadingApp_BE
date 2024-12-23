@@ -1,20 +1,27 @@
-import { useState } from "react";
-
-import { StyledPreviewCollapsibleBlockContainer } from "./styles";
+import { Text } from "../Base";
+import { StyledImagePreview, StyledPreviewCollapsibleBlockContainer } from "./styles";
 
 import { CollapsibleBlockPropsType } from "./types";
-import { BlockType } from "@/pages/IntroOverview/types";
 import { AccordionPanel } from "../Base";
 
-function PreviewCollapsibleBlock (props: CollapsibleBlockPropsType) {
-  const [blocks, setBlocks] = useState<BlockType[]>([]);
-
+function PreviewCollapsibleBlock(props: CollapsibleBlockPropsType) {
   return (
     <StyledPreviewCollapsibleBlockContainer>
       <AccordionPanel
-        summaryTitle={(props.value?.title || '') as string}
-        label=""
-        detail={blocks[1]?.value}
+        label={props.value?.title?.[props.language] || ''}
+        detail={props.value?.content?.map((contentItem, index) =>
+          contentItem.isTitle ?
+            <Text key={index} color="#474747" fontSize={16} fontWeight="700">
+              {contentItem?.[props.language]}
+            </Text> :
+            contentItem.url ?
+              <StyledImagePreview key={index}>
+                <img src={contentItem.url} />
+              </StyledImagePreview> :
+              <Text key={index} color="#474747" fontSize={16} fontWeight="500">
+                {contentItem?.[props.language]}
+              </Text>
+        )}
       />
     </StyledPreviewCollapsibleBlockContainer>
   )

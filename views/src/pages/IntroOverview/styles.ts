@@ -175,24 +175,34 @@ const StyledPreviewControlButtonContainer = styled(Box)({
   }
 });
 
-const StyledBlockGroup = styled(Box)({
+const StyledDynamicBlockGroup = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  margin: '20px 40px',
   boxSizing: 'border-box',
+  width: '100%'
 });
 
 const StyledPreviewContainer = styled(Box) ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  margin: '20px 40px',
   boxSizing: 'border-box',
   border: '1px solid #155D74',
+  borderRadius: '4px',
   backgroundColor: '#F0F5FB',
-  padding: '10px'
+  padding: '10px',
+  width: '300px',
+
+  '& > .MuiBox-root: first-of-type': {
+    marginBottom: '20px',
+    
+  },
+
+  '@media screen and (max-width: 700px)': {
+    width: '100%'
+  },
 });
 
 const StyledPreviewTitleContainer = styled(Box) ({
@@ -229,7 +239,20 @@ const StyledPreviewCollapseContainer = styled(Box) ({
   boxSizing: 'border-box',
   padding: '0px 10px',
   marginBottom: '10px',
-})
+  width: '100%',
+});
+
+const StyledBlockGroupContainer = styled(Box) ({
+  display: 'flex',
+  margin: '20px 40px',
+  boxSizing: 'border-box',
+  justifyContent: 'space-between',
+  gap: '20px',
+
+  '@media screen and (max-width: 700px)': {
+    flexDirection: 'column',
+  }
+});
 
 export {
   StyledContainer,
@@ -243,11 +266,12 @@ export {
   StyledButtonGroupContainer,
   StyledIntroControlButtonContainer,
   StyledPreviewControlButtonContainer,
-  StyledBlockGroup,
+  StyledDynamicBlockGroup,
   StyledPreviewContainer,
   StyledPreviewTitleContainer,
   StyledPreviewTextContainer,
   StyledPreviewImageContainer,
   StyledPreviewImage,
   StyledPreviewCollapseContainer,
+  StyledBlockGroupContainer,
 }

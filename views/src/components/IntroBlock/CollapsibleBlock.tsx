@@ -36,7 +36,6 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
       blocks.push(block);
     }
 
-    console.log(props.value)
     valueContents?.map((content, index) => {
       if (content.url) {
         const block: BlockType = {
