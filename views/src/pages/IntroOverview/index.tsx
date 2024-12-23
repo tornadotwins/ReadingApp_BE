@@ -338,7 +338,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
   };
 
   const handleSave = useCallback(() => {
-    // setIsLoading(true);
+    setIsLoading(true);
     const introResult: IntroType[] = [];
 
     blocks.map((block, index) => {
