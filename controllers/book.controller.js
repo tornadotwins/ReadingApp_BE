@@ -1006,27 +1006,6 @@ exports.updateIntro = async (req, res) => {
       // Step 3: Update the content array
       const updatedContent = [...verse.content]; // Copy the existing content array
 
-      // Iterate through each new content item
-      updatedContent.forEach((newContentItem) => {
-        // Check if the language or image already exists in the content array
-        const existingIndex = updatedContent.findIndex(
-          (item) =>
-            item?.[languageCode] === newContentItem?.[languageCode] || // Match language
-            item.image === newContentItem.image, // Match image
-        );
-
-        if (existingIndex !== -1) {
-          // If exists, merge the new content with the existing content
-          updatedContent[existingIndex] = {
-            ...updatedContent[existingIndex],
-            ...newContentItem,
-          };
-        } else {
-          // If not exists, add the new content item to the array
-          updatedContent.push(newContentItem);
-        }
-      });
-
       // Update the content field in the Introduction document
       existingVerse.content = updatedContent;
 
@@ -1043,8 +1022,8 @@ exports.updateIntro = async (req, res) => {
     isTranslated: updatedChapter.isTranslated,
     isCompleted: updatedChapter.isCompleted,
     isPublished: updatedChapter.isPublished,
-    verses: updatedIntroVerses
-  }
+    verses: updatedIntroVerses,
+  };
 
   // Return the updated chapter information in the response
   return res.status(200).json(updatedIntroChapter);
