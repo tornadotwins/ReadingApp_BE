@@ -1,12 +1,12 @@
 import { useEffect, useState, } from 'react';
 
-import { Button, Text } from "../Base";
+import { Button } from "../Base";
 import BlockHeader from "./BlockHeader";
 import TextBlock from "./TextBlock";
 import ImageBlock from "./ImageBlock";
 import {
   StyledContainer,
-  StyledSubTitleContainer,
+  // StyledSubTitleContainer,
   StyledCollapsibleButtonContainer,
   StyledCollapsibleButtonGroup,
   StyledCollapsibleAddButtonContainer,
@@ -90,21 +90,21 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
     )
   }
 
-  const _renderSubTitle = (title: string) => {
-    return (
-      <StyledSubTitleContainer>
-        <Text
-          color='#155D74'
-          fontFamily='Inter'
-          fontSize={16}
-          lineHeight={24}
-          fontWeight='bold'
-        >
-          {title}
-        </Text>
-      </StyledSubTitleContainer>
-    )
-  }
+  // const _renderSubTitle = (title: string) => {
+  //   return (
+  //     <StyledSubTitleContainer>
+  //       <Text
+  //         color='#155D74'
+  //         fontFamily='Inter'
+  //         fontSize={16}
+  //         lineHeight={24}
+  //         fontWeight='bold'
+  //       >
+  //         {title}
+  //       </Text>
+  //     </StyledSubTitleContainer>
+  //   )
+  // }
 
   // Add Block
   const handleAddBlock = (type: 'title' | 'text' | 'image') => {
@@ -251,10 +251,6 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
   return (
     <StyledContainer>
       {_renderHeader()}
-
-      {_renderSubTitle('Title: ')}
-
-      {_renderSubTitle('Content Items: ')}
 
       {_renderButtonGroup()}
 
