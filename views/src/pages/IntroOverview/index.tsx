@@ -84,7 +84,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
   const [isCompleted, setIsCompleted] = useState(location.state.subBookInfo.chapterInfos[0].chapterIsCompleted?.[selectedLanguage] || false);
   const [isPublished, setIsPublished] = useState(location.state.subBookInfo.chapterInfos[0].chapterIsPublished?.[selectedLanguage] || false);
 
-  const [showPreview, setShowPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
 
   const [blocks, setBlocks] = useState<BlockType[]>([]);
 
@@ -762,15 +762,6 @@ function IntroOverview(props: IntroOverviewPropsType) {
                 );
 
               case "collapsible": {
-                // const title = block.value['0']?.value;
-                // const valuesWithoutFirst = Object.keys(block.value)
-                //   .filter(key => key !== "0") // Exclude the first key
-                //   .map(key => ({[selectedLanguage]: block.value[key].value, isTitle: block.value[key]?.type === 'title'}));
-
-                // const contents: any[] = [];
-                // valuesWithoutFirst?.map(valueWithoutFirst => 
-                //   contents.push(valueWithoutFirst.value)
-                // );
                 const jsonArray = Object.values(block.value);
                 const title = jsonArray[0]?.value;
                 const contents = [];

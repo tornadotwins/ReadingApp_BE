@@ -4,6 +4,9 @@ type TitleBlockPropsType = {
   language: string;
   inputVal: string;
   blockIndex: number;
+  disableDelete?: boolean;
+  disableMoveUp?: boolean;
+  disableMovedown?: boolean;
 
   onInputChange: (val: string) => void;
   onDelete: () => void;
@@ -15,6 +18,9 @@ type TextBlockPropsType = {
   language: string;
   inputVal: string;
   blockIndex: number;
+  disableDelete?: boolean;
+  disableMoveUp?: boolean;
+  disableMovedown?: boolean;
 
   onInputChange: (val: string) => void;
   onDelete: () => void;
@@ -26,6 +32,9 @@ type ImageBlockPropsType = {
   url: string;
   alt: string;
   blockIndex: number;
+  disableDelete?: boolean;
+  disableMoveUp?: boolean;
+  disableMovedown?: boolean;
 
   onImageInputChange: (val: string) => void;
   onAltInputChange: (val: string) => void;
@@ -62,6 +71,9 @@ type CollapsibleBlockPropsType = {
 type BlockHeaderPropsType = {
   title: string;
   blockIndex: number;
+  disableDelete?: boolean;
+  disableMoveUp?: boolean;
+  disableMoveDown?: boolean;
 
   onDelete: () => void;
   onMoveUp: (index: number) => void;

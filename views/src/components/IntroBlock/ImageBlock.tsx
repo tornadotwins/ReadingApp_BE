@@ -32,6 +32,9 @@ function ImageBlock(props: ImageBlockPropsType) {
       <BlockHeader
         title="Image Block"
         blockIndex={props.blockIndex}
+        disableDelete={props.disableDelete}
+        disableMoveDown={props.disableMovedown}
+        disableMoveUp={props.disableMoveUp}
 
         onDelete={props.onDelete}
         onMoveUp={props.onMoveUp}

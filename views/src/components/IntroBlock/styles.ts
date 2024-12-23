@@ -24,7 +24,7 @@ const StyledBlockControlContainer = styled(Box) ({
   alignItems: 'center',
 });
 
-const StyledBlockControlButtonContainer = styled(Box) ({
+const StyledBlockControlButtonContainer = styled(Box) <{isdisabled: string}> (({isdisabled}) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -33,20 +33,21 @@ const StyledBlockControlButtonContainer = styled(Box) ({
   border: '1px solid #155D74',
   borderRadius: '4px',
   marginLeft: '5px',
+  opacity: isdisabled == 'true' ? '.8' : '1',
 
   '&:hover': {
-    cursor: 'pointer',
-    backgroundColor: '#155D74',
+    cursor: isdisabled == 'true' ? 'not-allowed' : 'pointer',
+    backgroundColor: isdisabled == 'true' ? '' : '#155D74',
 
     '& svg': {
-      fill: 'white'
+      fill: isdisabled == 'true' ? '' : 'white'
     },
 
     '& .MuiBox-root': {
-      color: 'white'
+      color: isdisabled == 'true' ? '' : 'white'
     }
   },
-});
+}));
 
 const StyledContentRow = styled(Box)({
   display: 'flex',

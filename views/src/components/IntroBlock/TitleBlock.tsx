@@ -14,6 +14,9 @@ function TitleBlock(props: TitleBlockPropsType) {
       <BlockHeader
         title='Title Block'
         blockIndex={props.blockIndex}
+        disableDelete={props.disableDelete}
+        disableMoveDown={props.disableMovedown}
+        disableMoveUp={props.disableMoveUp}
 
         onDelete={props.onDelete}
         onMoveUp={props.onMoveUp}

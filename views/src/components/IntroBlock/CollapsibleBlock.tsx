@@ -200,6 +200,9 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
                   language={props.language}
                   inputVal={block.value as string}
                   blockIndex={index + 1}
+                  disableDelete={index === 0}
+                  disableMovedown={index === 0}
+                  disableMoveUp={index === 0}
 
                   onInputChange={(val) => handleInputChange(block.id, val)}
                   onDelete={() => handleDeleteBlock(block.id)}
@@ -214,6 +217,7 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
                   language={props.language}
                   inputVal={block.value as string}
                   blockIndex={index + 1}
+                  disableMoveUp={index === 1}
 
                   onInputChange={(val) => handleInputChange(block.id, val)}
                   onDelete={() => handleDeleteBlock(block.id)}
@@ -228,6 +232,7 @@ function CollapsibleBlock(props: CollapsibleBlockPropsType) {
                   url={((block.value) as ImageValType).url}
                   alt={((block.value) as ImageValType).alt}
                   blockIndex={index + 1}
+                  disableMoveUp={index == 1}
 
                   onImageInputChange={(val) => handleUpdateImageBlock(block.id, { url: val })}
                   onAltInputChange={(val) => handleUpdateImageBlock(block.id, { alt: val })}

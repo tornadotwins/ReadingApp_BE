@@ -24,15 +24,24 @@ function BlockHeader(props: BlockHeaderPropsType) {
       </Text>
 
       <StyledBlockControlContainer>
-        <StyledBlockControlButtonContainer onClick={() => props.onMoveUp(props.blockIndex)}>
+        <StyledBlockControlButtonContainer
+          isdisabled={props.disableMoveUp ? 'true' : 'false'}
+          onClick={() => props.disableMoveUp ? {} : props.onMoveUp(props.blockIndex)}
+        >
           <ArrowUpwardIcon />
         </StyledBlockControlButtonContainer>
 
-        <StyledBlockControlButtonContainer onClick={() => props.onMoveDown(props.blockIndex)}>
+        <StyledBlockControlButtonContainer
+          isdisabled={props.disableMoveDown ? 'true' : 'false'}
+          onClick={() => props.disableMoveDown ? {} : props.onMoveDown(props.blockIndex)}
+        >
           <ArrowDownwardIcon />
         </StyledBlockControlButtonContainer>
 
-        <StyledBlockControlButtonContainer onClick={props.onDelete}>
+        <StyledBlockControlButtonContainer
+          isdisabled={props.disableDelete ? 'true' : 'false'}
+          onClick={() => props.disableDelete ? {} : props.onDelete()}
+        >
           <Text>Delete</Text>
         </StyledBlockControlButtonContainer>
       </StyledBlockControlContainer>
