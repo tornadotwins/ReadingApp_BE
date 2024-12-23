@@ -771,6 +771,19 @@ function IntroOverview(props: IntroOverviewPropsType) {
                 // valuesWithoutFirst?.map(valueWithoutFirst => 
                 //   contents.push(valueWithoutFirst.value)
                 // );
+                const jsonArray = Object.values(block.value);
+                const title = jsonArray[0]?.value;
+                const contents = [];
+                for (let index = 1; index < jsonArray.length; index++) {
+                  const jsonObj = jsonArray[index];
+                  if (jsonObj?.type == 'title') {
+                    contents.push({ [selectedLanguage]: jsonObj?.value, isTitle: true });
+                  } else if (jsonObj?.type == 'text') {
+                    contents.push({ [selectedLanguage]: jsonObj?.value, isTitle: false });
+                  } else {
+                    contents.push(jsonObj?.value);
+                  }
+                }
 
                 return (
                   <StyledPreviewCollapseContainer key={index}>
@@ -778,8 +791,8 @@ function IntroOverview(props: IntroOverviewPropsType) {
                       language={selectedLanguage}
                       blockIndex={block.blockIndex}
                       value={block.value as IntroType}
-                      // title={title}
-                      // contents={contents}
+                      title={title}
+                      contents={contents}
 
                       onChange={() => { }}
                       onDelete={() => { }}
