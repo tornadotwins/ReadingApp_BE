@@ -213,6 +213,7 @@ const StyledPreviewContainer = styled(Box) ({
   backgroundColor: '#F0F5FB',
   padding: '10px',
   width: '300px',
+  marginBottom: '10px',
 
   '& > .MuiBox-root: first-of-type': {
     marginBottom: '20px',
