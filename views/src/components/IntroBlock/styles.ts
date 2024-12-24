@@ -221,7 +221,21 @@ const StyledPreviewCollapsibleBlockContainer = styled(Box) ({
   boxSizing: 'border-box',
   border: '1px solid #155D74',
   borderRadius: '4px',
-  width: '100%'
+  width: '100%',
+  marginTop: '10px',
+
+  '& .MuiAccordionSummary-content .MuiBox-root': {
+    width: '100%',
+    wordWrap: 'break-work',
+    wordBreak: 'break-word',
+  },
+
+  '& .MuiAccordionDetails-root .MuiBox-root': {
+    marginTop: '10px',
+    width: '100%',
+    wordWrap: 'break-work',
+    wordBreak: 'break-word',
+  }
 });
 
 export {

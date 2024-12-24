@@ -215,6 +215,14 @@ const StyledPreviewContainer = styled(Box) ({
   width: '300px',
   marginBottom: '10px',
 
+  
+
+  '& .MuiBox-root': {
+    width: '100%',
+    wordWrap: 'break-work',
+    wordBreak: 'break-word'
+  },
+
   '& > .MuiBox-root: first-of-type': {
     marginBottom: '20px',
 
