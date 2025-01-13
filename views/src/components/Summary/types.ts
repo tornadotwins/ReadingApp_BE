@@ -14,8 +14,8 @@ type SummaryPropsType = {
   isPublish: boolean,
   isSpecialBook: boolean,
 
-  translateComplete: (value: boolean) => void,
-  translatePublish: (value: boolean) => void,
+  handleComplete: (value: boolean) => void,
+  handlePublish: (value: boolean) => void,
   handleCurrentChapterTitleChange?: (value: string) => void,
   handleArabicChapterTitleChange?: (value: string) => void,
   handleTransliterationChapterTitleChange?: (value: string) => void,

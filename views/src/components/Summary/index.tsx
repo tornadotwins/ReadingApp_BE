@@ -191,7 +191,7 @@ function Summary(props: SummaryPropsType) {
                         false :
                         true
                     }
-                    onChange={(value: boolean) => props.translateComplete(value)}
+                    onChange={(value: boolean) => props.handleComplete(value)}
                   />
                 </StyledSummaryItemContainer>
 
@@ -208,7 +208,7 @@ function Summary(props: SummaryPropsType) {
                         )
                       ) && !props.isComplete
                     }
-                    onChange={(value: boolean) => props.translatePublish(value)}
+                    onChange={(value: boolean) => props.handlePublish(value)}
                   />
                 </StyledSummaryItemContainer>
               </>
@@ -255,7 +255,7 @@ function Summary(props: SummaryPropsType) {
                   false :
                   true
               }
-              onChange={(value: boolean) => props.translateComplete(value)}
+              onChange={(value: boolean) => props.handleComplete(value)}
             />
           </StyledSummaryItemContainer>
 
@@ -270,7 +270,7 @@ function Summary(props: SummaryPropsType) {
                       role.role.toLowerCase() == "publisher".toLowerCase()
                   )) && !props.isComplete
               }
-              onChange={(value: boolean) => props.translatePublish(value)}
+              onChange={(value: boolean) => props.handlePublish(value)}
             />
           </StyledSummaryItemContainer>
         </StyledContainer>

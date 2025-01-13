@@ -766,8 +766,8 @@ function AudioOverview(props: AudioOverviewPropsType) {
         transliteration={inputTransliteration}
         currentChapterTitle={inputCurrentLanguageChapterName}
 
-        translateComplete={(value: boolean) => handleAudioComplete(value)}
-        translatePublish={(value: boolean) => handleAudioPublish(value)}
+        handleComplete={(value: boolean) => handleAudioComplete(value)}
+        handlePublish={(value: boolean) => handleAudioPublish(value)}
         handleCurrentChapterTitleChange={(value: string) => handleCurrentLanguageChapterNameChange(value)}
         handleArabicChapterTitleChange={(value: string) => handleArabicChapterNameChange(value)}
         handleTransliterationChapterTitleChange={(value: string) => setInputTransliteration(value)}

@@ -607,7 +607,10 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       chapterIsCompleted: updatedChapterInfo.isCompleted,
       chapterIsPublished: updatedChapterInfo.isPublished,
       subBookId: updatedChapterInfo.subBook,
+      verses: updatedChapterInfo.verses,
     }
+
+    setActiveChapterInfo(newChapterInfo)
 
     const updatedBookInfos = props.bookInfos.map((book) => ({
       ...book,
@@ -633,7 +636,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       payload: {
         chapterInfo: newChapterInfo,
       }
-    })
+    });
   };
 
   const updateReduxBookInfoWithSubBook = (updatedSubBookInfo: SubBookModelType) => {
@@ -1066,8 +1069,8 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         transliteration={inputTransliteration}
         currentChapterTitle={inputCurrentLanguageChapterName}
 
-        translateComplete={(value: boolean) => handleTranslateComplete(value)}
-        translatePublish={(value: boolean) => handleTranslatePublish(value)}
+        handleComplete={(value: boolean) => handleTranslateComplete(value)}
+        handlePublish={(value: boolean) => handleTranslatePublish(value)}
         handleCurrentChapterTitleChange={(value: string) => handleCurrentLanguageChapterNameChange(value)}
         handleArabicChapterTitleChange={(value: string) => handleArabicChapterNameChange(value)}
         handleTransliterationChapterTitleChange={(value: string) => setInputTransliteration(value)}
