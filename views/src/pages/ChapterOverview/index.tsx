@@ -916,7 +916,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   }, [file]);
 
   // Save book by calling API
-  const saveBook = () => {
+  const saveBook = useCallback(() => {
     translatorService
       .saveBook({ bookInfos: necessaryParsedData, bookTitle: props.currentBook, language: getLanguageFromLanguageCode(selectedLanguage) })
       .then(() => {
@@ -943,7 +943,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           autoClose: 3000
         });
       });
-  };
+  }, [selectedLanguage, necessaryParsedData]);
 
   // Log out
   const onLogout = () => {
