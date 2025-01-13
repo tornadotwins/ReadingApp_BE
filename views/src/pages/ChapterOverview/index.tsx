@@ -334,7 +334,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     }
 
     configureTableData();
-  }, [selectedSubBook, props.bookInfos, props.currentBook]);
+  }, [selectedSubBook, props.currentBook]);
 
   // Chapter Effect
   useEffect(() => {
@@ -386,7 +386,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     locationState.chapterId = ''
 
     configureTableData();
-  }, [selectedChapter]);
+  }, [props.chapterInfos, selectedChapter]);
 
   // Set the default values when render the page first
   useEffect(() => {
@@ -610,7 +610,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       verses: updatedChapterInfo.verses,
     }
 
-    setActiveChapterInfo(newChapterInfo)
+    setActiveChapterInfo(newChapterInfo);
 
     const updatedBookInfos = props.bookInfos.map((book) => ({
       ...book,
