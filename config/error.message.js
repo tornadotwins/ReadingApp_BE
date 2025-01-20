@@ -41,5 +41,9 @@ module.exports = {
   FAIL_UPDATE_APP_TEXT: 'Failed to update an app text',
   APP_TEXT_NOT_FOUND: "Could't find a app text",
   APP_PAGE_NOT_FOUND: "Couldn't find a page",
-  INTRO_INCORRECT_FORM: "Intro data is not correct form",
+  INTRO_INCORRECT_FORM: 'Intro data is not correct form',
+
+  // Journey
+  JOURNEY_NOT_FOUND: "Couldn't find journey",
+  ARTICLE_NOT_FOUND: "Couldn't find article",
 };
