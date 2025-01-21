@@ -515,6 +515,7 @@ exports.getBookInformation = async (req, res) => {
       bookId: book._id,
       bookTitle: book.title,
       bookImage: book.coverImage,
+      markImage: book.markImage,
       subBooks: subBooksWithChapters,
     };
 
@@ -1054,6 +1055,7 @@ const getSavedBookId = async (languageCode, title) => {
       },
       library: '66cbe68db07590b6dcd5f13a',
       coverImage: '', // Optional or provide a default value if needed
+      markImage: '',
       order:
         title == "Qur'an"
           ? 1
@@ -1314,6 +1316,7 @@ const sortAndGroupLibraries = (libraries) => {
       _id: book._id,
       title: book.title,
       coverImage: book.coverImage,
+      markImage: book.markImage,
       createdAt: book.createdAt,
       updatedAt: book.updatedAt,
     });
