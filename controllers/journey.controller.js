@@ -78,22 +78,32 @@ const collectAllJourneys = async (parentId, result = []) => {
 const collectArticlesByIds = async (journeyIds) => {
   try {
     if (!Array.isArray(journeyIds) || journeyIds.length === 0) {
-      return [];
+      return {};
     }
 
-    // Find articles whose IDs match the given array
+    // Find articles whose `article` field matches the given journey IDs
     const articles = await Article.find({
       article: { $in: journeyIds },
     });
 
     if (!articles || articles.length === 0) {
-      return [];
+      return {};
     }
 
-    return articles;
+    // Group articles by their parent journey ID
+    const groupedArticles = articles.reduce((acc, article) => {
+      const parentId = article.article.toString(); // Convert ObjectId to string for consistent keys
+      if (!acc[parentId]) {
+        acc[parentId] = [];
+      }
+      acc[parentId].push(article);
+      return acc;
+    }, {});
+
+    return groupedArticles;
   } catch (error) {
     console.error('Error fetching articles:', error);
-    return [];
+    return {};
   }
 };
 
@@ -115,16 +125,18 @@ exports.getHierarchicalJourneyList = async (req, res) => {
     // Collect all journeys in a flat list
     const journeyList = await collectAllJourneys(parent);
 
-    // Get articles by their IDs
+    // Get article IDs from journeys where `isArticle` is true
     const articleIds = journeyList
       .filter((journey) => journey.isArticle)
       .map((journey) => journey._id);
 
-    const articleList = await collectArticlesByIds(articleIds);
+    // Get articles grouped by parent journey IDs
+    const groupedArticles = await collectArticlesByIds(articleIds);
 
-    return res
-      .status(200)
-      .json({ journeys: journeyList, articles: articleList });
+    return res.status(200).json({
+      journeys: journeyList,
+      articlesByParent: groupedArticles,
+    });
   } catch (error) {
     console.error('Error fetching journeys:', error);
     return res
