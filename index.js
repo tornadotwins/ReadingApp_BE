@@ -13,6 +13,9 @@ const adminAuthRoute = require('./routes/adminAuth.route');
 const translatorRoute = require('./routes/translate.route');
 const audioRoute = require('./routes/audio.route');
 
+const journeyRoute = require('./routes/journey.route');
+const articleRoute = require('./routes/article.route');
+
 const dbConfig = require('./config/db.config');
 const path = require('path');
 
@@ -62,6 +65,8 @@ app.use('/admin/auth', adminAuthRoute);
 app.use('/translator', translatorRoute);
 app.use('/audio', audioRoute);
 
+app.use('/journey', journeyRoute);
+app.use('/article', articleRoute);
 
 app.get('/admin/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'index.html'));
