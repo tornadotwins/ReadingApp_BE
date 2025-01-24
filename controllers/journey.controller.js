@@ -87,23 +87,33 @@ const collectArticlesByIds = async (journeyIds) => {
     });
 
     if (!articles || articles.length === 0) {
-      return {};
+      return journeyIds.map((id) => ({
+        articleIdInJourney: id,
+        articleContents: [],
+      }));
     }
 
     // Group articles by their parent journey ID
     const groupedArticles = articles.reduce((acc, article) => {
-      const parentId = article.article.toString(); // Convert ObjectId to string for consistent keys
+      const parentId = article.article.toString(); // Convert ObjectId to string
       if (!acc[parentId]) {
         acc[parentId] = [];
       }
-      acc[parentId].push(article);
+      acc[parentId].push(article.toObject());
       return acc;
     }, {});
 
-    return groupedArticles;
+    // Format the result as an array
+    return journeyIds.map((id) => ({
+      articleIdInJourney: id,
+      articleContents: groupedArticles[id] || [],
+    }));
   } catch (error) {
     console.error('Error fetching articles:', error);
-    return {};
+    return journeyIds.map((id) => ({
+      articleIdInJourney: id,
+      articleContents: [],
+    }));
   }
 };
 
@@ -135,7 +145,7 @@ exports.getHierarchicalJourneyList = async (req, res) => {
 
     return res.status(200).json({
       journeys: journeyList,
-      articlesByParent: groupedArticles,
+      articles: groupedArticles,
     });
   } catch (error) {
     console.error('Error fetching journeys:', error);
