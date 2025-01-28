@@ -2,7 +2,6 @@ import { Dispatch } from "redux";
 
 import { UserType } from "../types";
 import { BookType, SubBookInfoType } from "../BookOverview/types";
-// import { BlockValType } from "@/components/IntroBlock/types";
 
 type IntroOverviewPropsType = {
   subBookInfo: SubBookInfoType,

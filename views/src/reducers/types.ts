@@ -1,6 +1,7 @@
 import { BookType, ChapterInfoType, SubBookInfoType } from "@/pages/BookOverview/types";
+import { ImageValType } from "@/pages/IntroOverview/types";
 import { ChapterType } from "@/pages/Translator/types";
-import { AppTextPageType, UserType } from "@/pages/types";
+import { AppTextPageType, ObjectType, UserType } from "@/pages/types";
 
 type StateType = {
   currentUser: UserType | null;
@@ -122,7 +123,32 @@ type AppStateType = {
     currentAudioHandler: string;
     appTextPages: AppTextPageType[];
   }
+  journeys: {
+    journeyTitle: string;
+  }
 };
+
+type JourneyCardType = {
+  _id: string;
+  parent: string;
+  parentModel: string;
+  isArticle: boolean;
+  title: ObjectType;
+  seriesTitle: ObjectType;
+  image: ImageValType;
+  depth: number;
+}
+
+type JourneyBookStateType = {
+  journeyCardInfos: JourneyCardType[] | [];
+}
+
+type JourneyBookActionType = {
+  type: string;
+  payload: {
+    journeyTitle: string;
+  }
+}
 
 export type {
   StateType,
@@ -141,4 +167,6 @@ export type {
   AppTextPageActionType,
   CurrentAudioHandlerActionType,
   AppStateType,
+  JourneyBookStateType,
+  JourneyBookActionType,
 }

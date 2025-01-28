@@ -37,10 +37,22 @@ function Header(props: HeaderType) {
           lineHeight={47}
           textAlign="center"
           color="white"
-          hasUnderline={!props.isAdminPage}
+          hasUnderline={!props.isAdminPage && !props.isJourneyPage}
           onClick={() => navigate('/admin/bookoverview')}
         >
           {'Translation Portal'}
+        </Text>
+        <Text
+          fontFamily="Buenard"
+          fontWeight="700"
+          fontSize={36}
+          lineHeight={47}
+          textAlign="center"
+          color="white"
+          hasUnderline={props.isJourneyPage}
+          onClick={() => navigate('/admin/journeyoverview')}
+        >
+          {'Journey Portal'}
         </Text>
       </StyledHeaderTitle>
 

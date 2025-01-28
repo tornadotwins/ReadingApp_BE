@@ -8,6 +8,7 @@ enum Pages {
   AdminPortal,
   Translator,
   BookOverview,
+  JourneyOverview,
   ChapterOverview,
   AppTextOverview,
   AudioOverview,

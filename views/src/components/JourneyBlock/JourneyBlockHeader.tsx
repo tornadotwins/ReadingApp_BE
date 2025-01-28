@@ -2,16 +2,17 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 import { Text } from "../Base";
-import {
-  StyledBlockHeaderContainer,
-  StyledBlockControlContainer,
-  StyledBlockControlButtonContainer,
-} from "./styles";
-import { BlockHeaderPropsType } from "./types";
 
-function BlockHeader(props: BlockHeaderPropsType) {
+import {
+  StyledJourneyBlockHeaderContainer,
+  StyledJourneyBlockControlContainer,
+  StyledJourneyBlockControlButtonContainer,
+} from './styles';
+import { JourneyBlockHeaderPropsType } from './types';
+
+function JourneyBlockHeader(props: JourneyBlockHeaderPropsType) {
   return (
-    <StyledBlockHeaderContainer>
+    <StyledJourneyBlockHeaderContainer>
       <Text
         color='#155D74'
         fontFamily='Inter'
@@ -22,30 +23,30 @@ function BlockHeader(props: BlockHeaderPropsType) {
         {props.title}
       </Text>
 
-      <StyledBlockControlContainer>
-        <StyledBlockControlButtonContainer
+      <StyledJourneyBlockControlContainer>
+        <StyledJourneyBlockControlButtonContainer
           isdisabled={props.disableMoveUp ? 'true' : 'false'}
           onClick={() => props.disableMoveUp ? {} : props.onMoveUp(props.blockIndex)}
         >
           <ArrowUpwardIcon />
-        </StyledBlockControlButtonContainer>
+        </StyledJourneyBlockControlButtonContainer>
 
-        <StyledBlockControlButtonContainer
+        <StyledJourneyBlockControlButtonContainer
           isdisabled={props.disableMoveDown ? 'true' : 'false'}
           onClick={() => props.disableMoveDown ? {} : props.onMoveDown(props.blockIndex)}
         >
           <ArrowDownwardIcon />
-        </StyledBlockControlButtonContainer>
+        </StyledJourneyBlockControlButtonContainer>
 
-        <StyledBlockControlButtonContainer
+        <StyledJourneyBlockControlButtonContainer
           isdisabled={props.disableDelete ? 'true' : 'false'}
           onClick={() => props.disableDelete ? {} : props.onDelete()}
         >
           <Text>Delete</Text>
-        </StyledBlockControlButtonContainer>
-      </StyledBlockControlContainer>
-    </StyledBlockHeaderContainer>
+        </StyledJourneyBlockControlButtonContainer>
+      </StyledJourneyBlockControlContainer>
+    </StyledJourneyBlockHeaderContainer>
   )
 }
 
-export default BlockHeader;
+export default JourneyBlockHeader;

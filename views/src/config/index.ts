@@ -2,8 +2,8 @@ import isMobile from '@/utils/is-mobile';
 
 import type { Notifications } from './types';
 
-// const API_URL = 'http://localhost:5000';
-const API_URL = 'https://readingapp-d5944320053c.herokuapp.com';
+const API_URL = 'http://localhost:5000';
+// const API_URL = 'https://readingapp-d5944320053c.herokuapp.com';
 
 const ACCESS_TOKEN = 'accessToken';
 const CURRENT_USER = 'currentUser';
@@ -65,6 +65,11 @@ const BOOK_QURAN = 'Qur\'an';
 const BOOK_INJIL = 'Injil';
 const BOOK_ZABUR = 'Zabur';
 const BOOK_TAWRAT = 'Tawrat';
+
+const JOURNEY_QURAN = 'Qur\'an Journey';
+const JOURNEY_INJIL = 'Injil Journey';
+const JOURNEY_ZABUR = 'Zabur Journey';
+const JOURNEY_TAWRAT = 'Tawrat Journey';
 
 const USER_ROLE_NONE = 'none';
 const USER_ROLE_TRANSLATOR = 'Translator';
@@ -277,6 +282,13 @@ const BOOK_SELECTORS = [
   { bookTitle: BOOK_TAWRAT, value: BOOK_TAWRAT },
 ];
 
+const JOURNEY_SELECTORS = [
+  { bookTitle: JOURNEY_QURAN, value: JOURNEY_QURAN },
+  { bookTitle: JOURNEY_INJIL, value: JOURNEY_INJIL },
+  { bookTitle: JOURNEY_ZABUR, value: JOURNEY_ZABUR },
+  { bookTitle: JOURNEY_TAWRAT, value: JOURNEY_TAWRAT }
+]
+
 export {
   API_URL,
   CURRENT_USER,
@@ -298,6 +310,11 @@ export {
   BOOK_INJIL,
   BOOK_ZABUR,
   BOOK_TAWRAT,
+
+  JOURNEY_QURAN,
+  JOURNEY_INJIL,
+  JOURNEY_ZABUR,
+  JOURNEY_TAWRAT,
 
   USER_ROLE_NONE,
   USER_ROLE_TRANSLATOR,
@@ -321,4 +338,5 @@ export {
   COLOR,
   LANGUAGE_CODE_TABLE,
   BOOK_SELECTORS,
+  JOURNEY_SELECTORS,
 };

@@ -57,6 +57,10 @@ type AppTextPageChangedType = {
   isChanged: boolean;
 }
 
+type ObjectType = {
+  [key: string]: string;
+}
+
 export type {
   RoleType,
   UserType,
@@ -64,5 +68,6 @@ export type {
   AppTextType,
   AppTextPageType,
   AppTextPageStatusType,
-  AppTextPageChangedType
+  AppTextPageChangedType,
+  ObjectType,
 };
