@@ -190,7 +190,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     )
   }
 
-  const handleJourneyCard = (isArticle: boolean) => {
+  const addJourneyCard = (isArticle: boolean) => {
     const id = `${isArticle ? 'article' : 'directory'}-${Date.now()}`;
     const newBlock: JourneyBlockType = {
       id,
@@ -205,20 +205,56 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     setJourneyBlocks([...journeyBlocks, newBlock]);
   }
 
+  const deleteJourneyCard = (id: string) => {
+    const newBlocks = journeyBlocks.filter(block => block.id !== id);
+
+    setEnableSaveBtn(true);
+    setJourneyBlocks(newBlocks);
+  }
+
+  const reorderJourneyCards = (index: number, direction: 'up' | 'down') => {
+    setEnableSaveBtn(true);
+    setJourneyBlocks((prevBlocks) => {
+      const newBlocks = [...prevBlocks];
+      if (direction === "up" && index > 0) {
+        [newBlocks[index], newBlocks[index - 1]] = [newBlocks[index - 1], newBlocks[index]];
+      }
+      if (direction === "down" && index < newBlocks.length - 1) {
+        [newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]];
+      }
+      return newBlocks;
+    });
+  };
+
+  const handleTitleChange = (id: string, value: string) => {
+    setEnableSaveBtn(true);
+    setJourneyBlocks(journeyBlocks.map(block => block.id == id ? { ...block, title: value } : block));
+  }
+
+  const handleSeriesTitleChange = (id: string, value: string) => {
+    setEnableSaveBtn(true);
+    setJourneyBlocks(journeyBlocks.map(block => block.id == id ? { ...block, seriesTitle: value } : block));
+  }
+
+  const handleSeriesLogoChange = (id: string, value: string) => {
+    setEnableSaveBtn(true);
+    setJourneyBlocks(journeyBlocks.map(block => block.id == id ? { ...block, seriesLogo: value } : block));
+  }
+
   const _renderJourneyControlButtonGroup = () => {
     return (
       <StyledDirectoryControlButtonGroupContainer>
         <StyledButtonContainer>
           <Button
             label="Add Article"
-            onClick={() => handleJourneyCard(true)}
+            onClick={() => addJourneyCard(true)}
           />
         </StyledButtonContainer>
 
         <StyledButtonContainer>
           <Button
             label="Add Directory"
-            onClick={() => handleJourneyCard(false)}
+            onClick={() => addJourneyCard(false)}
           />
         </StyledButtonContainer>
       </StyledDirectoryControlButtonGroupContainer>
@@ -250,17 +286,17 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
                   isArticle={block.type == 'article' ? true : false}
                   blockIndex={index}
                   language={currentLanguage}
-                  title=""
-                  seriesTitle=""
-                  seriesLogo=""
+                  title={block.title}
+                  seriesTitle={block.seriesTitle}
+                  seriesLogo={block.seriesLogo}
                   seriesLogoOptions={SERIES_LOGO_IMAGE_SELECT_OPTIONS}
 
-                  onTitleChange={() => { }}
-                  onSeriesTitle={() => { }}
-                  onSeriesLogoChange={() => { }}
-                  onDelete={() => { }}
-                  onMoveUp={() => { }}
-                  onMoveDown={() => { }}
+                  onTitleChange={(val) => handleTitleChange(block.id, val)}
+                  onSeriesTitleChange={(val) => handleSeriesTitleChange(block.id, val)}
+                  onSeriesLogoChange={(val) => handleSeriesLogoChange(block.id, val.target.value as string)}
+                  onDelete={() => deleteJourneyCard(block.id)}
+                  onMoveUp={() => reorderJourneyCards(index, 'up')}
+                  onMoveDown={() => reorderJourneyCards(index, 'down')}
                   onOpen={() => { }}
                 />
               )

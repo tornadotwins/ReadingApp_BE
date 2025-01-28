@@ -10,7 +10,7 @@ type JourneyBlockPropsType = {
   seriesLogoOptions: SelectBoxOption[];
 
   onTitleChange: (val: string) => void;
-  onSeriesTitle: (val: string) => void;
+  onSeriesTitleChange: (val: string) => void;
   onSeriesLogoChange: (event: React.ChangeEvent<{value: unknown}>) => void;
   onDelete: () => void;
   onMoveUp: (index: number) => void;

@@ -65,7 +65,7 @@ function JourneyBlock(props: JourneyBlockPropsType) {
             placeholder="Enter Series Title"
             value={props.seriesTitle}
 
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => props.onTitleChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => props.onSeriesTitleChange(e.target.value)}
           />
         </StyledInputContainer>
       </StyledContentRow>
