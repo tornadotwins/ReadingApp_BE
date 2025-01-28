@@ -287,6 +287,11 @@ const JOURNEY_SELECTORS = [
   { bookTitle: JOURNEY_INJIL, value: JOURNEY_INJIL },
   { bookTitle: JOURNEY_ZABUR, value: JOURNEY_ZABUR },
   { bookTitle: JOURNEY_TAWRAT, value: JOURNEY_TAWRAT }
+];
+
+const SERIES_LOGO_IMAGE_SELECT_OPTIONS = [
+  { label: 'Questionmark', value: '/questionmark.png' },
+  { label: 'Path', value: '/path.png' },
 ]
 
 export {
@@ -339,4 +344,5 @@ export {
   LANGUAGE_CODE_TABLE,
   BOOK_SELECTORS,
   JOURNEY_SELECTORS,
+  SERIES_LOGO_IMAGE_SELECT_OPTIONS,
 };

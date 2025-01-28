@@ -1,7 +1,13 @@
 import { getLanguageFromLanguageCode } from "@/utils";
-import { Button, Input, Text } from "../Base";
+import { Button, Input, SelectBox, Text } from "../Base";
 import JourneyBlockHeader from "./JourneyBlockHeader";
-import { StyledContentRow, StyledInputContainer, StyledJourneyBlockContainer, StyledLabel, StyledOpenButtonContainer } from "./styles";
+import {
+  StyledContentRow,
+  StyledInputContainer,
+  StyledJourneyBlockContainer,
+  StyledLabel, StyledLogoSelectContainer,
+  StyledOpenButtonContainer
+} from "./styles";
 import { JourneyBlockPropsType } from "./types";
 
 function JourneyBlock(props: JourneyBlockPropsType) {
@@ -77,15 +83,15 @@ function JourneyBlock(props: JourneyBlockPropsType) {
           </Text>
         </StyledLabel>
 
-        <StyledInputContainer>
-          <Input
-            type="text"
-            placeholder="Enter Title"
-            value={props.title}
+        <StyledLogoSelectContainer>
+          <SelectBox
+            label=""
+            value={props.seriesLogo}
+            options={props.seriesLogoOptions}
 
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => props.onTitleChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<{ value: unknown }>) => props.onSeriesLogoChange(e)}
           />
-        </StyledInputContainer>
+        </StyledLogoSelectContainer>
       </StyledContentRow>
 
       <StyledOpenButtonContainer>

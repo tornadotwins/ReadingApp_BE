@@ -27,7 +27,8 @@ import { AppStateType } from "@/reducers/types";
 import {
   JOURNEY_QURAN,
   ACCESS_TOKEN,
-  JOURNEY_SELECTORS
+  JOURNEY_SELECTORS,
+  SERIES_LOGO_IMAGE_SELECT_OPTIONS
 } from "@/config";
 import { getLanguageCodeFromLanguage } from "@/utils";
 import actionTypes from "@/actions/actionTypes";
@@ -252,7 +253,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
                   title=""
                   seriesTitle=""
                   seriesLogo=""
-                  seriesLogoOptions={[]}
+                  seriesLogoOptions={SERIES_LOGO_IMAGE_SELECT_OPTIONS}
 
                   onTitleChange={() => { }}
                   onSeriesTitle={() => { }}

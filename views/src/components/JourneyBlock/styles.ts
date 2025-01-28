@@ -110,6 +110,20 @@ const StyledInputContainer = styled(Box)({
   }
 });
 
+const StyledLogoSelectContainer = styled(Box) ({
+  display: 'flex',
+  justifyContent: 'start',
+  alignItems: 'center',
+  width: '100%',
+  borderRadius: '4px',
+  border: '1px solid #155D74',
+
+  '& .MuiInputBase-root': {
+    width: '100%',
+    backgroundColor: '#FFF'
+  }
+});
+
 const StyledOpenButtonContainer = styled(Box) ({
   display: 'flex',
   justifySelf: 'end',
@@ -184,6 +198,7 @@ export {
   StyledContentRow,
   StyledLabel,
   StyledInputContainer,
+  StyledLogoSelectContainer,
   StyledOpenButtonContainer,
   StyledJourneyBlockHeaderContainer,
   StyledJourneyBlockControlContainer,
