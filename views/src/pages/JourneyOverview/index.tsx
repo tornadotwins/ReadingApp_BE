@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
+import { toast, Bounce, ToastContainer } from "material-react-toastify";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import useOrientation from "@/hooks/useOrientation";
@@ -24,21 +25,23 @@ import { JourneyBlockType, JourneyOverviewPropsType } from "./types";
 import { LanguageType } from "../types";
 import { AppStateType } from "@/reducers/types";
 
+import { getLanguageCodeFromLanguage } from "@/utils";
+import Header from "@/components/Header";
+import Tools from "@/components/Tools";
+import { Button, LoadingOverlay, Text } from "@/components/Base";
+import BookSelector from "@/components/BookSelector";
+import JourneyPreferenceSelector from "@/components/JourneyPreferenceSelector";
+import JourneyBlock from "@/components/JourneyBlock/JourneyBlock";
+
+import journeyService from "@/services/journey.services";
+
+import actionTypes from "@/actions/actionTypes";
 import {
   JOURNEY_QURAN,
   ACCESS_TOKEN,
   JOURNEY_SELECTORS,
   SERIES_LOGO_IMAGE_SELECT_OPTIONS
 } from "@/config";
-import { getLanguageCodeFromLanguage } from "@/utils";
-import actionTypes from "@/actions/actionTypes";
-import Header from "@/components/Header";
-import Tools from "@/components/Tools";
-import { Button, LoadingOverlay, Text } from "@/components/Base";
-import { ToastContainer } from "material-react-toastify";
-import BookSelector from "@/components/BookSelector";
-import JourneyPreferenceSelector from "@/components/JourneyPreferenceSelector";
-import JourneyBlock from "@/components/JourneyBlock/JourneyBlock";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -161,12 +164,40 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     setIsPublished(!isPublished);
   }
 
-  const handleSavePreference = () => {
-    setIsLoading(true);
+  const handleSave = () => {
+    // setIsLoading(true);
+    const dataToSave = journeyBlocks.map(block => ({
+      number: block.blockIndex,
+      parent: '677b48614bc03c4a7acaaf8d', // need to be updated
+      parentModel: 'Book',  // need to be updated
+      depth: 1,   // need to be updated
+      isArticle: block.type == 'article' ? true : false,
+      image: { url: block.seriesLogo, alt: "Series Logo" },
+      seriesTitle: { [currentLanguage]: block.seriesTitle },
+      title: { [currentLanguage]: block.title },
+    }));
 
-    console.log('Clicked "Save Changes" button');
+    journeyService
+      .saveJourneyStage(dataToSave)
+      .then(res => {
+        console.log('saved journey: ', res);
 
-    setIsLoading(false);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        toast.error(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      });
   }
 
   const _renderJourneyPreferenceSelector = () => {
@@ -184,7 +215,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
           handleLanguageChange={handleLanguageChange}
           handleCompleteChange={handleCompleteChange}
           handlePublishChange={handlePublishChange}
-          handleSavePreference={handleSavePreference}
+          handleSavePreference={handleSave}
         />
       </StyledPreferenceSelectorContainer>
     )
@@ -211,6 +242,12 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     setEnableSaveBtn(true);
     setJourneyBlocks(newBlocks);
   }
+
+  useEffect(() => {
+    journeyBlocks.length > 0 ?
+      setEnableSaveBtn(true) :
+      setEnableSaveBtn(false);
+  }, [journeyBlocks]);
 
   const reorderJourneyCards = (index: number, direction: 'up' | 'down') => {
     setEnableSaveBtn(true);

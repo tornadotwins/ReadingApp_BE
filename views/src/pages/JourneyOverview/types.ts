@@ -1,5 +1,5 @@
 import { Dispatch } from "redux";
-import { UserType } from "../types"
+import { ObjectType, UserType } from "../types"
 
 type JourneyOverviewPropsType = {
   currentUser: UserType;
@@ -18,7 +18,20 @@ type JourneyBlockType = {
   seriesLogo: string;
 }
 
+type JourneyCardType = {
+  id?: string;
+  number: number;
+  parent: string;
+  parentModel: string;
+  depth: number;
+  isArticle: boolean;
+  image: ObjectType;
+  seriesTitle: ObjectType;
+  title: ObjectType;
+}
+
 export type {
   JourneyOverviewPropsType,
   JourneyBlockType,
+  JourneyCardType,
 }

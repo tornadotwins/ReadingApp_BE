@@ -12,10 +12,11 @@ const JourneySchema = new Schema({
     required: true,
     enum: ['Book', 'Journey'],
   },
-  depth: { type: Number, default: 0 },
+  depth: { type: Number, default: 1 },
   isArticle: { type: Boolean },
   title: { type: Object },
-  image: { type: String },
+
+  image: { type: Object },
   createdAt: { type: Number, default: Date.now() },
   updatedAt: { type: Number, default: Date.now() },
 });

@@ -10,4 +10,6 @@ router.get(
   JourneyController.getHierarchicalJourneyList,
 );
 
+router.post('/savestage', JourneyController.saveJourneyStage);;
+
 module.exports = router;

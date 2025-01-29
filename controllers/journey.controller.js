@@ -154,3 +154,27 @@ exports.getHierarchicalJourneyList = async (req, res) => {
       .json({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////// Save Journey Cards //////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.saveJourneyStage = async (req, res) => {
+  const { journeyCards } = req.body;
+
+  if (!Array.isArray(journeyCards) || journeyCards.length === 0) {
+    return res
+      .status(400)
+      .json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+  }
+
+  try {
+    // Save journey cards
+    const savedJourneys = await Journey.insertMany(journeyCards);
+
+    return res.status(200).json(savedJourneys);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+};
