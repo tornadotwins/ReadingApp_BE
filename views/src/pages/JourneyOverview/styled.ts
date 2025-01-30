@@ -26,7 +26,7 @@ const StyledBookSelectorContainer = styled(Box) ({
 });
 
 const StyledPreferenceSelectorContainer = styled(Box) ({
-  width: '700px',
+  width: '600px',
 
   display: 'flex',
   justifyContent: 'space-between',

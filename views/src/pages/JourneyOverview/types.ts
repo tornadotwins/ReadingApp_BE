@@ -31,8 +31,8 @@ type JourneyCardType = {
   image: ObjectType;
   seriesTitle: ObjectType;
   title: ObjectType;
-  isCompleted: ObjectType;
-  isPublished: ObjectType;
+  isCompleted?: ObjectType;
+  isPublished?: ObjectType;
 }
 
 type ArticleVerseType = {

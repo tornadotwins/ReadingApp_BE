@@ -60,6 +60,11 @@ type IntroRequestType = {
   verses: IntroType[],
 }
 
+type SaveJourneyRequestType = {
+  languageCode: string;
+  journeyCards: JourneyCardType[];
+}
+
 type SaveArticleRequestType = {
   parentId: string;
   languageCode: string;
@@ -84,6 +89,7 @@ export type {
   UpdateSubBookRequestType,
   SaveMarkerRequestType,
   IntroRequestType,
+  SaveJourneyRequestType,
   SaveArticleRequestType,
   GetJourneyStageResponseType,
 }

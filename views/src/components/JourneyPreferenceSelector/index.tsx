@@ -1,9 +1,9 @@
-import { Button, SelectBox, Switch } from "../Base";
+import { Button, SelectBox } from "../Base";
 import {
   StyledContainer,
   StyledButtonContainer,
   StyledLanguageSelectorContainer,
-  StyledSwitchContainer,
+  // StyledSwitchContainer,
 } from "./styles";
 import { JourneyPreferenceSelectorPropsType } from "./types";
 
@@ -22,7 +22,7 @@ function JourneyPreferenceSelector(props: JourneyPreferenceSelectorPropsType) {
         />
       </StyledLanguageSelectorContainer>
 
-      <StyledSwitchContainer>
+      {/* <StyledSwitchContainer>
         <Switch
           label="Complete:"
           value={props.isCompleted}
@@ -30,9 +30,9 @@ function JourneyPreferenceSelector(props: JourneyPreferenceSelectorPropsType) {
 
           onChange={props.handleCompleteChange}
         />
-      </StyledSwitchContainer>
+      </StyledSwitchContainer> */}
 
-      <StyledSwitchContainer>
+      {/* <StyledSwitchContainer>
         <Switch
           label="Publish:"
           value={props.isPublished}
@@ -40,7 +40,7 @@ function JourneyPreferenceSelector(props: JourneyPreferenceSelectorPropsType) {
 
           onChange={props.handlePublishChange}
         />
-      </StyledSwitchContainer>
+      </StyledSwitchContainer> */}
 
       <StyledButtonContainer isdisable={!props.enableSaveBtn ? 'true' : 'false'}>
         <Button

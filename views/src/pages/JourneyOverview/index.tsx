@@ -55,8 +55,6 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
   const [isLoading, setIsLoading] = useState(false);
   const [currentLanguage, setCurrnetLanguage] = useState('');
   const [selectedBook, setSelectedBook] = useState(props.currentJourneyTitle || JOURNEY_QURAN);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [isPublished, setIsPublished] = useState(false);
   const [enableSaveBtn, setEnableSaveBtn] = useState(false);
 
   const [journeyBlocks, setJourneyBlocks] = useState<JourneyBlockType[]>([]);
@@ -159,17 +157,18 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     setCurrnetLanguage(value);
   }
 
-  const handleCompleteChange = () => {
-    setIsCompleted(!isCompleted);
-  }
+  // const handleCompleteChange = () => {
+  //   setIsCompleted(!isCompleted);
+  // }
 
-  const handlePublishChange = () => {
-    setIsPublished(!isPublished);
-  }
+  // const handlePublishChange = () => {
+  //   setIsPublished(!isPublished);
+  // }
 
   const handleSave = () => {
     setIsLoading(true);
-    const dataToSave = journeyBlocks.map(block => ({
+    const blocksToSave = journeyBlocks.map(block => ({
+      id: block.id,
       number: block.blockIndex,
       parent: '677b48614bc03c4a7acaaf8d', // need to be updated
       parentModel: 'Book',  // need to be updated
@@ -178,9 +177,12 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
       image: { url: block.seriesLogo, alt: "Series Logo" },
       seriesTitle: { [currentLanguage]: block.seriesTitle },
       title: { [currentLanguage]: block.title },
-      isCompleted: { [currentLanguage]: isCompleted },
-      isPublished: { [currentLanguage]: isPublished },
     }));
+
+    const dataToSave = {
+      languageCode: currentLanguage,
+      journeyCards: blocksToSave
+    };
 
     journeyService
       .saveJourneyStage(dataToSave)
@@ -211,15 +213,13 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
         <JourneyPreferenceSelector
           availableLanguages={languages}
           currentLanguage={currentLanguage}
-          isCompleted={isCompleted}
-          isPublished={isPublished}
-          enableComplete
-          enablePublish
+          // enableComplete
+          // enablePublish
           enableSaveBtn={enableSaveBtn}
 
           handleLanguageChange={handleLanguageChange}
-          handleCompleteChange={handleCompleteChange}
-          handlePublishChange={handlePublishChange}
+          // handleCompleteChange={handleCompleteChange}
+          // handlePublishChange={handlePublishChange}
           handleSavePreference={handleSave}
         />
       </StyledPreferenceSelectorContainer>

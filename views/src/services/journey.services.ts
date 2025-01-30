@@ -2,11 +2,15 @@ import axios from 'axios';
 
 import { API_URL } from '@/config';
 import { JourneyCardType } from '@/pages/JourneyOverview/types';
-import { GetJourneyStageResponseType, SaveArticleRequestType } from './types';
+import {
+  SaveJourneyRequestType,
+  GetJourneyStageResponseType,
+  SaveArticleRequestType,
+} from './types';
 
 class JourenyService {
   // Save Journey Stage (Journey Cards)
-  saveJourneyStage = (data: JourneyCardType[]): Promise<JourneyCardType[]> => {
+  saveJourneyStage = (data: SaveJourneyRequestType): Promise<JourneyCardType[]> => {
     return new Promise((resolve, reject) => {
       const url = API_URL + '/journey/save-stage';
       axios
