@@ -68,8 +68,8 @@ type SaveJourneyRequestType = {
 type SaveArticleRequestType = {
   parentId: string;
   languageCode: string;
-  isCompleted: object;
-  isPublished: object;
+  isCompleted: boolean;
+  isPublished: boolean;
   verses: ArticleVerseType[];
 }
 

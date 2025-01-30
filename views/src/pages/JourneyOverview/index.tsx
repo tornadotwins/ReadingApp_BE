@@ -62,6 +62,8 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
   const [journeyBlocks, setJourneyBlocks] = useState<JourneyBlockType[]>([]);
   const [previewBlocks, setPreviewBlocks] = useState<PreviewJourneyCardType[]>([]);
 
+  const [depth, setDepth] = useState(1);
+
   const isPortrait = useOrientation();
   const navigate = useNavigate();
 
@@ -139,6 +141,15 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
         journeyTitle
       }
     })
+
+    props.dispatch({
+      type: actionTypes.SET_JOURNEY_DEPTH,
+      payload: {
+        depth: 1
+      }
+    });
+
+    setDepth(1);
   }
 
   const _renderJourneySelector = () => {
@@ -173,9 +184,9 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     const blocksToSave = journeyBlocks.map(block => ({
       id: block.id,
       number: block.blockIndex,
-      parent: '677b48614bc03c4a7acaaf8d', // need to be updated
-      parentModel: 'Book',  // need to be updated
-      depth: 1,   // need to be updated
+      parent: props.parentJourneyId,
+      parentModel: depth == 1 ? 'Book' : 'Journey',
+      depth: depth,
       isArticle: block.type == 'article' ? true : false,
       image: { url: block.seriesLogo, alt: "Series Logo" },
       seriesTitle: { [currentLanguage]: block.seriesTitle },
@@ -200,7 +211,17 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
         }));
 
         setJourneyBlocks(updatedJourneyBlocks);
-        console.log('saved journey: ', res);
+
+        toast.success('Successfully saved.', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000,
+        });
 
         setIsLoading(false);
       })
@@ -300,8 +321,12 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     );
   }
 
-  const handleOpen = (blockId: string, blockTitle: string, isArticle: boolean) => {
+  useEffect(() => {
+    if (!props.parentJourneyId)
+      setDepth(1);
+  }, []);
 
+  const handleOpen = (blockId: string, blockTitle: string, isArticle: boolean) => {
     props.dispatch({
       type: actionTypes.SET_JOURNEY_PARENT_ID,
       payload: {
@@ -318,7 +343,14 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
 
     if (isArticle) {
       navigate('/admin/articleoverview');
-
+      props.dispatch({
+        type: actionTypes.SET_JOURNEY_DEPTH,
+        payload: {
+          depth: depth
+        }
+      })
+    } else {
+      setDepth(prevDepth => prevDepth + 1);
     }
   }
 

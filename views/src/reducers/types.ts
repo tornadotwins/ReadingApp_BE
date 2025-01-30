@@ -170,6 +170,13 @@ type JourneyParentTitleActionType = {
   }
 }
 
+type JourneyDepthActionType = {
+  type: string;
+  payload: {
+    depth: number;
+  }
+}
+
 export type {
   StateType,
   BookStateType,
@@ -193,4 +200,5 @@ export type {
   JourneyParentActionType,
   JourneyBookImageActionType,
   JourneyParentTitleActionType,
+  JourneyDepthActionType,
 }

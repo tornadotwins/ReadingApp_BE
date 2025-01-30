@@ -345,12 +345,8 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
     const requestData = {
       parentId: props.articleId,
       languageCode: selectedLanguage,
-      isCompleted: {
-        [selectedLanguage]: isCompleted,
-      },
-      isPublished: {
-        [selectedLanguage]: isPublished,
-      },
+      isCompleted: isCompleted,
+      isPublished: isPublished,
       verses: articleVerses
     };
 
