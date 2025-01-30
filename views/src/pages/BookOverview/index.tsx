@@ -268,6 +268,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
         isLoggedIn={true}
         username={props.currentUser.username}
         isAdmin={props.currentUser.isAdmin}
+        isTranslationPage
         onLogOut={onLogout}
       />
     )

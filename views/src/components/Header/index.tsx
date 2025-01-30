@@ -37,7 +37,7 @@ function Header(props: HeaderType) {
           lineHeight={47}
           textAlign="center"
           color="white"
-          hasUnderline={!props.isAdminPage && !props.isJourneyPage}
+          hasUnderline={props.isTranslationPage}
           onClick={() => navigate('/admin/bookoverview')}
         >
           {'Translation Portal'}
@@ -49,7 +49,7 @@ function Header(props: HeaderType) {
           lineHeight={47}
           textAlign="center"
           color="white"
-          hasUnderline={props.isJourneyPage}
+          hasUnderline={!props.isAdminPage && props.isTranslationPage}
           onClick={() => navigate('/admin/journeyoverview')}
         >
           {'Journey Portal'}

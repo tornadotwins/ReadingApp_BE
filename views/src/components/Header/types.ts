@@ -4,7 +4,7 @@ type HeaderType = {
   username?: string;
   isAdmin?: boolean;
   isAdminPage?: boolean;
-  isJourneyPage?: boolean;
+  isTranslationPage?: boolean;
 
   onLogOut?: () => void;
 }

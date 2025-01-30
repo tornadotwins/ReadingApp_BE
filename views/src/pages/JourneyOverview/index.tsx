@@ -126,7 +126,6 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
         isLoggedIn
         username={props.currentUser.username}
         isAdmin={props.currentUser.isAdmin}
-        isJourneyPage
         onLogOut={onLogOut}
       />
     )
