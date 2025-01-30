@@ -458,18 +458,21 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
   const _renderDynamicJourneyBlocks = () => {
     return (
       <StyledDynamicJourneyContainer>
-        <StyledBackButtonContainer onClick={goBack}>
-          <ArrowBackIcon />
-          <Text
-            color="#155D74"
-            fontFamily="Inter"
-            fontWeight="500"
-            fontSize={16}
-            lineHeight={24}
-          >
-            {`Back to "${props.parentJourneyTitle}"`}
-          </Text>
-        </StyledBackButtonContainer>
+        {
+          depth > 1 &&
+          <StyledBackButtonContainer onClick={goBack}>
+            <ArrowBackIcon />
+            <Text
+              color="#155D74"
+              fontFamily="Inter"
+              fontWeight="500"
+              fontSize={16}
+              lineHeight={24}
+            >
+              {`Back to "${props.parentJourneyTitle}"`}
+            </Text>
+          </StyledBackButtonContainer>
+        }
 
         <StyledDynamicJourneyBlockGroupContainer>
           {
