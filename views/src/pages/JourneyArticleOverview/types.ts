@@ -2,13 +2,16 @@ import { Dispatch } from "redux";
 
 import { UserType } from "../types";
 import { BookType, SubBookInfoType } from "../BookOverview/types";
+import { ArticleVerseType } from "../JourneyOverview/types";
 
-type IntroOverviewPropsType = {
+type ArticleOverviewPropsType = {
   subBookInfo: SubBookInfoType,
   bookInfos: BookType[],
   currentLanguage: string,
   currentUser: UserType,
-  currentBook: string,
+  currentJourneyBook: string,
+  articleId: string,
+  articleTitle: string,
 
   dispatch: Dispatch
 }
@@ -38,7 +41,7 @@ type BlockType = {
   id: string;
   blockIndex: number;
   type: 'title' | 'text' | 'image' | 'collapsible';
-  value: string | ImageValType | CollapsibleValType | IntroType;
+  value: string | ImageValType | CollapsibleValType | IntroType | ArticleVerseType;
 }
 
 type IntroInnerObjType = {
@@ -57,7 +60,7 @@ type IntroType = {
 }
 
 export type {
-  IntroOverviewPropsType,
+  ArticleOverviewPropsType,
   SelectOptionType,
   ImageValType, 
   CollapsibleValType,

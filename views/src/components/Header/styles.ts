@@ -63,7 +63,7 @@ const StyledHeaderTitle = styled(Box) ({
   },
 
   '& :nth-of-type(2)': {
-    marginLeft: '50px',
+    margin: '0px 50px',
 
     '@media screen and (max-width: 900px)': {
       marginLeft: '20px'

@@ -66,6 +66,11 @@ const BOOK_INJIL = 'Injil';
 const BOOK_ZABUR = 'Zabur';
 const BOOK_TAWRAT = 'Tawrat';
 
+const JOURNEY_QURAN = 'Qur\'an Journeys';
+const JOURNEY_INJIL = 'Injil Journeys';
+const JOURNEY_ZABUR = 'Zabur Journeys';
+const JOURNEY_TAWRAT = 'Tawrat Journeys';
+
 const USER_ROLE_NONE = 'none';
 const USER_ROLE_TRANSLATOR = 'Translator';
 const USER_ROLE_PUBLISHER = 'Publisher';
@@ -277,6 +282,18 @@ const BOOK_SELECTORS = [
   { bookTitle: BOOK_TAWRAT, value: BOOK_TAWRAT },
 ];
 
+const JOURNEY_SELECTORS = [
+  { bookTitle: JOURNEY_QURAN, value: JOURNEY_QURAN },
+  { bookTitle: JOURNEY_INJIL, value: JOURNEY_INJIL },
+  { bookTitle: JOURNEY_ZABUR, value: JOURNEY_ZABUR },
+  { bookTitle: JOURNEY_TAWRAT, value: JOURNEY_TAWRAT }
+];
+
+const SERIES_LOGO_IMAGE_SELECT_OPTIONS = [
+  { label: 'Questionmark', value: '/images/icon_journey_help.svg' },
+  { label: 'Path', value: '/images/icon_journey_path.svg' },
+]
+
 export {
   API_URL,
   CURRENT_USER,
@@ -298,6 +315,11 @@ export {
   BOOK_INJIL,
   BOOK_ZABUR,
   BOOK_TAWRAT,
+
+  JOURNEY_QURAN,
+  JOURNEY_INJIL,
+  JOURNEY_ZABUR,
+  JOURNEY_TAWRAT,
 
   USER_ROLE_NONE,
   USER_ROLE_TRANSLATOR,
@@ -321,4 +343,6 @@ export {
   COLOR,
   LANGUAGE_CODE_TABLE,
   BOOK_SELECTORS,
+  JOURNEY_SELECTORS,
+  SERIES_LOGO_IMAGE_SELECT_OPTIONS,
 };

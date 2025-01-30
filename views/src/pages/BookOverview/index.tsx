@@ -38,6 +38,10 @@ import {
   BOOK_QURAN,
   BOOK_ZABUR,
   BOOK_SELECTORS,
+  JOURNEY_QURAN,
+  JOURNEY_INJIL,
+  JOURNEY_ZABUR,
+  JOURNEY_TAWRAT,
 } from "@/config";
 import actionTypes from "@/actions/actionTypes";
 import useOrientation from "@/hooks/useOrientation";
@@ -299,7 +303,13 @@ const BookOverview = (props: BookOverviewPropsType) => {
           onChange={handleLanguageChange}
         />
 
-        {!isSpecialBook &&
+        {(
+          !isSpecialBook &&
+          selectedBook !== JOURNEY_QURAN &&
+          selectedBook !== JOURNEY_INJIL &&
+          selectedBook !== JOURNEY_ZABUR &&
+          selectedBook !== JOURNEY_TAWRAT
+        ) &&
           <SelectBox
             label=""
             options={BOOK_OVERVIEW_TYPES}
