@@ -30,8 +30,19 @@ type JourneyCardType = {
   title: ObjectType;
 }
 
+type ArticleVerseType = {
+  id?: string;
+  article: string;
+  title: ObjectType;
+  image: ObjectType;
+  number: number;
+  isCollapsible: boolean;
+  content: any[];
+}
+
 export type {
   JourneyOverviewPropsType,
   JourneyBlockType,
   JourneyCardType,
+  ArticleVerseType,
 }

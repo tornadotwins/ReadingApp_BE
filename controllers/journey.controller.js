@@ -156,6 +156,30 @@ exports.getHierarchicalJourneyList = async (req, res) => {
 };
 
 /////////////////////////////////////////////////////////////////////////
+//////////////////////////// Get All Article ////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.getArticle = async (req, res) => {
+  try {
+    const { articleId } = req.params;
+    const article = await Article.find({ article: articleId }).sort({
+      number: 1,
+    });
+
+    if (article) {
+      return res.status(200).json(article);
+    } else {
+      return res
+        .status(404)
+        .json({ message: ERROR_MESSAGES.ARTICLE_NOT_FOUND });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+};
+
+/////////////////////////////////////////////////////////////////////////
 /////////////////////////// Save Journey Cards //////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.saveJourneyStage = async (req, res) => {
@@ -172,6 +196,131 @@ exports.saveJourneyStage = async (req, res) => {
     const savedJourneys = await Journey.insertMany(journeyCards);
 
     return res.status(200).json(savedJourneys);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: ERROR_MESSAGES.SERVER_ERROR });
+  }
+};
+
+/////////////////////////////////////////////////////////////////////////
+////////////////////////////// Save Article /////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.saveArticle = async (req, res) => {
+  try {
+    const {
+      parentId,
+      languageCode,
+      isCompleted,
+      isPublished,
+      verses,
+    } = req.body;
+
+    // Get the existing journey
+    const existingJourneyInfo = await Journey.findById(parentId);
+
+    // merge existing completion status with the new value for the current language
+    const updatedIsCompleted = {
+      ...existingJourneyInfo.isCompleted,
+      [languageCode]: isCompleted,
+    };
+
+    // Merge existing publish status with the new value for the current language
+    const updatedIsPublished = {
+      ...existingJourneyInfo.isPublished,
+      [languageCode]: isPublished,
+    };
+
+    // Prepare the updated Journey object with new information
+    const updatedJourneyInfo = {
+      parent: existingJourneyInfo.parent,
+      parentModel: existingJourneyInfo.parentModel,
+      isArticle: existingJourneyInfo.isArticle,
+      title: existingJourneyInfo.title,
+      image: existingJourneyInfo.image,
+      depth: existingJourneyInfo.depth,
+      seriesTitle: existingJourneyInfo.seriesTitle,
+      isCompleted: updatedIsCompleted,
+      isPublished: updatedIsPublished,
+    };
+
+    // Update the Journey document in database
+    const updatedJourney = await Journey.findByIdAndUpdate(
+      parentId,
+      updatedJourneyInfo,
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+
+    // Update verses in the article collection
+    let updatedArticleVerses = [];
+
+    // Loop through each verse in the input array
+    for (const verse of verses) {
+      // Check if a verse with the give journey and number exists in database
+      const existingVerse = await Article.findOne({
+        article: parentId,
+        number: verse.number,
+      });
+
+      if (!existingVerse) {
+        // If the verse doesn't exist, create a new Article document
+        const articleObj = new Article({
+          article: parentId,
+          text: verse.text,
+          image: verse.image,
+          number: verse.number,
+          isCollapse: verse.isCollapse,
+          title: verse.title,
+          content: verse.content,
+        });
+
+        // Save new article document and add it to the array
+        const newArticleObj = articleObj.save();
+        updatedArticleVerses.push(newArticleObj);
+      } else {
+        // If the verse exists, update its fields
+        existingVerse.title = {
+          ...existingVerse.title,
+          ...verse.title,
+        };
+
+        existingVerse.text = {
+          ...existingVerse.text,
+          ...verse.text,
+        };
+
+        existingVerse.image = {
+          ...existingVerse.image,
+          ...verse.image,
+        };
+
+        existingVerse.isCollapse = verse.isCollapse;
+        existingVerse.updatedAt = Date.now();
+
+        // Update the content array
+        const updatedContent = [...verse.content];
+
+        // Update the content field in the Article document
+        existingVerse.content = updatedContent;
+
+        // Save the updated article document
+        const updatedVerse = await existingVerse.save();
+        updatedArticleVerses.push(updatedVerse);
+      }
+    }
+
+    const updatedArticle = {
+      _id: updatedJourney._id,
+      journeyNumber: updatedJourney.number,
+      isCompleted: updatedJourney.isCompleted,
+      isPublished: updatedJourney.isPublished,
+      verses: updatedArticleVerses,
+    };
+
+    return res.status(200).json(updatedArticle);
   } catch (error) {
     return res
       .status(500)

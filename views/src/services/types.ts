@@ -1,5 +1,6 @@
 import { SubBookModelType } from "@/pages/ChapterOverview/types";
 import { IntroType } from "@/pages/IntroOverview/types";
+import { ArticleVerseType } from "@/pages/JourneyOverview/types";
 import { ParseDataType } from "@/pages/Translator/types";
 import { AppTextType } from "@/pages/types";
 
@@ -59,6 +60,14 @@ type IntroRequestType = {
   verses: IntroType[],
 }
 
+type SaveArticleRequestType = {
+  parentId: string;
+  languageCode: string;
+  isCompleted: boolean;
+  isPublished: boolean;
+  verses: ArticleVerseType[];
+}
+
 export type {
   UserRequestType,
   TranslatorRequestType,
@@ -68,4 +77,5 @@ export type {
   UpdateSubBookRequestType,
   SaveMarkerRequestType,
   IntroRequestType,
+  SaveArticleRequestType,
 }

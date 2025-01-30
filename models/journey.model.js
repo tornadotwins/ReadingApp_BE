@@ -15,8 +15,9 @@ const JourneySchema = new Schema({
   depth: { type: Number, default: 1 },
   isArticle: { type: Boolean },
   title: { type: Object },
-
   image: { type: Object },
+  isCompleted: { type: Object },
+  isPublished: { type: Object },
   createdAt: { type: Number, default: Date.now() },
   updatedAt: { type: Number, default: Date.now() },
 });
