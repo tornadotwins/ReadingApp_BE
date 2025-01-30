@@ -44,6 +44,8 @@ import {
   JOURNEY_SELECTORS,
   SERIES_LOGO_IMAGE_SELECT_OPTIONS
 } from "@/config";
+import JourneyPreview from "@/components/JourneyPreview/JourneyPreview";
+import { PreviewJourneyCardType } from "@/components/JourneyPreview/types";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -58,6 +60,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
   const [enableSaveBtn, setEnableSaveBtn] = useState(false);
 
   const [journeyBlocks, setJourneyBlocks] = useState<JourneyBlockType[]>([]);
+  const [previewBlocks, setPreviewBlocks] = useState<PreviewJourneyCardType[]>([]);
 
   const isPortrait = useOrientation();
   const navigate = useNavigate();
@@ -187,6 +190,16 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     journeyService
       .saveJourneyStage(dataToSave)
       .then(res => {
+        const updatedJourneyBlocks: JourneyBlockType[] = res.map(card => ({
+          id: card._id || `${card.isArticle ? 'article' : 'directory'}-${Date.now()}`,
+          blockIndex: card.number,
+          type: card.isArticle ? 'article' : 'directory',
+          title: card.title?.[currentLanguage] as string,
+          seriesTitle: card.seriesTitle?.[currentLanguage] as string,
+          seriesLogo: card.image.url as string,
+        }));
+
+        setJourneyBlocks(updatedJourneyBlocks);
         console.log('saved journey: ', res);
 
         setIsLoading(false);
@@ -280,7 +293,11 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
 
   const handleSeriesLogoChange = (id: string, value: string) => {
     setEnableSaveBtn(true);
-    setJourneyBlocks(journeyBlocks.map(block => block.id == id ? { ...block, seriesLogo: value } : block));
+    setJourneyBlocks(prevBlocks =>
+      prevBlocks.map(block =>
+        block.id === id ? { ...block, seriesLogo: value } : block
+      )
+    );
   }
 
   const handleOpen = (blockId: string, blockTitle: string, isArticle: boolean) => {
@@ -340,7 +357,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
         props.dispatch({
           type: actionTypes.SET_JOURNEY_IMAGE,
           payload: {
-            image: result.bookImage
+            image: result.markImage
           }
         })
       } catch (error) {
@@ -454,6 +471,16 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     )
   }
 
+  useEffect(() => {
+    const previewJourneyCards = journeyBlocks.map((block: JourneyBlockType) => ({
+      title: block.title,
+      seriesTitle: block.seriesTitle,
+      logo: block.seriesLogo,
+    }));
+
+    setPreviewBlocks(previewJourneyCards);
+  }, [journeyBlocks]);
+
   const _renderPreviewBlock = () => {
     return (
       <StyledPreviewBlockContainer>
@@ -470,7 +497,12 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
         </StyledPreviewTitleContainer>
 
         <StyledPagePreviewContainer>
-          aser
+          <JourneyPreview
+            markImg={props.journeyBookImage}
+            markTitle={selectedBook}
+            journeyItems={previewBlocks}
+            language={currentLanguage}
+          />
         </StyledPagePreviewContainer>
       </StyledPreviewBlockContainer>
     )
@@ -527,6 +559,7 @@ function mapStateToProps(state: AppStateType) {
     currentJourneyTitle: state.journeys.journeyTitle,
     parentJourneyId: state.journeys.parentId,
     parentJourneyTitle: state.journeys.parentJourneyTitle,
+    journeyBookImage: state.journeys.journeyBookImage,
   };
 }
 

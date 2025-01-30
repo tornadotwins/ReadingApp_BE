@@ -77,6 +77,7 @@ type SubBookInfoType = {
 type BookType = {
   bookId: string;
   bookImage: string;
+  markImage?: string;
   bookTitle: {
     ar: string;
     en: string;

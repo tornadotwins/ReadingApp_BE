@@ -195,14 +195,9 @@ exports.getArticle = async (req, res) => {
 /////////////////////////// Save Journey Cards //////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.saveJourneyStage = async (req, res) => {
-  const { languageCode, isCompleted, isPublished, journeyCards } =
-    req.body;
+  const { languageCode, journeyCards } = req.body;
 
-  if (
-    !Array.isArray(journeyCards) ||
-    journeyCards.length === 0 ||
-    !languageCode
-  ) {
+  if (journeyCards.length === 0 || !languageCode) {
     return res
       .status(400)
       .json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
@@ -240,18 +235,6 @@ exports.saveJourneyStage = async (req, res) => {
           journeyCardId,
         );
 
-        // merge existing completion status with the new value for the current language
-        const updatedIsCompleted = {
-          ...existingJourneyInfo.isCompleted,
-          [languageCode]: isCompleted,
-        };
-
-        // Merge existing publish status with the new value for the current language
-        const updatedIsPublished = {
-          ...existingJourneyInfo.isPublished,
-          [languageCode]: isPublished,
-        };
-
         // Merge existing title with the new value for the curent language
         const updatedTitle = {
           ...existingJourneyInfo.title,
@@ -274,8 +257,6 @@ exports.saveJourneyStage = async (req, res) => {
           image: journeyCard.image,
           depth: journeyCard.depth,
           number: journeyCard.number,
-          isCompleted: updatedIsCompleted,
-          isPublished: updatedIsPublished,
         };
 
         // Update the journey document in db

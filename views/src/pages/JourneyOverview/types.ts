@@ -7,6 +7,7 @@ type JourneyOverviewPropsType = {
   currentJourneyTitle: string;
   parentJourneyId: string;
   parentJourneyTitle: string;
+  journeyBookImage: string;
 
   dispatch: Dispatch
 }

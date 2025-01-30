@@ -6,6 +6,10 @@ import icon_upload from '@/assets/icon_upload.svg';
 import icon_preview from '@/assets/icon_preview.svg';
 import icon_mobile from '@/assets/icon_mobile.svg';
 
+import img_header_bg from '@/assets/bar_book_subtract.svg';
+import icon_search from '@/assets/btn_search.svg';
+import icon_close from '@/assets/btn_close.svg';
+
 const Images = {
   icon_check,
   icon_tool,
@@ -14,6 +18,9 @@ const Images = {
   icon_upload,
   icon_preview,
   icon_mobile,
+  img_header_bg,
+  icon_search,
+  icon_close,
 };
 
 export default Images;

@@ -290,8 +290,8 @@ const JOURNEY_SELECTORS = [
 ];
 
 const SERIES_LOGO_IMAGE_SELECT_OPTIONS = [
-  { label: 'Questionmark', value: '/questionmark.png' },
-  { label: 'Path', value: '/path.png' },
+  { label: 'Questionmark', value: '/images/icon_journey_help.svg' },
+  { label: 'Path', value: '/images/icon_journey_path.svg' },
 ]
 
 export {

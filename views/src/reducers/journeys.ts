@@ -11,6 +11,7 @@ import { JOURNEY_QURAN } from '@/config';
 
 export const initialState = {
   journeyTitle: JOURNEY_QURAN,
+  journeyMarkImg: "",
   parentId: "",
   journeyCardInfos: [],
   journeyBookImage: "",
@@ -23,6 +24,14 @@ export const initialState = {
 const setJourneyBook = (state: JourneyBookStateType, action: JourneyBookActionType) => {
   const { journeyTitle } = action.payload;
   return { ...state, journeyTitle: journeyTitle }
+}
+
+//////////////////////////////////////////////////////////////////
+/////////////////// Set Selected Journey Cover ///////////////////
+//////////////////////////////////////////////////////////////////
+const setJourneyMarkImg = (state: JourneyBookStateType, action: JourneyBookImageActionType) => {
+  const { image } = action.payload;
+  return { ...state, journeyMarkImg: image }
 }
 
 //////////////////////////////////////////////////////////////////
@@ -58,6 +67,7 @@ const resetJourneyInfo = () => ({
 
 const actionHandler = {
   [Types.SET_JOURNEY_BOOK]: setJourneyBook,
+  [Types.SET_JOURNEY_BOOK_MARK_IMAGE]: setJourneyMarkImg,
   [Types.SET_JOURNEY_PARENT_ID]: setParentId,
   [Types.SET_JOURNEY_IMAGE]: setJourneyImage,
   [Types.SET_JOUREY_PARENT_TITLE]: setParentJourneyTitle,

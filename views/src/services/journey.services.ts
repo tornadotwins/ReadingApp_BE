@@ -15,7 +15,7 @@ class JourenyService {
     return new Promise((resolve, reject) => {
       const url = API_URL + '/journey/save-stage';
       axios
-        .post(url, { journeyCards: data })
+        .post(url, data)
         .then((response) => {
           if(response.data) {
             resolve(response.data);

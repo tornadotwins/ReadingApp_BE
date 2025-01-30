@@ -793,6 +793,8 @@ exports.getBookInformationByTitle = async (req, res) => {
     const result = {
       bookId: book._id,
       bookTitle: book.title,
+      bookImage: book.coverImage,
+      markImage: book.markImage,
       subBooks: sortedSubBooks,
     };
 
