@@ -7,9 +7,14 @@ const ERROR_MESSAGES = require('../config/error.message');
 //////////////////////////// Get All Journeys ///////////////////////////
 /////////////////////////////////////////////////////////////////////////
 exports.getJourneys = async (req, res) => {
-  try {
-    const { parent } = req.params;
+  const { parent } = req.params;
 
+  if (parent == '' || parent == 'undefined')
+    return res
+      .status(400)
+      .json({ message: ERROR_MESSAGES.INCORRECT_PARAMS });
+
+  try {
     // Fetch journeys and populate their parent based on the depth
     const journeys = await Journey.find({ parent: parent }).sort({
       number: 1,
@@ -25,6 +30,7 @@ exports.getJourneys = async (req, res) => {
           markImage: bookInfo.markImage,
           cards: journeys,
         };
+
         return res.status(200).json(result);
       } else {
         const parentInfo = await Journey.findById(parent);
@@ -40,9 +46,7 @@ exports.getJourneys = async (req, res) => {
         return res.status(200).json(result);
       }
     } else {
-      return res
-        .status(404)
-        .json({ message: ERROR_MESSAGES.JOURNEY_NOT_FOUND });
+      return res.status(200).json([]);
     }
   } catch (error) {
     console.error('Error fetching journeys:', error);

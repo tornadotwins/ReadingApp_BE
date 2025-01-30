@@ -94,9 +94,10 @@ function JourneyBlock(props: JourneyBlockPropsType) {
         </StyledLogoSelectContainer>
       </StyledContentRow>
 
-      <StyledOpenButtonContainer>
+      <StyledOpenButtonContainer isdisable={props.disableOpen ? 'true' : 'false'}>
         <Button
           label={props.isArticle ? 'Open Article' : 'Open Directory'}
+          disabled={props.disableOpen}
 
           onClick={props.onOpen}
         />

@@ -3,12 +3,13 @@ import { Dispatch } from "redux";
 import { UserType } from "../types";
 import { BookType, SubBookInfoType } from "../BookOverview/types";
 
-type IntroOverviewPropsType = {
+type ArticleOverviewPropsType = {
   subBookInfo: SubBookInfoType,
   bookInfos: BookType[],
   currentLanguage: string,
   currentUser: UserType,
-  currentBook: string,
+  currentJourneyBook: string,
+  currentArticleId: string,
 
   dispatch: Dispatch
 }
@@ -57,7 +58,7 @@ type IntroType = {
 }
 
 export type {
-  IntroOverviewPropsType,
+  ArticleOverviewPropsType,
   SelectOptionType,
   ImageValType, 
   CollapsibleValType,

@@ -58,7 +58,7 @@ type AppTextPageChangedType = {
 }
 
 type ObjectType = {
-  [key: string]: string;
+  [key: string]: string | boolean;
 }
 
 export type {

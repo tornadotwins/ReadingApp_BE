@@ -33,6 +33,7 @@ import BookSelector from "@/components/BookSelector";
 import JourneyPreferenceSelector from "@/components/JourneyPreferenceSelector";
 import JourneyBlock from "@/components/JourneyBlock/JourneyBlock";
 
+import bookService from "@/services/book.services";
 import journeyService from "@/services/journey.services";
 
 import actionTypes from "@/actions/actionTypes";
@@ -165,7 +166,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
   }
 
   const handleSave = () => {
-    // setIsLoading(true);
+    setIsLoading(true);
     const dataToSave = journeyBlocks.map(block => ({
       number: block.blockIndex,
       parent: '677b48614bc03c4a7acaaf8d', // need to be updated
@@ -175,6 +176,8 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
       image: { url: block.seriesLogo, alt: "Series Logo" },
       seriesTitle: { [currentLanguage]: block.seriesTitle },
       title: { [currentLanguage]: block.title },
+      isCompleted: { [currentLanguage]: isCompleted },
+      isPublished: { [currentLanguage]: isPublished },
     }));
 
     journeyService
@@ -278,6 +281,19 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     setJourneyBlocks(journeyBlocks.map(block => block.id == id ? { ...block, seriesLogo: value } : block));
   }
 
+  const handleOpen = (blockId: string, isArticle: boolean) => {
+    if (!isArticle)
+      props.dispatch({
+        type: actionTypes.SET_JOURNEY_PARENT_ID,
+        payload: {
+          parentId: blockId
+        }
+      })
+    else {
+      console.log('article clicked')
+    }
+  }
+
   const _renderJourneyControlButtonGroup = () => {
     return (
       <StyledDirectoryControlButtonGroupContainer>
@@ -297,6 +313,83 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
       </StyledDirectoryControlButtonGroupContainer>
     )
   }
+
+  useEffect(() => {
+    const fetchJourneyBookInfo = async () => {
+      setIsLoading(true);
+      try {
+        const result = await bookService.getBookInfoByTitle(selectedBook);
+        props.dispatch({
+          type: actionTypes.SET_JOURNEY_PARENT_ID,
+          payload: {
+            parentId: result.bookId,
+          }
+        });
+
+        props.dispatch({
+          type: actionTypes.SET_JOURNEY_IMAGE,
+          payload: {
+            image: result.bookImage
+          }
+        })
+      } catch (error) {
+        toast.error('Failed to fetch journey book information', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      }
+    }
+
+    fetchJourneyBookInfo();
+  }, [selectedBook]);
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    journeyService
+      .getJourneyStage(props.parentJourneyId)
+      .then(res => {
+        if (res.cards && res.cards.length > 0) {
+          const journeyCards = res.cards;
+          const updatedJourneyBlocks: JourneyBlockType[] = journeyCards.map(card => ({
+            id: card._id || `${card.isArticle ? 'article' : 'directory'}-${Date.now()}`,
+            blockIndex: card.number,
+            type: card.isArticle ? 'article' : 'directory',
+            title: card.title?.[currentLanguage] as string,
+            seriesTitle: card.seriesTitle?.[currentLanguage] as string,
+            seriesLogo: card.image.url as string,
+          }));
+
+          setJourneyBlocks(updatedJourneyBlocks);
+        } else {
+          setJourneyBlocks([]);
+        }
+
+        setIsLoading(false);
+      })
+      .catch(error => {
+        toast.error(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+
+        setIsLoading(false);
+      });
+  }, [props.parentJourneyId]);
 
   const _renderDynamicJourneyBlocks = () => {
     return (
@@ -320,6 +413,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
               return (
                 <JourneyBlock
                   key={block.id}
+                  blockId={block.id}
                   isArticle={block.type == 'article' ? true : false}
                   blockIndex={index}
                   language={currentLanguage}
@@ -327,6 +421,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
                   seriesTitle={block.seriesTitle}
                   seriesLogo={block.seriesLogo}
                   seriesLogoOptions={SERIES_LOGO_IMAGE_SELECT_OPTIONS}
+                  disableOpen={block.id.startsWith('directory') || block.id.startsWith('article')}
 
                   onTitleChange={(val) => handleTitleChange(block.id, val)}
                   onSeriesTitleChange={(val) => handleSeriesTitleChange(block.id, val)}
@@ -334,7 +429,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
                   onDelete={() => deleteJourneyCard(block.id)}
                   onMoveUp={() => reorderJourneyCards(index, 'up')}
                   onMoveDown={() => reorderJourneyCards(index, 'down')}
-                  onOpen={() => { }}
+                  onOpen={() => handleOpen(block.id, block.type === 'article' ? true : false)}
                 />
               )
             })
@@ -414,7 +509,8 @@ function mapStateToProps(state: AppStateType) {
   return {
     currentUser: state.user.currentUser,
     currentLanguage: state.book.language,
-    currentJourneyTitle: state.journeys.journeyTitle
+    currentJourneyTitle: state.journeys.journeyTitle,
+    parentJourneyId: state.journeys.parentId,
   };
 }
 

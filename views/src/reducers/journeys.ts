@@ -3,12 +3,16 @@ import Types from '../actions/actionTypes';
 import { 
   JourneyBookStateType,
   JourneyBookActionType,
+  JourneyParentActionType,
+  JourneyBookImageActionType,
 } from './types';
 import { JOURNEY_QURAN } from '@/config';
 
 export const initialState = {
   journeyTitle: JOURNEY_QURAN,
+  parentId: "",
   journeyCardInfos: [],
+  journeyBookImage: "",
 };
 
 //////////////////////////////////////////////////////////////////
@@ -20,6 +24,22 @@ const setJourneyBook = (state: JourneyBookStateType, action: JourneyBookActionTy
 }
 
 //////////////////////////////////////////////////////////////////
+///////////////// Set Parent Journey(Article) ID /////////////////
+//////////////////////////////////////////////////////////////////
+const setParentId = (state: JourneyBookStateType, action: JourneyParentActionType) => {
+  const { parentId } = action.payload;
+  return { ...state,  parentId: parentId};
+}
+
+//////////////////////////////////////////////////////////////////
+/////////////////////// Set Journey Image ////////////////////////
+//////////////////////////////////////////////////////////////////
+const setJourneyImage = (state: JourneyBookStateType, action: JourneyBookImageActionType) => {
+  const { image } = action.payload;
+  return { ...state, journeyBookImage: image }
+}
+
+//////////////////////////////////////////////////////////////////
 /////////////////////// Reset journey info ///////////////////////
 //////////////////////////////////////////////////////////////////
 const resetJourneyInfo = () => ({
@@ -28,6 +48,8 @@ const resetJourneyInfo = () => ({
 
 const actionHandler = {
   [Types.SET_JOURNEY_BOOK]: setJourneyBook,
+  [Types.SET_JOURNEY_PARENT_ID]: setParentId,
+  [Types.SET_JOURNEY_IMAGE]: setJourneyImage,
 
   [Types.RESET_JOURNEY]: resetJourneyInfo
 }

@@ -5,6 +5,7 @@ type JourneyOverviewPropsType = {
   currentUser: UserType;
   currentLanguage: string;
   currentJourneyTitle: string;
+  parentJourneyId: string;
 
   dispatch: Dispatch
 }
@@ -20,6 +21,7 @@ type JourneyBlockType = {
 
 type JourneyCardType = {
   id?: string;
+  _id?: string;
   number: number;
   parent: string;
   parentModel: string;
@@ -28,15 +30,18 @@ type JourneyCardType = {
   image: ObjectType;
   seriesTitle: ObjectType;
   title: ObjectType;
+  isCompleted: ObjectType;
+  isPublished: ObjectType;
 }
 
 type ArticleVerseType = {
   id?: string;
   article: string;
   title: ObjectType;
+  text: ObjectType;
   image: ObjectType;
   number: number;
-  isCollapsible: boolean;
+  isCollapse: boolean;
   content: any[];
 }
 

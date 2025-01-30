@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import { API_URL } from '@/config';
 import { JourneyCardType } from '@/pages/JourneyOverview/types';
-import { SaveArticleRequestType } from './types';
+import { GetJourneyStageResponseType, SaveArticleRequestType } from './types';
 
 class JourenyService {
   // Save Journey Stage (Journey Cards)
@@ -38,6 +38,24 @@ class JourenyService {
         })
         .catch(error =>
           reject(error)
+        )
+    })
+  }
+
+  // Get Journey Stage (Journey Cards)
+  getJourneyStage = (parentId: string): Promise<GetJourneyStageResponseType> => {
+    return new Promise ((resolve, reject) => {
+      const url = API_URL + `/journey/${parentId}/journeys`;
+      axios
+        .get(url)
+        .then((response) => {
+          if(response.data)
+            resolve(response.data);
+          else
+            reject(response.data.error);
+        })
+        .catch(error =>
+          reject(error.response.data.message)
         )
     })
   }

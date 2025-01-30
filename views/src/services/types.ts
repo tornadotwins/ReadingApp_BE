@@ -1,6 +1,6 @@
 import { SubBookModelType } from "@/pages/ChapterOverview/types";
 import { IntroType } from "@/pages/IntroOverview/types";
-import { ArticleVerseType } from "@/pages/JourneyOverview/types";
+import { ArticleVerseType, JourneyCardType } from "@/pages/JourneyOverview/types";
 import { ParseDataType } from "@/pages/Translator/types";
 import { AppTextType } from "@/pages/types";
 
@@ -63,9 +63,16 @@ type IntroRequestType = {
 type SaveArticleRequestType = {
   parentId: string;
   languageCode: string;
-  isCompleted: boolean;
-  isPublished: boolean;
+  isCompleted: object;
+  isPublished: object;
   verses: ArticleVerseType[];
+}
+
+type GetJourneyStageResponseType = {
+  bookTitle: object;
+  cards: JourneyCardType[];
+  coverImage: string;
+  markimage: string;
 }
 
 export type {
@@ -78,4 +85,5 @@ export type {
   SaveMarkerRequestType,
   IntroRequestType,
   SaveArticleRequestType,
+  GetJourneyStageResponseType,
 }

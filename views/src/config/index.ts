@@ -66,10 +66,10 @@ const BOOK_INJIL = 'Injil';
 const BOOK_ZABUR = 'Zabur';
 const BOOK_TAWRAT = 'Tawrat';
 
-const JOURNEY_QURAN = 'Qur\'an Journey';
-const JOURNEY_INJIL = 'Injil Journey';
-const JOURNEY_ZABUR = 'Zabur Journey';
-const JOURNEY_TAWRAT = 'Tawrat Journey';
+const JOURNEY_QURAN = 'Qur\'an Journeys';
+const JOURNEY_INJIL = 'Injil Journeys';
+const JOURNEY_ZABUR = 'Zabur Journeys';
+const JOURNEY_TAWRAT = 'Tawrat Journeys';
 
 const USER_ROLE_NONE = 'none';
 const USER_ROLE_TRANSLATOR = 'Translator';

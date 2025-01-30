@@ -2,12 +2,14 @@ import { SelectBoxOption } from "../Base/Select/types";
 
 type JourneyBlockPropsType = {
   blockIndex: number;
+  blockId: string;
   isArticle: boolean;
   language: string;
   title: string;
   seriesTitle: string;
   seriesLogo: string;
   seriesLogoOptions: SelectBoxOption[];
+  disableOpen: boolean;
 
   onTitleChange: (val: string) => void;
   onSeriesTitleChange: (val: string) => void;

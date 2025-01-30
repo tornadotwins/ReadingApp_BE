@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -20,24 +20,18 @@ import CollapsibleBlock from "@/components/IntroBlock/CollapsibleBlock";
 import useOrientation from "@/hooks/useOrientation";
 
 import { AppStateType } from "@/reducers/types";
-import { SubBookInfoType } from "../BookOverview/types";
 import {
   BlockType,
   CollapsibleValType,
   ImageValType,
-  IntroOverviewPropsType,
+  ArticleOverviewPropsType,
   IntroType,
-  SelectOptionType,
 } from "./types";
-import { ChapterInfoType } from "../BookOverview/types";
-import { ChapterModelType } from "../ChapterOverview/types";
 
 import actionTypes from "@/actions/actionTypes";
 import {
   ACCESS_TOKEN,
   BOOK_SELECTORS,
-  BOOK_INJIL,
-  BOOK_TAWRAT,
 } from "@/config";
 import {
   StyledContainer,
@@ -54,26 +48,25 @@ import {
   StyledBlockGroupContainer,
 } from "./styles";
 import { getLanguageFromLanguageCode } from "@/utils";
-import bookService from "@/services/book.services";
+
+import journeyService from "@/services/journey.services";
+import { ArticleVerseType, JourneyCardType } from "../JourneyOverview/types";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
   { toolName: 'Arabic', onClick: () => { } }
 ];
 
-function IntroOverview(props: IntroOverviewPropsType) {
+function JourneyArticleOverview(props: ArticleOverviewPropsType) {
   const location = useLocation();
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [selectedBook, setSelectedBook] = useState(props.currentBook);
-  const [selectedSubBook, setSelectedSubBook] = useState(location.state.subBookInfo?.subBookId);
-  const [currentChapter, setCurrentChapter] = useState(location.state.chapterId);
+  const [selectedJourneyBook, setSelectedJourneyBook] = useState(props.currentJourneyBook || "");
   const [selectedLanguage, setSelectedLanguage] = useState(props.currentLanguage);
 
-  const [subBookSelectOptions, setSubBookSelectOptions] = useState<SelectOptionType[]>([]);
-  const [isCompleted, setIsCompleted] = useState(location.state.subBookInfo.chapterInfos[0].chapterIsCompleted?.[selectedLanguage] || false);
-  const [isPublished, setIsPublished] = useState(location.state.subBookInfo.chapterInfos[0].chapterIsPublished?.[selectedLanguage] || false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isPublished, setIsPublished] = useState(false);
 
   const [blocks, setBlocks] = useState<BlockType[]>([]);
 
@@ -84,89 +77,79 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
   const languages = useMemo(() => location.state.languages, [location]);
 
-  // Get current intro chapter info
-  useEffect(() => {
-    const currentBookInfo = props.bookInfos.find(book => book.bookTitle.en == props.currentBook);
-    const currentSubBookInfo = currentBookInfo?.subBooks?.find(subBook => subBook.subBookId == selectedSubBook);
-    const currentChapterId = currentSubBookInfo?.chapterInfos && currentSubBookInfo?.chapterInfos[0].chapterNumber == 0 &&
-      currentSubBookInfo?.chapterInfos[0]?.chapterId || '';
-
-    setCurrentChapter(currentChapterId);
-  }, [selectedSubBook]);
-
   // Get Intro verses
-  useEffect(() => {
-    setIsLoading(true);
-    setBlocks([]);
-    bookService
-      .getIntroVerses(currentChapter)
-      .then(result => {
-        // Set complete/publish
-        setIsCompleted(result.isCompleted?.[selectedLanguage] || false);
-        setIsPublished(result.isPublished?.[selectedLanguage] || false);
+  // useEffect(() => {
+  //   setIsLoading(true);
+  //   setBlocks([]);
+  //   journey
+  //     .getIntroVerses(currentChapter)
+  //     .then(result => {
+  //       // Set complete/publish
+  //       setIsCompleted(result.isCompleted?.[selectedLanguage] || false);
+  //       setIsPublished(result.isPublished?.[selectedLanguage] || false);
 
-        const blocks: BlockType[] = [];
-        if (result.verses && result.verses.length > 0) {
-          result.verses?.map((verse: IntroType) => {
-            const verseNumber = verse.number;
-            if (!verse.isCollapse && verse.title) {
-              const block: BlockType = {
-                id: verse.id || `title-${Date.now()}-${Math.random()}`,
-                type: 'title',
-                blockIndex: verseNumber,
-                value: verse.title?.[selectedLanguage]
-              };
+  //       const blocks: BlockType[] = [];
+  //       if (result.verses && result.verses.length > 0) {
+  //         result.verses?.map((verse: IntroType) => {
+  //           const verseNumber = verse.number;
+  //           if (!verse.isCollapse && verse.title) {
+  //             const block: BlockType = {
+  //               id: verse.id || `title-${Date.now()}-${Math.random()}`,
+  //               type: 'title',
+  //               blockIndex: verseNumber,
+  //               value: verse.title?.[selectedLanguage]
+  //             };
 
-              blocks.push(block);
-            } else if (!verse.isCollapse && verse.text) {
-              const block: BlockType = {
-                id: verse.id || `text-${Date.now()}-${Math.random()}`,
-                type: 'text',
-                blockIndex: verseNumber,
-                value: verse.text?.[selectedLanguage]
-              };
+  //             blocks.push(block);
+  //           } else if (!verse.isCollapse && verse.text) {
+  //             const block: BlockType = {
+  //               id: verse.id || `text-${Date.now()}-${Math.random()}`,
+  //               type: 'text',
+  //               blockIndex: verseNumber,
+  //               value: verse.text?.[selectedLanguage]
+  //             };
 
-              blocks.push(block);
-            } else if (!verse.isCollapse && verse.image) {
-              const block: BlockType = {
-                id: verse.id || `image-${Date.now()}-${Math.random()}`,
-                type: 'image',
-                blockIndex: verseNumber,
-                value: verse.image as ImageValType
-              };
+  //             blocks.push(block);
+  //           } else if (!verse.isCollapse && verse.image) {
+  //             const block: BlockType = {
+  //               id: verse.id || `image-${Date.now()}-${Math.random()}`,
+  //               type: 'image',
+  //               blockIndex: verseNumber,
+  //               value: verse.image as ImageValType
+  //             };
 
-              blocks.push(block);
-            } else if (verse.isCollapse) {
-              const block: BlockType = {
-                id: verse.id || `collapsible-${Date.now()}-${Math.random()}`,
-                type: 'collapsible',
-                blockIndex: verseNumber,
-                value: verse
-              };
+  //             blocks.push(block);
+  //           } else if (verse.isCollapse) {
+  //             const block: BlockType = {
+  //               id: verse.id || `collapsible-${Date.now()}-${Math.random()}`,
+  //               type: 'collapsible',
+  //               blockIndex: verseNumber,
+  //               value: verse
+  //             };
 
-              blocks.push(block);
-            }
-          });
-        }
+  //             blocks.push(block);
+  //           }
+  //         });
+  //       }
 
-        setBlocks(blocks);
-        setIsLoading(false);
-      })
-      .catch(error => {
-        console.log('warning/error while getting intro information: \n', error);
-        toast.warning('No introduction information for the chapter.', {
-          position: 'top-right',
-          draggable: true,
-          theme: 'colored',
-          transition: Bounce,
-          closeOnClick: true,
-          pauseOnHover: true,
-          hideProgressBar: false,
-          autoClose: 3000
-        });
-        setIsLoading(false);
-      })
-  }, [currentChapter, selectedLanguage]);
+  //       setBlocks(blocks);
+  //       setIsLoading(false);
+  //     })
+  //     .catch(error => {
+  //       console.log('warning/error while getting intro information: \n', error);
+  //       toast.warning('No introduction information for the chapter.', {
+  //         position: 'top-right',
+  //         draggable: true,
+  //         theme: 'colored',
+  //         transition: Bounce,
+  //         closeOnClick: true,
+  //         pauseOnHover: true,
+  //         hideProgressBar: false,
+  //         autoClose: 3000
+  //       });
+  //       setIsLoading(false);
+  //     })
+  // }, [currentChapter, selectedLanguage]);
 
   // Log out
   const onLogout = () => {
@@ -199,14 +182,14 @@ function IntroOverview(props: IntroOverviewPropsType) {
     )
   };
 
-  const handleSelectedBook = (bookTitle: string) => {
-    setSelectedBook(bookTitle);
-    navigate('/admin/bookoverview')
+  const handleSelectedBook = (journeyBookTitle: string) => {
+    setSelectedJourneyBook(journeyBookTitle);
+    navigate('/admin/journeyoverview')
 
     props.dispatch({
-      type: actionTypes.SET_BOOK,
+      type: actionTypes.SET_JOURNEY_BOOK,
       payload: {
-        bookTitle
+        journeyBookTitle
       }
     })
   };
@@ -220,35 +203,10 @@ function IntroOverview(props: IntroOverviewPropsType) {
             bookTitle: book.bookTitle,
             onClick: () => { handleSelectedBook(book.value) }
           }))}
-          selectedBook={selectedBook}
+          selectedBook={selectedJourneyBook}
         />
       </StyledBookSelectorContainer>
     )
-  };
-
-  // Get sub book options
-  useEffect(() => {
-    const currentBookInfo = props.bookInfos.find(bookInfo => bookInfo.bookTitle.en == props.currentBook);
-
-    // Update subbook options
-    if (currentBookInfo) {
-      const uniqueSubBooks = Array.from(
-        new Set(currentBookInfo.subBooks.map(sb => sb.subBookId))
-      ).map(id => currentBookInfo.subBooks.find(sb => sb.subBookId === id)!);
-
-      const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
-        label: subBook.subBookTitle?.[selectedLanguage],
-        value: subBook.subBookId
-      }));
-
-      setSubBookSelectOptions(newSubBookOptions);
-      setSelectedSubBook(location.state.subBookInfo?.subBookId || newSubBookOptions[0].value);
-    }
-  }, [props.currentBook]);
-
-  const handleSelectSubBookChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    const value = event.target.value as string;
-    setSelectedSubBook(value);
   };
 
   const handleSelectLanguageChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -261,19 +219,6 @@ function IntroOverview(props: IntroOverviewPropsType) {
     return (
       <StyledSelectContainer>
         <StyledSelectGroupContainer>
-          {
-            (selectedBook == BOOK_INJIL || selectedBook == BOOK_TAWRAT) &&
-            <SelectBox
-              label=""
-              options={subBookSelectOptions}
-              value={subBookSelectOptions.find(option => option.value === selectedSubBook) ? selectedSubBook : ''}
-              backgroundColor="#fff"
-              textColor="#155D74"
-
-              onChange={handleSelectSubBookChange}
-            />
-          }
-
           <SelectBox
             label=""
             options={languages}
@@ -296,47 +241,31 @@ function IntroOverview(props: IntroOverviewPropsType) {
     setEnableSaveBtn(true);
   };
 
-  const updateReduxBookInfoWithChapter = (updatedChapterInfo: ChapterModelType) => {
-    const newChapterInfo: ChapterInfoType = {
-      chapterAudio: updatedChapterInfo.audio,
-      chapterId: updatedChapterInfo._id,
-      chapterNumber: updatedChapterInfo.chapterNumber,
-      chapterTranslated: updatedChapterInfo.isTranslated,
-      chapterIsCompleted: updatedChapterInfo.isCompleted,
-      chapterIsPublished: updatedChapterInfo.isPublished,
-      subBookId: updatedChapterInfo.subBook,
-    }
+  const updateReduxBookInfoWithChapter = (updatedArticleInfo: JourneyCardType) => {
+    // const newChapterInfo: ChapterInfoType = {
+    //   chapterAudio: updatedChapterInfo.audio,
+    //   chapterId: updatedChapterInfo._id,
+    //   chapterNumber: updatedChapterInfo.chapterNumber,
+    //   chapterTranslated: updatedChapterInfo.isTranslated,
+    //   chapterIsCompleted: updatedChapterInfo.isCompleted,
+    //   chapterIsPublished: updatedChapterInfo.isPublished,
+    //   subBookId: updatedChapterInfo.subBook,
+    // }
+    console.log(updatedArticleInfo);
 
-    const updatedBookInfos = props.bookInfos.map((book) => ({
-      ...book,
-      subBooks: book.subBooks.map((subBook) => ({
-        ...subBook,
-        chapterInfos: subBook.chapterInfos.map((chapter) =>
-          chapter.chapterId === currentChapter
-            ? { ...chapter, ...newChapterInfo }
-            : chapter
-        ),
-      })),
-    }));
-
-    props.dispatch({
-      type: actionTypes.SET_BOOKINFOS,
-      payload: {
-        bookInfos: updatedBookInfos
-      }
-    });
+    ////need to be updated
   };
 
   const handleSave = useCallback(() => {
     setIsLoading(true);
-    const introResult: IntroType[] = [];
+    const articleVerses: ArticleVerseType[] = [];
 
     blocks.map((block, index) => {
       switch (block.type) {
         case 'title': {
           const title = block.value as string;
-          const introObj: IntroType = {
-            chapter: currentChapter,
+          const articleObj: ArticleVerseType = {
+            article: props.currentArticleId,
             title: {
               [selectedLanguage]: title,
             },
@@ -347,15 +276,15 @@ function IntroOverview(props: IntroOverviewPropsType) {
             content: []
           }
 
-          introResult.push(introObj);
+          articleVerses.push(articleObj);
 
           break;
         }
 
         case 'text': {
           const text = block.value as string;
-          const introObj: IntroType = {
-            chapter: currentChapter,
+          const articleObj: ArticleVerseType = {
+            article: props.currentArticleId,
             title: {},
             text: {
               [selectedLanguage]: text,
@@ -366,7 +295,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
             content: [],
           };
 
-          introResult.push(introObj);
+          articleVerses.push(articleObj);
 
           break;
         }
@@ -376,8 +305,8 @@ function IntroOverview(props: IntroOverviewPropsType) {
           const imageUrl = imageObj.url;
           const imageAlt = imageObj.alt;
 
-          const introObj: IntroType = {
-            chapter: currentChapter,
+          const articleObj: ArticleVerseType = {
+            article: props.currentArticleId,
             title: {},
             text: {},
             image: {
@@ -389,14 +318,14 @@ function IntroOverview(props: IntroOverviewPropsType) {
             content: [],
           };
 
-          introResult.push(introObj);
+          articleVerses.push(articleObj);
 
           break;
         }
 
         case 'collapsible': {
-          let introObj: IntroType = {
-            chapter: currentChapter,
+          let articleObj: ArticleVerseType = {
+            article: props.currentArticleId,
             title: {},
             text: {},
             image: {},
@@ -408,8 +337,8 @@ function IntroOverview(props: IntroOverviewPropsType) {
           const collapseObj = block.value as CollapsibleValType;
 
           const collapseTitle = collapseObj['0']?.value;
-          introObj = {
-            ...introObj,
+          articleObj = {
+            ...articleObj,
             title:
             {
               [selectedLanguage]: collapseTitle as string
@@ -443,12 +372,12 @@ function IntroOverview(props: IntroOverviewPropsType) {
             }
           }
 
-          introObj = {
-            ...introObj,
+          articleObj = {
+            ...articleObj,
             content: collapseResult
           }
 
-          introResult.push(introObj);
+          articleVerses.push(articleObj);
 
           break;
         }
@@ -456,24 +385,23 @@ function IntroOverview(props: IntroOverviewPropsType) {
     });
 
     const requestData = {
+      parentId: props.currentArticleId,
       languageCode: selectedLanguage,
-      subBookId: selectedSubBook,
-      chapterId: currentChapter,
       isCompleted: {
         [selectedLanguage]: isCompleted,
       },
       isPublished: {
         [selectedLanguage]: isPublished,
       },
-      verses: introResult
+      verses: articleVerses
     };
 
-    bookService
-      .updateIntroData(requestData)
+    journeyService
+      .saveArticle(requestData)
       .then(result => {
-        updateReduxBookInfoWithChapter(result);
+        console.log(result);
 
-        toast.success('Successfully updated.', {
+        toast.success('Successfully saved.', {
           position: 'top-right',
           draggable: true,
           theme: 'colored',
@@ -481,21 +409,23 @@ function IntroOverview(props: IntroOverviewPropsType) {
           closeOnClick: true,
           pauseOnHover: true,
           hideProgressBar: false,
-          autoClose: 3000
+          autoClose: 3000,
         });
+
         setIsLoading(false);
       })
       .catch(error => {
         toast.error(error.message, {
           position: 'top-right',
           draggable: true,
-          theme: 'colored',
+          theme: "colored",
           transition: Bounce,
           closeOnClick: true,
           pauseOnHover: true,
           hideProgressBar: false,
-          autoClose: 3000
+          autoClose: 3000,
         });
+
         setIsLoading(false);
       });
   }, [blocks, isCompleted, isPublished]);
@@ -759,9 +689,10 @@ function mapStateToProps(state: AppStateType) {
     currentUser: state.user.currentUser,
     bookInfos: state.book.bookInfos,
     chapterInfos: state.book.chapterInfos,
-    currentBook: state.book.book,
     currentLanguage: state.book.language,
+    currentJourneyBook: state.journeys.journeyTitle,
+    articleId: state.journeys.parentId,
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(IntroOverview);
+export default connect(mapStateToProps, mapDispatchToProps)(JourneyArticleOverview);
