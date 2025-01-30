@@ -80,6 +80,12 @@ type GetJourneyStageResponseType = {
   markimage: string;
 }
 
+type GetArticleResponseType = {
+  isCompleted: boolean;
+  isPublished: boolean;
+  verses: ArticleVerseType[];
+}
+
 export type {
   UserRequestType,
   TranslatorRequestType,
@@ -92,4 +98,5 @@ export type {
   SaveJourneyRequestType,
   SaveArticleRequestType,
   GetJourneyStageResponseType,
+  GetArticleResponseType,
 }

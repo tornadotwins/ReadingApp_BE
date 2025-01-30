@@ -33,7 +33,7 @@ import {
 import actionTypes from "@/actions/actionTypes";
 import {
   ACCESS_TOKEN,
-  BOOK_SELECTORS,
+  JOURNEY_SELECTORS,
 } from "@/config";
 import {
   StyledContainer,
@@ -49,14 +49,20 @@ import {
   StyledDynamicBlockGroup,
   StyledBackButtonContainer,
   StyledPreviewBlockContainer,
+  StyledPreviewContainer,
   StyledPreviewTitleContainer,
+  StyledPreviewTextContainer,
+  StyledPreviewImageContainer,
+  StyledPreviewImage,
+  StyledPreviewCollapseContainer,
   StyledPagePreviewContainer,
   StyledJourneyContentContainer,
 } from "./styles";
+import PreviewCollapsibleBlock from "@/components/IntroBlock/PreviewCollapsibleBlock";
 import { getLanguageFromLanguageCode, getLanguageCodeFromLanguage } from "@/utils";
 
 import journeyService from "@/services/journey.services";
-import { ArticleVerseType, JourneyCardType } from "../JourneyOverview/types";
+import { ArticleVerseType } from "../JourneyOverview/types";
 import { LanguageType } from "../types";
 
 const TOOLS = [
@@ -119,81 +125,6 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
       setSelectedLanguage(processedLanguages[0].value);
   }, [props.currentUser, selectedLanguage, processLanguages]);
 
-  // Get Intro verses
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   setBlocks([]);
-  //   journey
-  //     .getIntroVerses(currentChapter)
-  //     .then(result => {
-  //       // Set complete/publish
-  //       setIsCompleted(result.isCompleted?.[selectedLanguage] || false);
-  //       setIsPublished(result.isPublished?.[selectedLanguage] || false);
-
-  //       const blocks: BlockType[] = [];
-  //       if (result.verses && result.verses.length > 0) {
-  //         result.verses?.map((verse: IntroType) => {
-  //           const verseNumber = verse.number;
-  //           if (!verse.isCollapse && verse.title) {
-  //             const block: BlockType = {
-  //               id: verse.id || `title-${Date.now()}-${Math.random()}`,
-  //               type: 'title',
-  //               blockIndex: verseNumber,
-  //               value: verse.title?.[selectedLanguage]
-  //             };
-
-  //             blocks.push(block);
-  //           } else if (!verse.isCollapse && verse.text) {
-  //             const block: BlockType = {
-  //               id: verse.id || `text-${Date.now()}-${Math.random()}`,
-  //               type: 'text',
-  //               blockIndex: verseNumber,
-  //               value: verse.text?.[selectedLanguage]
-  //             };
-
-  //             blocks.push(block);
-  //           } else if (!verse.isCollapse && verse.image) {
-  //             const block: BlockType = {
-  //               id: verse.id || `image-${Date.now()}-${Math.random()}`,
-  //               type: 'image',
-  //               blockIndex: verseNumber,
-  //               value: verse.image as ImageValType
-  //             };
-
-  //             blocks.push(block);
-  //           } else if (verse.isCollapse) {
-  //             const block: BlockType = {
-  //               id: verse.id || `collapsible-${Date.now()}-${Math.random()}`,
-  //               type: 'collapsible',
-  //               blockIndex: verseNumber,
-  //               value: verse
-  //             };
-
-  //             blocks.push(block);
-  //           }
-  //         });
-  //       }
-
-  //       setBlocks(blocks);
-  //       setIsLoading(false);
-  //     })
-  //     .catch(error => {
-  //       console.log('warning/error while getting intro information: \n', error);
-  //       toast.warning('No introduction information for the chapter.', {
-  //         position: 'top-right',
-  //         draggable: true,
-  //         theme: 'colored',
-  //         transition: Bounce,
-  //         closeOnClick: true,
-  //         pauseOnHover: true,
-  //         hideProgressBar: false,
-  //         autoClose: 3000
-  //       });
-  //       setIsLoading(false);
-  //     })
-  // }, [currentChapter, selectedLanguage]);
-
-  // Log out
   const onLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
 
@@ -241,7 +172,7 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
     return (
       <StyledBookSelectorContainer>
         <BookSelector
-          books={BOOK_SELECTORS.map(book => ({
+          books={JOURNEY_SELECTORS.map(book => ({
             bookTitle: book.bookTitle,
             onClick: () => { handleSelectedBook(book.value) }
           }))}
@@ -283,21 +214,6 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
     setEnableSaveBtn(true);
   };
 
-  const updateReduxBookInfoWithChapter = (updatedArticleInfo: JourneyCardType) => {
-    // const newChapterInfo: ChapterInfoType = {
-    //   chapterAudio: updatedChapterInfo.audio,
-    //   chapterId: updatedChapterInfo._id,
-    //   chapterNumber: updatedChapterInfo.chapterNumber,
-    //   chapterTranslated: updatedChapterInfo.isTranslated,
-    //   chapterIsCompleted: updatedChapterInfo.isCompleted,
-    //   chapterIsPublished: updatedChapterInfo.isPublished,
-    //   subBookId: updatedChapterInfo.subBook,
-    // }
-    console.log(updatedArticleInfo);
-
-    ////need to be updated
-  };
-
   const handleSave = useCallback(() => {
     setIsLoading(true);
     const articleVerses: ArticleVerseType[] = [];
@@ -307,7 +223,7 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
         case 'title': {
           const title = block.value as string;
           const articleObj: ArticleVerseType = {
-            article: props.currentArticleId,
+            article: props.articleId,
             title: {
               [selectedLanguage]: title,
             },
@@ -326,7 +242,7 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
         case 'text': {
           const text = block.value as string;
           const articleObj: ArticleVerseType = {
-            article: props.currentArticleId,
+            article: props.articleId,
             title: {},
             text: {
               [selectedLanguage]: text,
@@ -348,7 +264,7 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
           const imageAlt = imageObj.alt;
 
           const articleObj: ArticleVerseType = {
-            article: props.currentArticleId,
+            article: props.articleId,
             title: {},
             text: {},
             image: {
@@ -367,7 +283,7 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
 
         case 'collapsible': {
           let articleObj: ArticleVerseType = {
-            article: props.currentArticleId,
+            article: props.articleId,
             title: {},
             text: {},
             image: {},
@@ -427,7 +343,7 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
     });
 
     const requestData = {
-      parentId: props.currentArticleId,
+      parentId: props.articleId,
       languageCode: selectedLanguage,
       isCompleted: {
         [selectedLanguage]: isCompleted,
@@ -440,9 +356,7 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
 
     journeyService
       .saveArticle(requestData)
-      .then(result => {
-        console.log(result);
-
+      .then(() => {
         toast.success('Successfully saved.', {
           position: 'top-right',
           draggable: true,
@@ -608,6 +522,73 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
     });
   };
 
+  useEffect(() => {
+    journeyService
+      .getArticle(props.articleId)
+      .then(res => {
+        const blocks: BlockType[] = [];
+
+        if (res.verses && res.verses.length > 0) {
+          res.verses?.map((verse: ArticleVerseType) => {
+            if (!verse.isCollapse && verse.title) {
+              const block: BlockType = {
+                id: verse._id || `title-${Date.now()}-${Math.random()}`,
+                type: 'title',
+                blockIndex: verse.number,
+                value: verse.title?.[selectedLanguage] as string,
+              };
+
+              blocks.push(block);
+            } else if (!verse.isCollapse && verse.text) {
+              const block: BlockType = {
+                id: verse._id || `text-${Date.now()}-${Math.random()}`,
+                type: 'text',
+                blockIndex: verse.number,
+                value: verse.text?.[selectedLanguage] as string,
+              };
+
+              blocks.push(block);
+            } else if (!verse.isCollapse && verse.image) {
+              const block: BlockType = {
+                id: verse.id || `image-${Date.now()}-${Math.random()}`,
+                type: 'image',
+                blockIndex: verse.number,
+                value: verse.image as ImageValType
+              };
+
+              blocks.push(block);
+            } else if (verse.isCollapse) {
+              const block: BlockType = {
+                id: verse.id || `collapsible-${Date.now()}-${Math.random()}`,
+                type: 'collapsible',
+                blockIndex: verse.number,
+                value: verse
+              };
+
+              blocks.push(block);
+            }
+          })
+        }
+
+        setBlocks(blocks);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        toast.warning(error, {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000,
+        });
+
+        setIsLoading(false);
+      });
+  }, [selectedLanguage, props.articleId]);
+
   const _renderDynamicBlocks = () => {
     return (
       <StyledDynamicBlockGroup>
@@ -711,7 +692,77 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
         </StyledPreviewTitleContainer>
 
         <StyledPagePreviewContainer>
-          aser
+          {
+            blocks && blocks.length > 0 &&
+            <StyledPreviewContainer>
+              {
+                blocks.map((block, index) => {
+                  switch (block.type) {
+                    case "title":
+                      return (
+                        <StyledPreviewTitleContainer key={index}>
+                          <Text color='black' fontWeight="bold" textAlign="left" fontFamily="Inter">
+                            {block.value as string}
+                          </Text>
+                        </StyledPreviewTitleContainer>
+                      );
+
+                    case "text":
+                      return (
+                        <StyledPreviewTextContainer key={index}>
+                          <Text color='black' fontSize={16} fontWeight="400" fontFamily="Inter">
+                            {block.value as string}
+                          </Text>
+                        </StyledPreviewTextContainer>
+                      );
+
+                    case "image":
+                      return (
+                        <StyledPreviewImageContainer key={index}>
+                          <StyledPreviewImage
+                            src={(block.value as ImageValType).url}
+                            alt={(block.value as ImageValType).alt}
+                          />
+                        </StyledPreviewImageContainer>
+                      );
+
+                    case "collapsible": {
+                      const jsonArray = Object.values(block.value);
+                      const title = jsonArray[0]?.value;
+                      const contents = [];
+                      for (let index = 1; index < jsonArray.length; index++) {
+                        const jsonObj = jsonArray[index];
+                        if (jsonObj?.type == 'title') {
+                          contents.push({ [selectedLanguage]: jsonObj?.value, isTitle: true });
+                        } else if (jsonObj?.type == 'text') {
+                          contents.push({ [selectedLanguage]: jsonObj?.value, isTitle: false });
+                        } else {
+                          contents.push(jsonObj?.value);
+                        }
+                      }
+
+                      return (
+                        <StyledPreviewCollapseContainer key={index}>
+                          <PreviewCollapsibleBlock
+                            language={selectedLanguage}
+                            blockIndex={block.blockIndex}
+                            value={block.value as IntroType}
+                            title={title}
+                            contents={contents}
+
+                            onChange={() => { }}
+                            onDelete={() => { }}
+                            onMoveDown={() => { }}
+                            onMoveUp={() => { }}
+                          />
+                        </StyledPreviewCollapseContainer>
+                      )
+                    }
+                  }
+                })
+              }
+            </StyledPreviewContainer>
+          }
         </StyledPagePreviewContainer>
       </StyledPreviewBlockContainer>
     )

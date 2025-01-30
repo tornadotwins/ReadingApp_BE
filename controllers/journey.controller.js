@@ -169,8 +169,16 @@ exports.getArticle = async (req, res) => {
       number: 1,
     });
 
+    const journey = await Journey.findById(articleId);
+    const isCompleted = journey.isCompleted;
+    const isPublished = journey.isPublished;
+
     if (article) {
-      return res.status(200).json(article);
+      return res.status(200).json({
+        isCompleted,
+        isPublished,
+        verses: article,
+      });
     } else {
       return res
         .status(404)

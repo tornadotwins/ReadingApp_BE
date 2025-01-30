@@ -37,6 +37,7 @@ type JourneyCardType = {
 
 type ArticleVerseType = {
   id?: string;
+  _id?: string;
   article: string;
   title: ObjectType;
   text: ObjectType;

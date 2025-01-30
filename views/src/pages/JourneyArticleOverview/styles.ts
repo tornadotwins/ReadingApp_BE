@@ -205,6 +205,32 @@ const StyledPreviewBlockContainer = styled(Box) ({
   margin: '20px 40px 0px 40px',
 });
 
+const StyledPreviewContainer = styled(Box) ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  boxSizing: 'border-box',
+  border: '1px solid #155D74',
+  backgroundColor: '#F0F5FB',
+  padding: '10px',
+  width: '100%',
+
+  '& .MuiBox-root': {
+    width: '100%',
+    wordWrap: 'break-work',
+    wordBreak: 'break-word'
+  },
+
+  '& > .MuiBox-root: first-of-type': {
+    marginBottom: '20px',
+
+  },
+
+  '@media screen and (max-width: 700px)': {
+    width: '100%'
+  },
+});
+
 const StyledPreviewTitleContainer = styled(Box) ({
   display: 'flex',
   alignItems: 'center',
@@ -235,6 +261,35 @@ const StyledBlockGroupContainer = styled(Box) ({
   }
 });
 
+const StyledPreviewTextContainer = styled(Box) ({
+  display: 'flex',
+  alignSelf: 'start',
+  boxSizing: 'border-box',
+  padding: '0px 10px',
+  marginBottom: '10px'
+});
+
+const StyledPreviewImageContainer = styled(Box) ({
+  display: 'flex',
+  alignSelf: 'start',
+  boxSizing: 'border-box',
+  padding: '0px 10px',
+  marginBottom: '10px',
+});
+
+const StyledPreviewImage = styled('img') ({
+  width: '250px',
+});
+
+const StyledPreviewCollapseContainer = styled(Box) ({
+  display: 'flex',
+  alignSelf: 'start',
+  boxSizing: 'border-box',
+  padding: '0px 10px',
+  marginBottom: '10px',
+  width: '100%',
+});
+
 const StyledJourneyContentContainer = styled(Box) ({
   display: 'flex',
   alignItems: 'start',
@@ -254,8 +309,13 @@ export {
   StyledDynamicBlockGroup,
   StyledBackButtonContainer,
   StyledPreviewBlockContainer,
+  StyledPreviewContainer,
   StyledPreviewTitleContainer,
   StyledPagePreviewContainer,
   StyledBlockGroupContainer,
+  StyledPreviewTextContainer,
+  StyledPreviewImageContainer,
+  StyledPreviewImage,
+  StyledPreviewCollapseContainer,
   StyledJourneyContentContainer,
 }

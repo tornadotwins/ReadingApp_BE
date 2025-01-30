@@ -6,6 +6,7 @@ import {
   SaveJourneyRequestType,
   GetJourneyStageResponseType,
   SaveArticleRequestType,
+  GetArticleResponseType,
 } from './types';
 
 class JourenyService {
@@ -53,6 +54,24 @@ class JourenyService {
       axios
         .get(url)
         .then((response) => {
+          if(response.data)
+            resolve(response.data);
+          else
+            reject(response.data.error);
+        })
+        .catch(error =>
+          reject(error.response.data.message)
+        )
+    })
+  }
+
+  // Get Article
+  getArticle = (articleId: string): Promise<GetArticleResponseType> => {
+    return new Promise((resolve, reject) => {
+      const url = API_URL + `/journey/${articleId}/article`;
+      axios
+        .get(url)
+        .then(response => {
           if(response.data)
             resolve(response.data);
           else
