@@ -469,7 +469,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
               fontSize={16}
               lineHeight={24}
             >
-              {`Back to "${props.parentJourneyTitle}"`}
+              Back
             </Text>
           </StyledBackButtonContainer>
         }
