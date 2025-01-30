@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { toast, Bounce, ToastContainer } from "material-react-toastify";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate } from "react-router-dom";
 
 import useOrientation from "@/hooks/useOrientation";
 
@@ -61,6 +62,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
   const [journeyBlocks, setJourneyBlocks] = useState<JourneyBlockType[]>([]);
 
   const isPortrait = useOrientation();
+  const navigate = useNavigate();
 
   // Memorized language processing
   const processLanguages = useCallback(() => {
@@ -281,16 +283,25 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     setJourneyBlocks(journeyBlocks.map(block => block.id == id ? { ...block, seriesLogo: value } : block));
   }
 
-  const handleOpen = (blockId: string, isArticle: boolean) => {
-    if (!isArticle)
-      props.dispatch({
-        type: actionTypes.SET_JOURNEY_PARENT_ID,
-        payload: {
-          parentId: blockId
-        }
-      })
-    else {
-      console.log('article clicked')
+  const handleOpen = (blockId: string, blockTitle: string, isArticle: boolean) => {
+
+    props.dispatch({
+      type: actionTypes.SET_JOURNEY_PARENT_ID,
+      payload: {
+        parentId: blockId
+      }
+    });
+
+    props.dispatch({
+      type: actionTypes.SET_JOUREY_PARENT_TITLE,
+      payload: {
+        title: blockTitle
+      }
+    });
+
+    if (isArticle) {
+      navigate('/admin/articleoverview');
+
     }
   }
 
@@ -391,10 +402,14 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
       });
   }, [props.parentJourneyId]);
 
+  const goBack = () => {
+
+  }
+
   const _renderDynamicJourneyBlocks = () => {
     return (
       <StyledDynamicJourneyContainer>
-        <StyledBackButtonContainer>
+        <StyledBackButtonContainer onClick={goBack}>
           <ArrowBackIcon />
           <Text
             color="#155D74"
@@ -403,7 +418,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
             fontSize={16}
             lineHeight={24}
           >
-            {`Back to overview`}
+            {`Back to "${props.parentJourneyTitle}"`}
           </Text>
         </StyledBackButtonContainer>
 
@@ -429,7 +444,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
                   onDelete={() => deleteJourneyCard(block.id)}
                   onMoveUp={() => reorderJourneyCards(index, 'up')}
                   onMoveDown={() => reorderJourneyCards(index, 'down')}
-                  onOpen={() => handleOpen(block.id, block.type === 'article' ? true : false)}
+                  onOpen={() => handleOpen(block.id, block.title || block.seriesTitle, block.type === 'article' ? true : false)}
                 />
               )
             })
@@ -511,6 +526,7 @@ function mapStateToProps(state: AppStateType) {
     currentLanguage: state.book.language,
     currentJourneyTitle: state.journeys.journeyTitle,
     parentJourneyId: state.journeys.parentId,
+    parentJourneyTitle: state.journeys.parentJourneyTitle,
   };
 }
 

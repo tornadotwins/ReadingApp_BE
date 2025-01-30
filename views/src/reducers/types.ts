@@ -126,6 +126,7 @@ type AppStateType = {
   journeys: {
     journeyTitle: string;
     parentId: string;
+    parentJourneyTitle: string;
   }
 };
 
@@ -154,6 +155,13 @@ type JourneyBookImageActionType = {
   }
 }
 
+type JourneyParentTitleActionType = {
+  type: string;
+  payload: {
+    title: string;
+  }
+}
+
 export type {
   StateType,
   BookStateType,
@@ -175,4 +183,5 @@ export type {
   JourneyBookActionType,
   JourneyParentActionType,
   JourneyBookImageActionType,
+  JourneyParentTitleActionType,
 }

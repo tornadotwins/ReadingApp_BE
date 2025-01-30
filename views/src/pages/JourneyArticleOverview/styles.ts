@@ -162,12 +162,65 @@ const StyledIntroControlButtonContainer = styled(Box)({
 });
 
 const StyledDynamicBlockGroup = styled(Box)({
+  width: '600px',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'center',
   boxSizing: 'border-box',
-  width: '100%'
+  margin: '20px 40px 0px 40px',
+});
+
+const StyledBackButtonContainer = styled(Box) ({
+  display: 'flex',
+  alignItems: 'center',
+  cursor: 'pointer',
+  transform: '.25s all ease',
+  marginBottom: '10px',
+  alignSelf: 'start',
+
+  '& svg': {
+    fill: '#155D74',
+    marginRight: '10px'
+  },
+
+  '& .MuiBox-root': {
+    userSelect: 'none',
+  },
+
+  '&:hover': {
+    '& .MuiBox-root': {
+      color: '#266E85',
+    },
+
+    '& svg': {
+      fill: '#266E85',
+    },
+  }
+});
+
+const StyledPreviewBlockContainer = styled(Box) ({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '400px',
+  margin: '20px 40px 0px 40px',
+});
+
+const StyledPreviewTitleContainer = styled(Box) ({
+  display: 'flex',
+  alignItems: 'center',
+  width: '100%',
+  marginBottom: '20px',
+
+  '& .MuiBox-root': {
+    userSelect: 'none',
+  },
+});
+
+const StyledPagePreviewContainer = styled(Box) ({
+  display: 'flex',
+  width: '100%',
+  boxSizing: 'border-box',
+  border: '1px solid #000',
 });
 
 const StyledBlockGroupContainer = styled(Box) ({
@@ -182,6 +235,11 @@ const StyledBlockGroupContainer = styled(Box) ({
   }
 });
 
+const StyledJourneyContentContainer = styled(Box) ({
+  display: 'flex',
+  alignItems: 'start',
+});
+
 export {
   StyledContainer,
   StyledIntroOverviewContainer,
@@ -194,5 +252,10 @@ export {
   StyledButtonGroupContainer,
   StyledIntroControlButtonContainer,
   StyledDynamicBlockGroup,
+  StyledBackButtonContainer,
+  StyledPreviewBlockContainer,
+  StyledPreviewTitleContainer,
+  StyledPagePreviewContainer,
   StyledBlockGroupContainer,
+  StyledJourneyContentContainer,
 }

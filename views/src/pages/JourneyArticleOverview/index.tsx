@@ -1,14 +1,16 @@
-import { useCallback, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { toast, Bounce, ToastContainer } from "material-react-toastify";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import {
   Button,
   LoadingOverlay,
   SelectBox,
-  Switch
+  Switch,
+  Text,
 } from "@/components/Base";
 import Header from "@/components/Header";
 import Tools from "@/components/Tools";
@@ -45,12 +47,17 @@ import {
   StyledButtonGroupContainer,
   StyledIntroControlButtonContainer,
   StyledDynamicBlockGroup,
-  StyledBlockGroupContainer,
+  StyledBackButtonContainer,
+  StyledPreviewBlockContainer,
+  StyledPreviewTitleContainer,
+  StyledPagePreviewContainer,
+  StyledJourneyContentContainer,
 } from "./styles";
-import { getLanguageFromLanguageCode } from "@/utils";
+import { getLanguageFromLanguageCode, getLanguageCodeFromLanguage } from "@/utils";
 
 import journeyService from "@/services/journey.services";
 import { ArticleVerseType, JourneyCardType } from "../JourneyOverview/types";
+import { LanguageType } from "../types";
 
 const TOOLS = [
   { toolName: 'Western', onClick: () => { } },
@@ -58,12 +65,12 @@ const TOOLS = [
 ];
 
 function JourneyArticleOverview(props: ArticleOverviewPropsType) {
-  const location = useLocation();
 
   const [isLoading, setIsLoading] = useState(false);
 
   const [selectedJourneyBook, setSelectedJourneyBook] = useState(props.currentJourneyBook || "");
   const [selectedLanguage, setSelectedLanguage] = useState(props.currentLanguage);
+  const [languages, setLanguages] = useState<LanguageType[]>([]);
 
   const [isCompleted, setIsCompleted] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
@@ -75,7 +82,42 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
   const isPortrait = useOrientation();
   const navigate = useNavigate();
 
-  const languages = useMemo(() => location.state.languages, [location]);
+  // Memorized language processing
+  const processLanguages = useCallback(() => {
+    if (!props.currentUser?.roles) return [];
+
+    const uniqueLanguages = props.currentUser.roles.reduce<LanguageType[]>((acc, role) => {
+      if (role.role !== 'none') {
+        const languageCode = getLanguageCodeFromLanguage(role.language);
+        const exists = acc.some(item => item.value === languageCode);
+
+        if (!exists) {
+          acc.push({ value: languageCode, label: role.language });
+        }
+      }
+
+      return acc;
+    }, []);
+
+    if (!props.currentLanguage) {
+      props.dispatch({
+        type: actionTypes.SET_CURRENT_LANGUAGE,
+        payload: {
+          language: uniqueLanguages[0].value
+        }
+      })
+    }
+
+    return uniqueLanguages;
+  }, [props.currentUser]);
+
+  useEffect(() => {
+    const processedLanguages = processLanguages();
+    setLanguages(processedLanguages);
+
+    if (processedLanguages.length > 0 && !processedLanguages.some(lang => lang.value === selectedLanguage))
+      setSelectedLanguage(processedLanguages[0].value);
+  }, [props.currentUser, selectedLanguage, processLanguages]);
 
   // Get Intro verses
   // useEffect(() => {
@@ -569,6 +611,19 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
   const _renderDynamicBlocks = () => {
     return (
       <StyledDynamicBlockGroup>
+        <StyledBackButtonContainer onClick={() => navigate('/admin/journeyoverview')}>
+          <ArrowBackIcon />
+          <Text
+            color="#155D74"
+            fontFamily="Inter"
+            fontWeight="500"
+            fontSize={16}
+            lineHeight={24}
+          >
+            {`Back to "${props.articleTitle || 'Prev'}"`}
+          </Text>
+        </StyledBackButtonContainer>
+
         {blocks.map((block, index) => {
           switch (block.type) {
             case 'title':
@@ -640,11 +695,35 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
     )
   };
 
-  const _renderBlockGroup = () => {
+  const _renderPreviewBlock = () => {
     return (
-      <StyledBlockGroupContainer>
+      <StyledPreviewBlockContainer>
+        <StyledPreviewTitleContainer>
+          <Text
+            color="#155D74"
+            fontFamily="Inter"
+            fontWeight="500"
+            fontSize={16}
+            lineHeight={24}
+          >
+            {`Journey Preview`}
+          </Text>
+        </StyledPreviewTitleContainer>
+
+        <StyledPagePreviewContainer>
+          aser
+        </StyledPagePreviewContainer>
+      </StyledPreviewBlockContainer>
+    )
+  }
+
+  const _renderJourneyContent = () => {
+    return (
+      <StyledJourneyContentContainer>
         {_renderDynamicBlocks()}
-      </StyledBlockGroupContainer>
+
+        {_renderPreviewBlock()}
+      </StyledJourneyContentContainer>
     )
   }
 
@@ -661,7 +740,7 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
 
         {_renderIntroControlButtonGroup()}
 
-        {_renderBlockGroup()}
+        {_renderJourneyContent()}
       </StyledIntroOverviewContainer>
     )
   };
@@ -692,6 +771,7 @@ function mapStateToProps(state: AppStateType) {
     currentLanguage: state.book.language,
     currentJourneyBook: state.journeys.journeyTitle,
     articleId: state.journeys.parentId,
+    articleTitle: state.journeys.parentJourneyTitle,
   };
 }
 

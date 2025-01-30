@@ -10,6 +10,7 @@ type ArticleOverviewPropsType = {
   currentUser: UserType,
   currentJourneyBook: string,
   currentArticleId: string,
+  articleTitle: string,
 
   dispatch: Dispatch
 }

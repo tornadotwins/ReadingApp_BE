@@ -37,6 +37,11 @@ const routes: Routes = {
     path: '/admin/journeyoverview',
     title: 'Journey Overview',
   },
+  [Pages.ArticleOverview]: {
+    component: asyncComponentLoader(() => import('@/pages/JourneyArticleOverview')),
+    path: '/admin/articleoverview',
+    title: 'Article Overview',
+  },
   [Pages.ChapterOverview]: {
     component: asyncComponentLoader(() => import('@/pages/ChapterOverview')),
     path: '/admin/chapteroverview',

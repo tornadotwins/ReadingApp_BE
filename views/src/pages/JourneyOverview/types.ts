@@ -6,6 +6,7 @@ type JourneyOverviewPropsType = {
   currentLanguage: string;
   currentJourneyTitle: string;
   parentJourneyId: string;
+  parentJourneyTitle: string;
 
   dispatch: Dispatch
 }
