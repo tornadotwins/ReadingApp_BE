@@ -281,12 +281,14 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     setJourneyBlocks(newBlocks);
   }
 
+  // Enable/Disable Save button
   useEffect(() => {
     journeyBlocks.length > 0 ?
       setEnableSaveBtn(true) :
       setEnableSaveBtn(false);
   }, [journeyBlocks]);
 
+  // Reorder journey cards
   const reorderJourneyCards = (index: number, direction: 'up' | 'down') => {
     setEnableSaveBtn(true);
     setJourneyBlocks((prevBlocks) => {
@@ -301,16 +303,19 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     });
   };
 
+  // Handle change in title in block
   const handleTitleChange = (id: string, value: string) => {
     setEnableSaveBtn(true);
     setJourneyBlocks(journeyBlocks.map(block => block.id == id ? { ...block, title: value } : block));
   }
 
+  // Handle change in series title in block
   const handleSeriesTitleChange = (id: string, value: string) => {
     setEnableSaveBtn(true);
     setJourneyBlocks(journeyBlocks.map(block => block.id == id ? { ...block, seriesTitle: value } : block));
   }
 
+  // Handle change in series logo in block
   const handleSeriesLogoChange = (id: string, value: string) => {
     setEnableSaveBtn(true);
     setJourneyBlocks(prevBlocks =>
@@ -320,11 +325,13 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     );
   }
 
+  // When the page is navigated from library page, set depth 1
   useEffect(() => {
     if (!props.parentJourneyId)
       setDepth(1);
   }, []);
 
+  // Open block (navigate to Articles page / open next stage's journey cards)
   const handleOpen = (blockId: string, blockTitle: string, isArticle: boolean) => {
     props.dispatch({
       type: actionTypes.SET_JOURNEY_PARENT_ID,
@@ -353,6 +360,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     }
   }
 
+  // Render "Add Article"/"Add Directory" buttons
   const _renderJourneyControlButtonGroup = () => {
     return (
       <StyledDirectoryControlButtonGroupContainer>
@@ -373,6 +381,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     )
   }
 
+  // Set Journey Book Information when hit different journey book tab in order to get book id(for parent id) and journey book image
   useEffect(() => {
     const fetchJourneyBookInfo = async () => {
       setIsLoading(true);
@@ -410,6 +419,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     fetchJourneyBookInfo();
   }, [selectedBook]);
 
+  // Whenever the card is changed, fetch card infos
   useEffect(() => {
     setIsLoading(true);
 
@@ -420,11 +430,11 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
           const journeyCards = res.cards;
           const updatedJourneyBlocks: JourneyBlockType[] = journeyCards.map(card => ({
             id: card._id || `${card.isArticle ? 'article' : 'directory'}-${Date.now()}`,
-            blockIndex: card.number,
+            blockIndex: card.number || 1,
             type: card.isArticle ? 'article' : 'directory',
-            title: card.title?.[currentLanguage] as string,
-            seriesTitle: card.seriesTitle?.[currentLanguage] as string,
-            seriesLogo: card.image.url as string,
+            title: (card.title?.[currentLanguage] || "") as string,
+            seriesTitle: (card.seriesTitle?.[currentLanguage] || "") as string,
+            seriesLogo: card.image.url as string || '',
           }));
 
           setJourneyBlocks(updatedJourneyBlocks);
@@ -448,7 +458,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
 
         setIsLoading(false);
       });
-  }, [props.parentJourneyId]);
+  }, [props.parentJourneyId, currentLanguage]);
 
   const goBack = () => {
 
@@ -505,6 +515,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     )
   }
 
+  // Change preview blocks whenever journey blocks are changed
   useEffect(() => {
     const previewJourneyCards = journeyBlocks.map((block: JourneyBlockType) => ({
       title: block.title,
