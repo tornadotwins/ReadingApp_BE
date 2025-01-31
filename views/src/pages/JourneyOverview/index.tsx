@@ -22,7 +22,7 @@ import {
   StyledPreviewTitleContainer,
   StyledJourneyContentContainer,
 } from "./styled";
-import { JourneyBlockType, JourneyOverviewPropsType } from "./types";
+import { JourneyBlockType, JourneyCardType, JourneyOverviewPropsType } from "./types";
 import { LanguageType } from "../types";
 import { AppStateType } from "@/reducers/types";
 
@@ -302,8 +302,6 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
         [newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]];
       }
 
-      console.log(newBlocks.map((block, i) => ({ ...block, blockIndex: i })))
-
       // Reassign blockIndex based on new order
       return newBlocks.map((block, i) => ({ ...block, blockIndex: i }));
     });
@@ -473,8 +471,20 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
       });
   }, [props.parentJourneyId, currentLanguage]);
 
+  // Go back
   const goBack = () => {
+    const parentJourneyCardInfo = props.journeyCardInfos?.find((journeyCard: JourneyCardType) => journeyCard._id == props.parentJourneyId);
 
+    if (parentJourneyCardInfo) {
+      const grandParentJourneyCardId = parentJourneyCardInfo.parent;
+
+      props.dispatch({
+        type: actionTypes.SET_JOURNEY_PARENT_ID,
+        payload: {
+          parentId: grandParentJourneyCardId
+        }
+      })
+    }
   }
 
   const _renderDynamicJourneyBlocks = () => {
@@ -618,6 +628,7 @@ function mapStateToProps(state: AppStateType) {
     parentJourneyId: state.journeys.parentId,
     parentJourneyTitle: state.journeys.parentJourneyTitle,
     journeyBookImage: state.journeys.journeyBookImage,
+    journeyCardInfos: state.journeys.journeyCardInfos,
   };
 }
 

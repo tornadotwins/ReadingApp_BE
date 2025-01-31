@@ -128,6 +128,7 @@ type AppStateType = {
     parentId: string;
     parentJourneyTitle: string;
     journeyBookImage: string;
+    journeyCardInfos: JourneyCardType[];
   }
 };
 
