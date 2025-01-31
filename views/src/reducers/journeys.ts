@@ -74,28 +74,13 @@ const setDepth = (state: JourneyBookStateType, action: JourneyDepthActionType) =
 //////////////////////////////////////////////////////////////////
 const updateJourneyCards = (state: JourneyBookStateType, action: JourneyUpdateActionType) => {
   const updatedCards = action.payload.journeyCards;
-  console.log('input: ', updatedCards);
+  const parentId = updatedCards[0].parent;
 
-  const updatedJourneyCardInfos = state.journeyCardInfos?.map(existingCard => {
-    const matchingCard = updatedCards.find(
-      newCard => newCard._id === existingCard?._id
-    );
+  // Remove all cards with the parentId
+  const journeyCardsWithoutParentId = state.journeyCardInfos?.filter(journeyCard => journeyCard.parent !== parentId);
+  const updatedJourneyCardsToSave = [...journeyCardsWithoutParentId, ...updatedCards];
 
-    return matchingCard ? { ...existingCard, ...matchingCard } : existingCard;
-  });
-
-  // Add new cards that don't already exist
-  const newCards = updatedCards.filter(
-    newCard => !state.journeyCardInfos.some(
-      existingCard => existingCard.id === newCard.id || existingCard._id === newCard._id
-    )
-  );
-  console.log([...updatedJourneyCardInfos, ...newCards]);
-
-  return {
-    ...state,
-    journeyCardInfos: [...updatedJourneyCardInfos, ...newCards],
-  };
+  return { ...state, journeyCardInfos: updatedJourneyCardsToSave  };
 };
 
 //////////////////////////////////////////////////////////////////

@@ -170,14 +170,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     setCurrnetLanguage(value);
   }
 
-  // const handleCompleteChange = () => {
-  //   setIsCompleted(!isCompleted);
-  // }
-
-  // const handlePublishChange = () => {
-  //   setIsPublished(!isPublished);
-  // }
-
+  // Save journey blocks
   const handleSave = () => {
     setIsLoading(true);
     const blocksToSave = journeyBlocks.map(block => ({
@@ -282,7 +275,9 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
   }
 
   const deleteJourneyCard = (id: string) => {
-    const newBlocks = journeyBlocks.filter(block => block.id !== id);
+    const newBlocks = journeyBlocks
+      .filter(block => block.id !== id)
+      .map((block, index) => ({ ...block, blockIndex: index }));
 
     setEnableSaveBtn(true);
     setJourneyBlocks(newBlocks);
@@ -300,13 +295,17 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     setEnableSaveBtn(true);
     setJourneyBlocks((prevBlocks) => {
       const newBlocks = [...prevBlocks];
+
       if (direction === "up" && index > 0) {
         [newBlocks[index], newBlocks[index - 1]] = [newBlocks[index - 1], newBlocks[index]];
-      }
-      if (direction === "down" && index < newBlocks.length - 1) {
+      } else if (direction === "down" && index < newBlocks.length - 1) {
         [newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]];
       }
-      return newBlocks;
+
+      console.log(newBlocks.map((block, i) => ({ ...block, blockIndex: i })))
+
+      // Reassign blockIndex based on new order
+      return newBlocks.map((block, i) => ({ ...block, blockIndex: i }));
     });
   };
 
@@ -426,7 +425,7 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
     fetchJourneyBookInfo();
   }, [selectedBook]);
 
-  // Whenever the card is changed, fetch card infos
+  // Whenever open page, fetch card infos
   useEffect(() => {
     setIsLoading(true);
 
@@ -443,6 +442,13 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
             seriesTitle: (card.seriesTitle?.[currentLanguage] || "") as string,
             seriesLogo: card.image.url as string || '',
           }));
+
+          props.dispatch({
+            type: actionTypes.UPDATE_JOURNEY_CARDS,
+            payload: {
+              journeyCards: journeyCards
+            }
+          });
 
           setJourneyBlocks(updatedJourneyBlocks);
         } else {

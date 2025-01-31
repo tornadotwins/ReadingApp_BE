@@ -204,7 +204,7 @@ exports.saveJourneyStage = async (req, res) => {
   }
 
   try {
-    const parentId = journeyCards.parent;
+    const parentId = journeyCards[0].parent;
     // Remove all documents that has the parent id
     await Journey.deleteMany({ parent: parentId });
 
