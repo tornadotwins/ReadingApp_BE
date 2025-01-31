@@ -5,7 +5,7 @@ const StyledContainer = styled(Box) ({
   flexDirection: 'column',
   margin: 'auto',
   position: 'relative',
-  height: '100dvh'
+  height: '80dvh'
 });
 
 const StyledHeaderContainer = styled(Box)({
@@ -132,7 +132,7 @@ const StyledSettingBtn = styled('img')({
 
 ////////////////////// Body //////////////////////
 const StyledBodyContainer = styled(Box)({
-  height: 'calc(100dvh - 185px)',
+  height: 'calc(80dvh - 185px)',
   width: 'calc(100% - 60px)',
   position: 'absolute',
   top: '145px',
@@ -140,13 +140,13 @@ const StyledBodyContainer = styled(Box)({
   backgroundColor: 'rgb(21, 93, 116)',
 
   '@media screen and (orientation: landscape)': {
-    height: 'calc(100dvh - 145px)',
+    height: 'calc(80dvh - 145px)',
   },
 });
 
 const StyledMainContainer = styled(Box)({
   backgroundColor: '#FFF',
-  height: 'calc(100dvh - 185px) !important',
+  height: 'calc(80dvh - 185px) !important',
   position: 'relative',
   zIndex: '1',
   display: 'flex',
@@ -155,7 +155,7 @@ const StyledMainContainer = styled(Box)({
   overflowY: 'scroll',
 
   '@media screen and (orientation: landscape)': {
-    height: 'calc(100dvh - 145px)',
+    height: 'calc(80dvh - 145px)',
   }
 });
 
