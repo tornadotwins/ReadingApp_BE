@@ -524,6 +524,9 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
       .then(res => {
         const blocks: BlockType[] = [];
 
+        setIsCompleted(res.isCompleted?.[selectedLanguage] as boolean);
+        setIsPublished(res.isPublished?.[selectedLanguage] as boolean);
+
         if (res.verses && res.verses.length > 0) {
           res.verses?.map((verse: ArticleVerseType) => {
             if (!verse.isCollapse && verse.title) {

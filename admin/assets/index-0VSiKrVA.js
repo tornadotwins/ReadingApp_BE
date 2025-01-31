@@ -1,1 +1,0 @@
-import{a as r,j as t}from"./createTheme-eHT6QdmW.js";import{as as o,at as c}from"./App-pKm6ZYhu.js";function x(i){const[a,n]=r.useState(null),s=e=>{const l=e.target.files?e.target.files[0]:null;i.onChange(e),n(l)};return t.jsxs(o,{children:[t.jsx(c,{type:"file",onChange:s,inputProps:{accept:i.type},variant:"outlined"}),a&&t.jsx("p",{children:a.name})]})}export{x as F};

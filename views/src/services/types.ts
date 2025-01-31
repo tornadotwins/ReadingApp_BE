@@ -2,7 +2,7 @@ import { SubBookModelType } from "@/pages/ChapterOverview/types";
 import { IntroType } from "@/pages/IntroOverview/types";
 import { ArticleVerseType, JourneyCardType } from "@/pages/JourneyOverview/types";
 import { ParseDataType } from "@/pages/Translator/types";
-import { AppTextType } from "@/pages/types";
+import { AppTextType, ObjectType } from "@/pages/types";
 
 type UserRequestType = {
   id?: string;
@@ -81,8 +81,8 @@ type GetJourneyStageResponseType = {
 }
 
 type GetArticleResponseType = {
-  isCompleted: boolean;
-  isPublished: boolean;
+  isCompleted: ObjectType;
+  isPublished: ObjectType;
   verses: ArticleVerseType[];
 }
 
