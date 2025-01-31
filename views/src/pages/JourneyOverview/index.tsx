@@ -209,6 +209,13 @@ function JourneyOverview(props: JourneyOverviewPropsType) {
           seriesLogo: card.image.url as string,
         }));
 
+        props.dispatch({
+          type: actionTypes.UPDATE_JOURNEY_CARDS,
+          payload: {
+            journeyCards: res
+          }
+        });
+
         setJourneyBlocks(updatedJourneyBlocks);
 
         toast.success('Successfully saved.', {

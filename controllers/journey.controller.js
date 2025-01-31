@@ -204,75 +204,28 @@ exports.saveJourneyStage = async (req, res) => {
   }
 
   try {
+    const parentId = journeyCards.parent;
+    // Remove all documents that has the parent id
+    await Journey.deleteMany({ parent: parentId });
+
     let updatedJourneyCards = [];
+
     for (const journeyCard of journeyCards) {
-      const journeyCardId = journeyCard.id;
+      const card = new Journey({
+        number: journeyCard.number,
+        parent: journeyCard.parent,
+        parentModel: journeyCard.parentModel,
+        depth: journeyCard.depth,
+        isArticle: journeyCard.isArticle,
+        title: journeyCard.title,
+        seriesTitle: journeyCard.seriesTitle,
+        image: journeyCard.image,
+      });
 
-      // If the journey card is new to save
-      if (
-        journeyCardId.startsWith('directory') ||
-        journeyCardId.startsWith('article')
-      ) {
-        const card = new Journey({
-          number: journeyCard.number,
-          parent: journeyCard.parent,
-          parentModel: journeyCard.parentModel,
-          depth: journeyCard.depth,
-          isArticle: journeyCard.isArticle,
-          title: journeyCard.title,
-          seriesTitle: journeyCard.seriesTitle,
-          image: journeyCard.image,
-          isCompleted: journeyCard.isCompleted,
-          isPublished: journeyCard.isPublished,
-        });
-
-        const savedCard = await card.save();
-        updatedJourneyCards.push(savedCard);
-      } else {
-        // if the journey card already exists
-        // Get the existing journey card
-        const existingJourneyInfo = await Journey.findById(
-          journeyCardId,
-        );
-
-        // Merge existing title with the new value for the curent language
-        const updatedTitle = {
-          ...existingJourneyInfo.title,
-          [languageCode]: journeyCard.title?.[languageCode],
-        };
-
-        // Merge existing series title with the new value for the current language
-        const updatedSeriesTitle = {
-          ...existingJourneyInfo.seriesTitle,
-          [languageCode]: journeyCard.seriesTitle?.[languageCode],
-        };
-
-        // Prepare the updated Journey object with new information
-        const updatedJourneyInfo = {
-          parent: existingJourneyInfo.parent,
-          parentModel: existingJourneyInfo.parentModel,
-          isArticle: journeyCard.isArticle,
-          title: updatedTitle,
-          seriesTitle: updatedSeriesTitle,
-          image: journeyCard.image,
-          depth: journeyCard.depth,
-          number: journeyCard.number,
-        };
-
-        // Update the journey document in db
-        const updatedJourney = await Journey.findByIdAndUpdate(
-          existingJourneyInfo._id,
-          updatedJourneyInfo,
-          {
-            new: true,
-            runValidators: true,
-          },
-        );
-
-        updatedJourneyCards.push(updatedJourney);
-      }
+      const savedCard = await card.save();
+      updatedJourneyCards.push(savedCard);
     }
-
+    
     updatedJourneyCards.sort((a, b) => a.number - b.number);
     return res.status(200).json(updatedJourneyCards);
   } catch (error) {

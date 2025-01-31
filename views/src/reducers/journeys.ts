@@ -7,6 +7,7 @@ import {
   JourneyBookImageActionType,
   JourneyParentTitleActionType,
   JourneyDepthActionType,
+  JourneyUpdateActionType,
 } from './types';
 import { JOURNEY_QURAN } from '@/config';
 
@@ -69,6 +70,35 @@ const setDepth = (state: JourneyBookStateType, action: JourneyDepthActionType) =
 }
 
 //////////////////////////////////////////////////////////////////
+////////////////////// Update Journey Cards //////////////////////
+//////////////////////////////////////////////////////////////////
+const updateJourneyCards = (state: JourneyBookStateType, action: JourneyUpdateActionType) => {
+  const updatedCards = action.payload.journeyCards;
+  console.log('input: ', updatedCards);
+
+  const updatedJourneyCardInfos = state.journeyCardInfos?.map(existingCard => {
+    const matchingCard = updatedCards.find(
+      newCard => newCard._id === existingCard?._id
+    );
+
+    return matchingCard ? { ...existingCard, ...matchingCard } : existingCard;
+  });
+
+  // Add new cards that don't already exist
+  const newCards = updatedCards.filter(
+    newCard => !state.journeyCardInfos.some(
+      existingCard => existingCard.id === newCard.id || existingCard._id === newCard._id
+    )
+  );
+  console.log([...updatedJourneyCardInfos, ...newCards]);
+
+  return {
+    ...state,
+    journeyCardInfos: [...updatedJourneyCardInfos, ...newCards],
+  };
+};
+
+//////////////////////////////////////////////////////////////////
 /////////////////////// Reset journey info ///////////////////////
 //////////////////////////////////////////////////////////////////
 const resetJourneyInfo = () => ({
@@ -82,6 +112,7 @@ const actionHandler = {
   [Types.SET_JOURNEY_IMAGE]: setJourneyImage,
   [Types.SET_JOUREY_PARENT_TITLE]: setParentJourneyTitle,
   [Types.SET_JOURNEY_DEPTH]: setDepth,
+  [Types.UPDATE_JOURNEY_CARDS]: updateJourneyCards,
 
   [Types.RESET_JOURNEY]: resetJourneyInfo
 }
