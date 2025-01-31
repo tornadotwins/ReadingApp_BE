@@ -352,7 +352,8 @@ function JourneyArticleOverview(props: ArticleOverviewPropsType) {
 
     journeyService
       .saveArticle(requestData)
-      .then(() => {
+      .then((res) => {
+        console.log(res)
         toast.success('Successfully saved.', {
           position: 'top-right',
           draggable: true,

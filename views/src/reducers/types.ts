@@ -128,6 +128,7 @@ type AppStateType = {
     parentId: string;
     parentJourneyTitle: string;
     journeyBookImage: string;
+    journeyCardInfos: JourneyCardType[];
   }
 };
 
@@ -177,6 +178,13 @@ type JourneyDepthActionType = {
   }
 }
 
+type JourneyUpdateActionType = {
+  type: string;
+  payload: {
+    journeyCards: JourneyCardType[];
+  }
+}
+
 export type {
   StateType,
   BookStateType,
@@ -201,4 +209,5 @@ export type {
   JourneyBookImageActionType,
   JourneyParentTitleActionType,
   JourneyDepthActionType,
+  JourneyUpdateActionType,
 }

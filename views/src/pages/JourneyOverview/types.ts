@@ -8,6 +8,7 @@ type JourneyOverviewPropsType = {
   parentJourneyId: string;
   parentJourneyTitle: string;
   journeyBookImage: string;
+  journeyCardInfos: JourneyCardType[];
 
   dispatch: Dispatch
 }
