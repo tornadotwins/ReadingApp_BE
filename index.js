@@ -66,33 +66,17 @@ app.use('/audio', audioRoute);
 
 app.use('/journey', journeyRoute);
 
+//////////////////////// Should Be Removed ////////////////////////
+const lakeRoute = require('./routes/lake.route');
+app.use('/lake', lakeRoute);
+//////////////////////// Should Be Removed ////////////////////////
+
 app.get('/admin/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'index.html'));
 });
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
-
-//////////////////////// Should Be Removed ////////////////////////
-app.get('/lake/road', (req, res) => {
-  try {
-    axios
-      .get(
-        'https://trafficnz.info/service/traffic/rest/4/events/withinbounds/175.2352/-39.5744/176.5243/-38.1838/10',
-      )
-      .then((response) => {
-        console.log(response.data);
-        res.json(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-        res.status(500).json(error);
-      });
-  } catch (error) {
-    res.status(500).json({ error: error.toString() });
-  }
-});
-//////////////////////// Should Be Removed ////////////////////////
 
 const port = process.env.PORT || 5000;
 const server = app.listen(port, () => {
