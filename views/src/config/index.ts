@@ -4,6 +4,7 @@ import type { Notifications } from './types';
 
 // const API_URL = 'http://localhost:5000';
 const API_URL = 'https://readingapp-d5944320053c.herokuapp.com';
+const APP_VERSION = "2.0.0";
 
 const ACCESS_TOKEN = 'accessToken';
 const CURRENT_USER = 'currentUser';
@@ -296,6 +297,7 @@ const SERIES_LOGO_IMAGE_SELECT_OPTIONS = [
 
 export {
   API_URL,
+  APP_VERSION,
   CURRENT_USER,
   loader,
   notifications,
