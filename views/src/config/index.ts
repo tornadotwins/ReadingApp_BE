@@ -253,6 +253,7 @@ const LANGUAGE_CODE_TABLE = [
   { language: "Sundanese", code: "su" },
   { language: "Swahili", code: "sw" },
   { language: "Swedish", code: "sv" },
+  { language: "Tagalog", code: "tlg" },
   { language: "Tajik", code: "tg" },
   { language: "Tamil", code: "ta" },
   { language: "Tatar", code: "tt" },

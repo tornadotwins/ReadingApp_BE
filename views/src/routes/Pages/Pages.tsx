@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import Box from '@mui/material/Box';
 
@@ -48,4 +49,16 @@ function Pages(props: any) {
   );
 }
 
-export default Pages;
+function mapDispatchToProps(dispatch: any) {
+  return {
+    dispatch,
+  };
+}
+
+function mapStateToProps(state: any) {
+  return {
+    currentUser: state.user.currentUser,
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Pages);

@@ -277,11 +277,20 @@ function AdminPortal(props: AdminPortalPropsType) {
 
     setIsLoading(true);
 
+    const updatedCurrentUser = { ...props.currentUser, roles: [...props.currentUser.roles, { language: language, role: 'none' }] };
+
     authService
       .addLanguage(language)
       .then((users: UserType[]) => {
         setUsers(users);
         setTableHeaders([...tableHeaders, language]);
+
+        props.dispatch({
+          type: actionTypes.SET_CURRENT_USER,
+          payload: {
+            user: updatedCurrentUser,
+          }
+        });
 
         toast.success('Updated successfully', {
           position: 'top-right',
@@ -325,6 +334,16 @@ function AdminPortal(props: AdminPortalPropsType) {
         .deleteLanguage(language)
         .then((users: UserType[]) => {
           setUsers(users);
+
+          // Update current user info in Redux Store
+          const currentUser = users.find(user => user._id === props.currentUser._id);
+          props.dispatch({
+            type: actionTypes.SET_CURRENT_USER,
+            payload: {
+              user: currentUser
+            }
+          });
+
           toast.success(`Language "${language}" deleted successfully`, {
             position: 'top-right',
             draggable: true,
@@ -365,6 +384,15 @@ function AdminPortal(props: AdminPortalPropsType) {
     authService
       .updateUsers(users)
       .then(() => {
+        // Update current users information in Redux store
+        const currentUser = users.find(user => user._id === props.currentUser._id);
+        props.dispatch({
+          type: actionTypes.SET_CURRENT_USER,
+          payload: {
+            user: currentUser
+          }
+        });
+
         toast.success('Updated successfully', {
           position: 'top-right',
           draggable: true,
