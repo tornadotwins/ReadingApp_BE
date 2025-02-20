@@ -917,9 +917,11 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
 
   // Save book by calling API
   const saveBook = useCallback(() => {
+    setIsLoading(true);
     translatorService
       .saveBook({ bookInfos: necessaryParsedData, bookTitle: props.currentBook, language: getLanguageFromLanguageCode(selectedLanguage) })
       .then(() => {
+        setIsLoading(false);
         toast.success('Saved successfully!', {
           position: 'top-right',
           draggable: true,
@@ -932,7 +934,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         });
       })
       .catch(() => {
-        toast.success('Failed to save book', {
+        toast.error('Failed to save book', {
           position: 'top-right',
           draggable: true,
           theme: 'colored',
@@ -942,6 +944,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           hideProgressBar: false,
           autoClose: 3000
         });
+        setIsLoading(false);
       });
   }, [selectedLanguage, necessaryParsedData]);
 

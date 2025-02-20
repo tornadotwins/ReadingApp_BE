@@ -1260,19 +1260,18 @@ const saveVerse = async (
 
         result.push(savedVerse);
       } else {
-        existingVerse.text[languageCode] = verseText;
-        existingVerse.updatedAt = Date.now();
-
-        await Verse.updateOne(
-          { _id: existingVerse._id },
+        const updatedVerse = await Verse.findByIdAndUpdate(
+          existingVerse._id,
           {
             $set: {
               [`text.${languageCode}`]: verseText,
+              updatedAt: Date.now(),
             },
           },
+          {
+            new: true,
+          },
         );
-
-        const updatedVerse = await Verse.findById(existingVerse._id);
 
         result.push(updatedVerse);
       }
