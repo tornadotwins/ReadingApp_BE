@@ -82,7 +82,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
     if (!props.currentUser?.roles) return [];
 
     const uniqueLanguages = props.currentUser.roles.reduce<LanguageType[]>((acc, role) => {
-      if (role.role !== 'none') {
+      if (role.role !== 'none' || props.currentUser.isAdmin) {
         const languageCode = getLanguageCodeFromLanguage(role.language);
         const exists = acc.some(item => item.value === languageCode);
 
