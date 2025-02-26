@@ -66,11 +66,6 @@ app.use('/audio', audioRoute);
 
 app.use('/journey', journeyRoute);
 
-//////////////////////// Should Be Removed ////////////////////////
-const lakeRoute = require('./routes/lake.route');
-app.use('/lake', lakeRoute);
-//////////////////////// Should Be Removed ////////////////////////
-
 app.get('/admin/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'index.html'));
 });
