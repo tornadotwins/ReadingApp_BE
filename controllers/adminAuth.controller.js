@@ -277,3 +277,21 @@ exports.deleteLanguage = async (req, res) => {
 
   return res.status(200).send({ users: responseUsers });
 };
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////// Get All Languages ///////////////////////////
+/////////////////////////////////////////////////////////////////////////
+exports.getAllLanguages = async (req, res) => {
+  const users = await AdminUser.find();
+
+  const allLanguages = users.reduce((acc, user) => {
+    user.roles.forEach((role) => {
+      if (!acc.includes(role.language)) {
+        acc.push(role.language);
+      }
+    });
+    return acc;
+  }, []);
+
+  return res.status(200).send({ languages: allLanguages });
+};
