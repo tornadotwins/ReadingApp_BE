@@ -1,4 +1,3 @@
-import { LANGUAGE_CODE_TABLE } from "@/config";
 import { SelectOptionType } from "@/pages/ChapterOverview/types";
 
 export const convertNumber2Date = (timestamp: number) => {
@@ -26,15 +25,11 @@ export const findDuplicatedString = (arr: string[]) => {
 }
 
 export const getLanguageFromLanguageCode = (languageCode: string) => {
-  const languageObj = LANGUAGE_CODE_TABLE.find((languageObj) => languageObj.code == languageCode);
-
-  return languageObj?.language || 'English';
+  return languageCode === 'en' ? 'English' : languageCode === 'ar' ? 'Arabic' : languageCode === 'tlg' ? 'Tagalog' : languageCode;
 }
 
 export const getLanguageCodeFromLanguage = (language: string) => {
-  const languageObj = LANGUAGE_CODE_TABLE.find((languageObj) => languageObj.language == language);
-
-  return languageObj?.code || 'en';
+  return language == "English" ? 'en' : language === "Arabic" ? 'ar' : language === "Tagalog" ? 'tlg' : language;
 }
 
 export const getLabelFromValueInDropdownOptions = (value: string, options: SelectOptionType[]) => {
