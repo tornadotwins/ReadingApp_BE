@@ -147,6 +147,7 @@ function AudioOverview(props: AudioOverviewPropsType) {
         isLoggedIn
         username={props.currentUser.username}
         isAdmin={props.currentUser.isAdmin}
+        isTranslationPage
         onLogOut={onLogout}
       />
     )

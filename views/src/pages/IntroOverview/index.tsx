@@ -205,6 +205,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
         isLoggedIn
         username={props.currentUser.username}
         isAdmin={props.currentUser.isAdmin}
+        isTranslationPage
         onLogOut={onLogout}
       />
     )

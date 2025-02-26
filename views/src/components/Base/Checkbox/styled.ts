@@ -14,7 +14,7 @@ const StyledCheckBox = styled(Box) ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  marginLeft: '20px',
+  marginLeft: '0px',
 
   backgroundColor: 'white',
   border: 'none',

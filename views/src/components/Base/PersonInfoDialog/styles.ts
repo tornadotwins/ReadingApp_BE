@@ -5,6 +5,7 @@ import {
   DialogTitle,
   styled
 } from '@mui/material';
+import { boxSizing, minWidth } from '@mui/system';
 
 const StyledPersonInfoContainer = styled(Box) ({
   display: 'flex',
@@ -35,6 +36,7 @@ const StyledDialogTitle = styled (DialogTitle) ({
 const StyledDialogContent = styled(DialogContent) ({
   backgroundColor: '#155D74',
   padding: '12px',
+  width: '240px',
 
   '& >.MuiBox-root: nth-of-type(3)': {
     '& >.MuiBox-root: nth-of-type(2)': {
@@ -54,6 +56,11 @@ const StyledForm = styled(Box) ({
   justifyContent: 'center',
   alignItems: 'center',
 
+  '& > :first-of-type': {
+    minWidth: '80px',
+    boxSizing: 'border-box',
+  },
+
   '& > .MuiBox-root': {
     padding: '8px',
     paddingRight: '0px',
@@ -71,6 +78,11 @@ const StyledCheckForm = styled(Box) ({
   marginTop: '8px',
   paddingLeft: '8px',
 
+  '& > :first-of-type': {
+    minWidth: '80px',
+    boxSizing: 'border-box',
+  },
+
   '& input': {
     border: '1px solid blue'
   },
@@ -86,7 +98,6 @@ const StyledCheckForm = styled(Box) ({
   '& .MuiSvgIcon-root': {
     fontSize: '45px',
     color: 'white',
-
   }
 });
 

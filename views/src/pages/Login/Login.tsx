@@ -34,7 +34,7 @@ function Login(props: LoginPropsType) {
         props.dispatch({
           type: actionTypes.SET_CURRENT_USER,
           payload: {
-            user: user,
+            user,
           },
         });
 

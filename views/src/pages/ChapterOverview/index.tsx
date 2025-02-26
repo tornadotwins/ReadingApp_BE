@@ -121,7 +121,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const [selectedBook, setSelectedBook] = useState(props.currentBook);
   const [selectedSubBook, setSelectedSubBook] = useState<string>(locationState.subBookInfo.subBookId);
   const [selectedChapter, setSelectedChapter] = useState<string>(locationState.chapterId);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>(props.currentLanguage);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(props.currentLanguage || 'en');
 
   const [isImport, setIsImport] = useState(locationState.isImport);
 
@@ -178,23 +178,23 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
       const language = getLanguageFromLanguageCode(selectedLanguage);
       if (isSpecialBook) {
         newHeaders = ['SubBook_English', `SubBook_${language}`, 'SubBook_Transliteration', 'Chapter_Number', 'Verse_Number', `Verse_${language}`];
-        newRows = verseInfos?.map(verseInfo => ({
+        newRows = verseInfos[0]?.verseText?.[selectedLanguage] ? verseInfos?.map(verseInfo => ({
           SubBook_English: currentSubBook?.subBookTitle?.en || '',
           [`SubBook_${language}`]: currentSubBook?.subBookTitle?.[selectedLanguage] || currentSubBook?.subBookTitle?.en || '',
           SubBook_Transliteration: isSpecialBook && currentSubBook?.subBookTitle?.transliteration || '',
           Chapter_Number: activeChapterInfo?.chapterNumber?.toString() || '1',
           Verse_Number: verseInfo?.verseNumber?.toString() || '1',
           [`Verse_${language}`]: verseInfo?.verseText?.[selectedLanguage] || verseInfo?.verseText?.en || '',
-        }));
+        })) : [];
       } else {
         newHeaders = ['SubBook_English', `SubBook_${language}`, 'Chapter_Number', 'Verse_Number', `Verse_${language}`];
-        newRows = verseInfos?.map(verseInfo => ({
+        newRows = verseInfos[0]?.verseText?.[selectedLanguage] ? verseInfos?.map(verseInfo => ({
           SubBook_English: currentSubBook?.subBookTitle?.en || '',
           [`SubBook_${language}`]: currentSubBook?.subBookTitle?.[selectedLanguage] || currentSubBook?.subBookTitle?.en || '',
           Chapter_Number: activeChapterInfo?.chapterNumber?.toString() || '1',
           Verse_Number: verseInfo?.verseNumber?.toString() || '1',
           [`Verse_${language}`]: verseInfo?.verseText?.[selectedLanguage] || verseInfo?.verseText?.en || '',
-        }));
+        })) : [];
       }
     }
 
@@ -973,6 +973,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         isLoggedIn
         username={props.currentUser.username}
         isAdmin={props.currentUser.isAdmin}
+        isTranslationPage
         onLogOut={onLogout}
       />
     )
