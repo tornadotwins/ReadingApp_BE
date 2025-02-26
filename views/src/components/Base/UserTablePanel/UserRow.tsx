@@ -331,7 +331,7 @@ const UserRow = (props: UserRowType) => {
             <SelectBox
               label=""
               options={RoleOptions}
-              value={role ? role.role : 'none'}
+              value={isAdmin ? 'publisher' : role ? role.role : 'none'}
               textColor="#155D74"
               onChange={(e) => handleRoleChange(e.target.value as string, header)}
             />

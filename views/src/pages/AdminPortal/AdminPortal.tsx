@@ -272,12 +272,13 @@ function AdminPortal(props: AdminPortalPropsType) {
     setShowLanguageDlg(false);
 
     users.map((user: UserType) => {
-      user.roles.push({ language: language, role: 'none' });
+      user.roles.push({ language: language, role: user.isAdmin ? 'publisher' : 'none' });
     });
 
-    setIsLoading(true);
+    setUsers(users);
 
-    const updatedCurrentUser = { ...props.currentUser, roles: [...props.currentUser.roles, { language: language, role: 'none' }] };
+    setIsLoading(true);
+    const updatedCurrentUser = { ...props.currentUser, roles: [...props.currentUser.roles, { language: language, role: props.currentUser.isAdmin ? 'publisher' : 'none' }] };
 
     authService
       .addLanguage(language)

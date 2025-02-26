@@ -227,7 +227,10 @@ exports.addLanguage = async (req, res) => {
   // Update each user's roles and save
   await Promise.all(
     users.map(async (user) => {
-      user.roles.push({ language, role: 'none' });
+      user.roles.push({
+        language,
+        role: user.isAdmin ? 'publisher' : 'none',
+      });
       await user.save();
     }),
   );
