@@ -90,6 +90,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
         isLoggedIn={true}
         username={props.currentUser.username}
         isAdmin={props.currentUser.isAdmin}
+        isTranslationPage
         onLogOut={onLogout}
       />
     )

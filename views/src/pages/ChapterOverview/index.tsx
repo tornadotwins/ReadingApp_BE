@@ -973,6 +973,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
         isLoggedIn
         username={props.currentUser.username}
         isAdmin={props.currentUser.isAdmin}
+        isTranslationPage
         onLogOut={onLogout}
       />
     )
