@@ -121,7 +121,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
   const [selectedBook, setSelectedBook] = useState(props.currentBook);
   const [selectedSubBook, setSelectedSubBook] = useState<string>(locationState.subBookInfo.subBookId);
   const [selectedChapter, setSelectedChapter] = useState<string>(locationState.chapterId);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>(props.currentLanguage);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(props.currentLanguage || 'en');
 
   const [isImport, setIsImport] = useState(locationState.isImport);
 

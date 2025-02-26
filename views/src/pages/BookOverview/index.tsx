@@ -71,7 +71,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
   const [bookInfo, setBookInfo] = useState<BookType | null>(null);
 
   const [selectedBook, setSelectedBook] = useState(props.currentBook || BOOK_QURAN);
-  const [currentLanguage, setCurrentLanguage] = useState('');
+  const [currentLanguage, setCurrentLanguage] = useState(props.currentLanguage || 'en');
   const [currentBookOverviewType, setCurrentBookOverviewType] = useState(BOOK_OVERVIEW_TYPES[0].value);
 
   const navigate = useNavigate();
