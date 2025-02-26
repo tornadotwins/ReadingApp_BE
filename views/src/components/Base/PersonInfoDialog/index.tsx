@@ -93,7 +93,6 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
             fontSize={16}
             fontWeight='400'
             lineHeight={24}
-            textAlign='center'
           >
             Username:
           </Text>
@@ -110,7 +109,6 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
             fontSize={16}
             fontWeight='400'
             lineHeight={24}
-            textAlign='center'
           >
             Password:
           </Text>
@@ -129,7 +127,6 @@ function PersonInfoDialog(props: PersonInfoDialogType) {
             fontSize={16}
             fontWeight='400'
             lineHeight={24}
-            textAlign='center'
           >
             Is Admin:
           </Text>
