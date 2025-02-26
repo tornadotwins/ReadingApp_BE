@@ -962,60 +962,25 @@ exports.updateIntro = async (req, res) => {
   // Step 2: Update Verses in the Introduction collection
   let updatedIntroVerses = []; // Array to hold the updated verse objects
 
+  // Remove all documents that has the chapter id
+  await Introduction.deleteMany({ chapter: chapterId });
+
   // Loop through each verse in the input array
   for (const verse of verses) {
-    // Check if a verse with the given chapter and number exists in the database
-    const existingVerse = await Introduction.findOne({
+    // If the verse does not exist, create a new Introduction document
+    const introductionObj = new Introduction({
       chapter: chapterId,
+      text: verse.text,
+      image: verse.image,
       number: verse.number,
+      isCollapse: verse.isCollapse,
+      title: verse.title,
+      content: verse.content,
     });
 
-    if (!existingVerse) {
-      // If the verse does not exist, create a new Introduction document
-      const introductionObj = new Introduction({
-        chapter: chapterId,
-        text: verse.text,
-        image: verse.image,
-        number: verse.number,
-        isCollapse: verse.isCollapse,
-        title: verse.title,
-        content: verse.content,
-      });
-
-      // Save the new Introduction document and add it to the array
-      const newIntroductionObj = introductionObj.save();
-      updatedIntroVerses.push(newIntroductionObj);
-    } else {
-      // If the verse exists, update its fields
-      existingVerse.title = {
-        ...existingVerse.title, // Retain existing title
-        ...verse.title, // Merge with new title
-      };
-
-      existingVerse.text = {
-        ...existingVerse.text, // Retain existing text
-        ...verse.text, // Merge with new text
-      };
-
-      existingVerse.image = {
-        ...existingVerse.image, // Retain existing image
-        ...verse.image, // Merge with new image
-      };
-
-      // Update other fields directly
-      existingVerse.isCollapse = verse.isCollapse;
-      existingVerse.updatedAt = Date.now(); // Update the timestamp
-
-      // Step 3: Update the content array
-      const updatedContent = [...verse.content]; // Copy the existing content array
-
-      // Update the content field in the Introduction document
-      existingVerse.content = updatedContent;
-
-      // Save the updated Introduction document
-      const updatedVerse = await existingVerse.save();
-      updatedIntroVerses.push(updatedVerse);
-    }
+    // Save the new Introduction document and add it to the array
+    const newIntroductionObj = introductionObj.save();
+    updatedIntroVerses.push(newIntroductionObj);
   }
 
   const updatedIntroChapter = {
@@ -1025,7 +990,7 @@ exports.updateIntro = async (req, res) => {
     isTranslated: updatedChapter.isTranslated,
     isCompleted: updatedChapter.isCompleted,
     isPublished: updatedChapter.isPublished,
-    verses: updatedIntroVerses,
+    verses: updatedIntroVerses.sort((a, b) => a.number - b.number),
   };
 
   // Return the updated chapter information in the response
