@@ -15,21 +15,46 @@ const UserSchema = new Schema({
     theme: { type: String, default: Config.THEME.DEFAULT },
     startAyasOnNewLine: { type: Boolean, default: false },
     showAyasNumbers: { type: Boolean, default: false },
-    ayasNumberDisplayFormat: { type: String, default: Config.AYA_NUMBER_FORMAT.BEFORE },
+    ayasNumberDisplayFormat: {
+      type: String,
+      default: Config.AYA_NUMBER_FORMAT.BEFORE,
+    },
     showQuranReferences: { type: Boolean, default: true },
-    displayType: { type: String, default: Config.DISPLAY_TYPE.SPLIT_PANEL },
-    referenceLanguage: { type: String, default: Config.REFERENCE_LANGUAGE.ARABIC },
-    readingLanguage: { type: String, default: Config.READING_LANGUAGE.ENGLISH },
-    readingControls: { type: String, default: Config.READING_CONTROLS_TYPE.LEFT_HANDED },
-    pageControl: { type: String, default: Config.PAGES_CONTROLS_TYPE.LEFT_TO_RIGHT },
+    displayType: {
+      type: String,
+      default: Config.DISPLAY_TYPE.SPLIT_PANEL,
+    },
+    referenceLanguage: {
+      type: String,
+      default: Config.REFERENCE_LANGUAGE.ARABIC,
+    },
+    readingLanguage: {
+      type: String,
+      default: Config.READING_LANGUAGE.ENGLISH,
+    },
+    keepEnglish: { type: Boolean, default: Config.KEEP_ENGLISH },
+    appLanguage: {
+      type: String,
+      default: Config.APP_LANGUAGE.ENGLISH,
+    },
+    readingControls: {
+      type: String,
+      default: Config.READING_CONTROLS_TYPE.LEFT_HANDED,
+    },
+    pageControl: {
+      type: String,
+      default: Config.PAGES_CONTROLS_TYPE.LEFT_TO_RIGHT,
+    },
   },
   soundSettings: {
     volume: { type: Number, default: 20 },
     autoScrollText: { type: Boolean, default: true },
-    language: { type: String, default: Config.SOUND_LANGUAGE.ORIGINAL },
-    other: { type: String }
+    language: {
+      type: String,
+      default: Config.SOUND_LANGUAGE.ORIGINAL,
+    },
+    other: { type: String },
   },
 });
 
-module.exports = mongoose.model("User", UserSchema);
- 
+module.exports = mongoose.model('User', UserSchema);

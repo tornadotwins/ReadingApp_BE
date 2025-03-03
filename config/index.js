@@ -34,6 +34,11 @@ module.exports = {
     ARABIC: 'ar',
     ENGLISH: 'en',
   },
+  KEEP_ENGLISH: false,
+  APP_LANGUAGE: {
+    ARABIC: 'ar',
+    ENGLISH: 'en',
+  },
   PAGES_CONTROLS_TYPE: {
     RIGTH_TO_LEFT: 'right_to_left',
     LEFT_TO_RIGHT: 'left_to_right',
