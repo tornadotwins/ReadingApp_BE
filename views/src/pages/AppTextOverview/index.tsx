@@ -265,7 +265,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
 
     const changedPageId = updatedTerms.find(updatedTerm => updatedTerm.texts.find(text => text._id == id))?.pageId;
 
-    if (textChangedPageStatus.length > 0)
+    if (textChangedPageStatus?.length > 0)
       setTextChangedPageStatus(prevTextChangePageStatuses =>
         prevTextChangePageStatuses.map(textChangedPageStatus =>
           textChangedPageStatus.pageId == changedPageId ?

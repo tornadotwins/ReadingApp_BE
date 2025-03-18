@@ -1,0 +1,1 @@
+import{j as e}from"./createTheme-BkOecchB.js";import{M as a,aV as r,ad as t}from"./App-BaAKsH-2.js";import"./index-BeKl_pxT.js";function o(){return e.jsxs(e.Fragment,{children:[e.jsx(a,{title:"page 3"}),e.jsx(r,{children:e.jsx(t,{variant:"h3",children:"Page 3"})})]})}export{o as default};
