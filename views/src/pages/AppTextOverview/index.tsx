@@ -265,16 +265,19 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
 
     const changedPageId = updatedTerms.find(updatedTerm => updatedTerm.texts.find(text => text._id == id))?.pageId;
 
-    setTextChangedPageStatus(prevTextChangePageStatuses =>
-      prevTextChangePageStatuses.map(textChangedPageStatus =>
-        textChangedPageStatus.pageId == changedPageId ?
-          {
-            ...textChangedPageStatus,
-            isChanged: true
-          } :
-          textChangedPageStatus
-      )
-    );
+    if (textChangedPageStatus.length > 0)
+      setTextChangedPageStatus(prevTextChangePageStatuses =>
+        prevTextChangePageStatuses.map(textChangedPageStatus =>
+          textChangedPageStatus.pageId == changedPageId ?
+            {
+              ...textChangedPageStatus,
+              isChanged: true
+            } :
+            textChangedPageStatus
+        )
+      );
+    else
+      setTextChangedPageStatus([{ pageId: changedPageId || '', isChanged: true }])
   };
 
   // Handle changes in complete/publish switches
