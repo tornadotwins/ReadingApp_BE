@@ -59,9 +59,9 @@ const StyledDefaultTermContainer = styled(Box)({
   '& .MuiBox-root': {
     minWidth: '200px',
     width: '200px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+    // overflow: 'hidden',
+    // textOverflow: 'ellipsis',
+    // whiteSpace: 'nowrap',
 
     '@media screen and (max-width: 1000px)': {
       minWidth: '150px',
