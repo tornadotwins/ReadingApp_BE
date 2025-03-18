@@ -66,7 +66,6 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
   const isPortrait = useOrientation();
 
   const onLogout = () => {
-
     localStorage.removeItem(ACCESS_TOKEN);
 
     props.dispatch({
@@ -425,7 +424,7 @@ function AppTextOverview(props: AppTextOverviewPropsType) {
           pageName={appTextPage.pageTitle}
           defaultLanguage={defaultLanguage}
           languages={languages}
-          currentLanguage={props.currentLanguage}
+          currentLanguage={currentLanguage}
           currentLanguageLabel={getLanguageFromLanguageCode(currentLanguage)}
           currentUser={props.currentUser}
           pageId={appTextPage.pageId}
