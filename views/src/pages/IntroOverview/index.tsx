@@ -249,7 +249,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
       ).map(id => currentBookInfo.subBooks.find(sb => sb.subBookId === id)!);
 
       const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
-        label: subBook.subBookTitle?.[selectedLanguage],
+        label: subBook.subBookTitle?.[selectedLanguage] || subBook.subBookTitle?.en || subBook.subBookTitle?.ar || 'No Sub book title',
         value: subBook.subBookId
       }));
 
