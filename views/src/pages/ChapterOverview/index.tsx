@@ -248,7 +248,7 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
           ).map(id => existingBook.subBooks.find(sb => sb.subBookId === id)!);
 
           const newSubBookOptions = uniqueSubBooks.map((subBook: SubBookInfoType) => ({
-            label: subBook.subBookTitle?.[selectedLanguage],
+            label: subBook.subBookTitle?.[selectedLanguage] || subBook.subBookTitle?.en || subBook.subBookTitle?.ar || 'No title for sub book',
             value: subBook.subBookId
           }));
 
