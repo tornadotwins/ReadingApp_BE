@@ -331,7 +331,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
         <Button
           icon={<CloudUploadIcon />}
           label={`Import ${currentBookOverviewType} into ${languageName} ${selectedBook}`}
-          onClick={() => moveToChapterOverview(bookInfo?.subBooks[0].chapterInfos[0].chapterId || '', true)}
+          onClick={() => moveToChapterOverview(bookInfo?.subBooks[1].chapterInfos[1].chapterId || '', true)}
         />
       </StyledUploadButtonContainer>
     )
