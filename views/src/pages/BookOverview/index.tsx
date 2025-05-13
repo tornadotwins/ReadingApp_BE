@@ -30,7 +30,7 @@ import {
   ChapterInfoType,
   SubBookInfoType
 } from "./types";
-import { LanguageType } from "../types";
+import { AppTextPageType, AppTextType, LanguageType } from "../types";
 
 // Config and Utility Imports
 import {
@@ -42,6 +42,9 @@ import {
   JOURNEY_INJIL,
   JOURNEY_ZABUR,
   JOURNEY_TAWRAT,
+  BOOK_INJIL_PAGE_TITLE,
+  BOOK_ZABUR_PAGE_TITLE,
+  BOOK_INJIL,
 } from "@/config";
 import actionTypes from "@/actions/actionTypes";
 import useOrientation from "@/hooks/useOrientation";
@@ -52,6 +55,7 @@ import {
 
 import bookService from "@/services/book.services";
 import { AppStateType } from '@/reducers/types';
+import translatorService from "@/services/translator.services";
 
 // Constants
 const BOOK_OVERVIEW_TYPES = [
@@ -69,6 +73,8 @@ const BookOverview = (props: BookOverviewPropsType) => {
   const [languages, setLanguages] = useState<LanguageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [bookInfo, setBookInfo] = useState<BookType | null>(null);
+  const [injilSubBookTitleInfo, setInjilSubBookTitleInfo] = useState<AppTextType[]>([]);
+  const [zaburSubBookTitleInfo, setZaburSubBookTitleInfo] = useState<AppTextType[]>([]);
 
   const [selectedBook, setSelectedBook] = useState(props.currentBook || BOOK_QURAN);
   const [currentLanguage, setCurrentLanguage] = useState(props.currentLanguage || 'en');
@@ -114,6 +120,42 @@ const BookOverview = (props: BookOverviewPropsType) => {
       setCurrentLanguage(processedLanguages[0].value);
     }
   }, [props.currentUser, currentLanguage, processLanguages]);
+
+  // Get sub book information
+  useEffect(() => {
+    const fetchSubBookTitles = async () => {
+      try {
+        const result = await translatorService.getAllAppTexts();
+        if (result && result.length > 0) {
+          switch (selectedBook) {
+            case BOOK_INJIL: {
+              const injil = result.find((subBook: AppTextPageType) => subBook.pageTitle === BOOK_INJIL_PAGE_TITLE);
+              setInjilSubBookTitleInfo(injil?.texts || []);
+              break;
+            }
+            case BOOK_ZABUR: {
+              const zabur = result.find((subBook: AppTextPageType) => subBook.pageTitle === BOOK_ZABUR_PAGE_TITLE);
+              setZaburSubBookTitleInfo(zabur?.texts || []);
+              break;
+            }
+          }
+        }
+      } catch (error) {
+        toast.error('Failed to fetch sub book titles', {
+          position: 'top-right',
+          draggable: true,
+          theme: 'colored',
+          transition: Bounce,
+          closeOnClick: true,
+          pauseOnHover: true,
+          hideProgressBar: false,
+          autoClose: 3000
+        });
+      }
+    };
+
+    fetchSubBookTitles();
+  }, [selectedBook]);
 
   // Book information effect
   useEffect(() => {
@@ -349,6 +391,7 @@ const BookOverview = (props: BookOverviewPropsType) => {
                   language={languageName}
                   languageCode={currentLanguage}
                   bookInfo={bookInfo}
+                  subBookTitleInfo={selectedBook === BOOK_INJIL ? injilSubBookTitleInfo : selectedBook === BOOK_ZABUR ? zaburSubBookTitleInfo : []}
                   isQuranOrZabur={false}
 
                   onClickSquare={moveToChapterOverview}

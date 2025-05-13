@@ -16,7 +16,7 @@ function SubBookText(props: SubBookTextPropsType) {
       {!props.isQuranOrZabur && props.subBook &&
         <StyledSubBookTitleContainer>
           <Text color="#155D74" fontFamily="'Baloo Da 2'" fontWeight="400">
-            {props.subBook.subBookTitle?.[props.languageCode]}
+            {props.subBookTitleInfo?.find(subBook => subBook.variable === props.subBook?.subBookTitle?.en)?.text?.[props.languageCode] || props.subBook?.subBookTitle?.en}
           </Text>
         </StyledSubBookTitleContainer>
       }

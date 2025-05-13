@@ -67,6 +67,11 @@ const BOOK_INJIL = 'Injil';
 const BOOK_ZABUR = 'Zabur';
 const BOOK_TAWRAT = 'Tawrat';
 
+const BOOK_QURAN_PAGE_TITLE = "Origin Qur'an Surah Names";
+const BOOK_INJIL_PAGE_TITLE = "Origin Injil Sub-book Names";
+const BOOK_ZABUR_PAGE_TITLE = "Origin Zabur Sub-book Names";
+const BOOK_TAWRAT_PAGE_TITLE = "Origin Tawrat Sub-book Names";
+
 const JOURNEY_QURAN = 'Qur\'an Journeys';
 const JOURNEY_INJIL = 'Injil Journeys';
 const JOURNEY_ZABUR = 'Zabur Journeys';
@@ -318,6 +323,11 @@ export {
   BOOK_INJIL,
   BOOK_ZABUR,
   BOOK_TAWRAT,
+
+  BOOK_QURAN_PAGE_TITLE,
+  BOOK_INJIL_PAGE_TITLE,
+  BOOK_ZABUR_PAGE_TITLE,
+  BOOK_TAWRAT_PAGE_TITLE,
 
   JOURNEY_QURAN,
   JOURNEY_INJIL,

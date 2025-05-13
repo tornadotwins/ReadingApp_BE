@@ -23,6 +23,7 @@ const BookTextOverview = (props: ChapterTextOverviewPropsType) => {
           <SubBookText
             key={index}
             subBook={subBook}
+            subBookTitleInfo={props.subBookTitleInfo || []}
             languageCode={props.languageCode}
             isQuranOrZabur={props.isQuranOrZabur}
 
