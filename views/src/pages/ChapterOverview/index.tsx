@@ -320,10 +320,12 @@ function ChapterOverview(props: ChapterOverviewPropsType) {
     setInputEnglishChaptername(subBookInfo?.subBookTitle?.en || "");
     setInputTransliteration(subBookInfo?.subBookTitle?.transliteration || '');
 
-    const newChapterOptions = subBookInfo?.chapterInfos?.map(chapterInfo => ({
-      value: chapterInfo.chapterId,
-      label: chapterInfo.chapterNumber.toString(),
-    }));
+    const newChapterOptions = subBookInfo?.chapterInfos
+      ?.filter(chapterInfo => chapterInfo.chapterNumber !== 0)
+      .map(chapterInfo => ({
+        value: chapterInfo.chapterId,
+        label: chapterInfo.chapterNumber.toString(),
+      }));
 
     if (newChapterOptions && locationState.chapterId) {
       setChapterSelectOptions(newChapterOptions);
