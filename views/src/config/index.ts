@@ -4,7 +4,7 @@ import type { Notifications } from './types';
 
 // const API_URL = 'http://localhost:5000';
 const API_URL = 'https://readingapp-d5944320053c.herokuapp.com';
-const APP_VERSION = "3.0.2";
+const APP_VERSION = "3.0.3";
 
 const ACCESS_TOKEN = 'accessToken';
 const CURRENT_USER = 'currentUser';

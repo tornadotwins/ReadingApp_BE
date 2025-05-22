@@ -1,0 +1,1 @@
+import{j as e}from"./createTheme-DFoNA-EK.js";import{M as a,aV as r,ad as t}from"./App-ByM7bJ9P.js";import"./index-BXKGEq58.js";function o(){return e.jsxs(e.Fragment,{children:[e.jsx(a,{title:"page 3"}),e.jsx(r,{children:e.jsx(t,{variant:"h3",children:"Page 3"})})]})}export{o as default};
