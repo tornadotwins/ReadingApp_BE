@@ -15,7 +15,7 @@ const audioRoute = require('./routes/audio.route');
 
 const journeyRoute = require('./routes/journey.route');
 
-const dbConfig = require('./config/db.config');
+const dbConfig = process.env.DATABASE_URL;
 const path = require('path');
 
 // Connect DB.
