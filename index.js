@@ -20,7 +20,7 @@ const path = require('path');
 
 // Connect DB.
 mongoose
-  .connect(dbConfig?.url)
+  .connect(dbConfig.url)
   .then(() => {
     console.log('Successfully connected to the database');
   })
