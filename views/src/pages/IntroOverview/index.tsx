@@ -651,7 +651,12 @@ function IntroOverview(props: IntroOverviewPropsType) {
       if (direction === "down" && index < newBlocks.length - 1) {
         [newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]];
       }
-      return newBlocks;
+
+      // Update blockIndex for each block after reordering
+      return newBlocks.map((block: BlockType, index: number) => ({
+        ...block,
+        blockIndex: index
+      }));
     });
   };
 
