@@ -126,7 +126,7 @@ const StyledButtonGroupContainer = styled(Box) ({
   }
 })
 
-const StyledIntroControlButtonContainer = styled(Box)({
+const StyledIntroControlButtonContainer = styled(Box)<{isdisable: string}>(({isdisable}) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -134,15 +134,15 @@ const StyledIntroControlButtonContainer = styled(Box)({
   padding: '5px 10px',
   boxSizing: 'border-box',
   border: '1px solid #474747',
-  backgroundColor: '#FFAA5D',
-  cursor: 'pointer',
+  backgroundColor: isdisable === 'true' ? '#c0c0c0' : '#FFAA5D',
+  cursor: isdisable === 'true' ? 'not-allowed' : 'pointer',
 
   'button': {
     width: '100%',
   },
 
   '&:hover': {
-    backgroundColor: '#EE994C',
+    backgroundColor: isdisable === 'true' ? '#c0c0c0' : '#EE994C',
   },
 
   '& .MuiBox-root': {
@@ -159,7 +159,7 @@ const StyledIntroControlButtonContainer = styled(Box)({
     marginRight: '0px !important',
     marginBottom: '10px'
   }
-});
+}));
 
 const StyledPreviewControlButtonContainer = styled(Box)({
   display: 'flex',

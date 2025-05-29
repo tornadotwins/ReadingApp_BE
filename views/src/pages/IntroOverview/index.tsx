@@ -569,30 +569,42 @@ function IntroOverview(props: IntroOverviewPropsType) {
     return (
       <StyledIntroControlButtonGroup>
         <StyledButtonGroupContainer>
-          <StyledIntroControlButtonContainer>
+          <StyledIntroControlButtonContainer isdisable={selectedLanguage !== 'en' ? 'true' : 'false'}>
             <Button
               label="Add Title"
+              disabled={selectedLanguage != "en"}
+              tooltip={selectedLanguage != "en" ? "You can only add title in English." : ""}
+
               onClick={() => handleAddBlock('title')}
             />
           </StyledIntroControlButtonContainer>
 
-          <StyledIntroControlButtonContainer>
+          <StyledIntroControlButtonContainer isdisable={selectedLanguage !== 'en' ? 'true' : 'false'}>
             <Button
               label="Add Text"
+              disabled={selectedLanguage != "en"}
+              tooltip={selectedLanguage != "en" ? "You can only add text in English." : ""}
+
               onClick={() => handleAddBlock('text')}
             />
           </StyledIntroControlButtonContainer>
 
-          <StyledIntroControlButtonContainer>
+          <StyledIntroControlButtonContainer isdisable={selectedLanguage !== 'en' ? 'true' : 'false'}>
             <Button
               label="Add Image"
+              disabled={selectedLanguage != "en"}
+              tooltip={selectedLanguage != "en" ? "You can only add image in English." : ""}
+
               onClick={() => handleAddBlock('image')}
             />
           </StyledIntroControlButtonContainer>
 
-          <StyledIntroControlButtonContainer>
+          <StyledIntroControlButtonContainer isdisable={selectedLanguage !== 'en' ? 'true' : 'false'}>
             <Button
               label="Add Collapsible"
+              disabled={selectedLanguage != "en"}
+              tooltip={selectedLanguage != "en" ? "You can only add collapsile in English." : ""}
+
               onClick={() => handleAddBlock('collapsible')}
             />
           </StyledIntroControlButtonContainer>

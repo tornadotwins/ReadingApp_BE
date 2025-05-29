@@ -8,7 +8,7 @@ const StyledButton = styled(MuiButton) ({
 
   '&:hover': {
     backgroundColor: 'transparent'
-  }
+  },
 });
 
 export { StyledButton };
