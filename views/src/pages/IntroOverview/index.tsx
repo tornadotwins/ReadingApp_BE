@@ -86,6 +86,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
   const [showPreview, setShowPreview] = useState(true);
 
+  const [originBlocks, setOriginBlocks] = useState<any[]>([]);
   const [blocks, setBlocks] = useState<BlockType[]>([]);
 
   const [enableSaveBtn, setEnableSaveBtn] = useState(false);
@@ -118,6 +119,7 @@ function IntroOverview(props: IntroOverviewPropsType) {
 
         const blocks: BlockType[] = [];
         if (result.verses && result.verses.length > 0) {
+          setOriginBlocks(result.verses);
           result.verses?.map((verse: IntroType) => {
             const verseNumber = verse.number;
             if (!verse.isCollapse && verse.title) {
@@ -344,12 +346,16 @@ function IntroOverview(props: IntroOverviewPropsType) {
     const introResult: IntroType[] = [];
 
     blocks.map((block, index) => {
+      const originalBlock = originBlocks?.find(originBlock => originBlock?.id === block?.id);
       switch (block.type) {
         case 'title': {
+          const originTitle = originalBlock?.title;
+
           const title = block.value as string;
           const introObj: IntroType = {
             chapter: currentChapter,
             title: {
+              ...originTitle,
               [selectedLanguage]: title,
             },
             text: {},
@@ -365,11 +371,14 @@ function IntroOverview(props: IntroOverviewPropsType) {
         }
 
         case 'text': {
+          const originText = originalBlock?.text;
+
           const text = block.value as string;
           const introObj: IntroType = {
             chapter: currentChapter,
             title: {},
             text: {
+              ...originText,
               [selectedLanguage]: text,
             },
             image: {},
