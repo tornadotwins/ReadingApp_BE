@@ -11,6 +11,8 @@ type ButtonProps = {
   color?: 'primary' | 'secondary';
   style?: CSSProperties;
   reference?: RefObject<HTMLButtonElement>;
+  tooltip?: string;
+
   onClick: () => void;
 };
 
